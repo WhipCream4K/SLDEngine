@@ -123,7 +123,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\rtm\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -147,7 +147,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\rtm\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -171,7 +171,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\rtm\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -195,7 +195,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\rtm\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -214,6 +214,46 @@
     <ClInclude Include="Core\Window\MainSubSystem.h" />
     <ClInclude Include="Debugging\GUIDebugComponent.h" />
     <ClInclude Include="GameObject\GameObject.h" />
+    <ClInclude Include="Math\rtm\constants.h" />
+    <ClInclude Include="Math\rtm\impl\compiler_utils.h" />
+    <ClInclude Include="Math\rtm\impl\detect_arch.h" />
+    <ClInclude Include="Math\rtm\impl\detect_compiler.h" />
+    <ClInclude Include="Math\rtm\impl\detect_features.h" />
+    <ClInclude Include="Math\rtm\impl\error.h" />
+    <ClInclude Include="Math\rtm\impl\mask_common.h" />
+    <ClInclude Include="Math\rtm\impl\matrix_affine_common.h" />
+    <ClInclude Include="Math\rtm\impl\matrix_cast.h" />
+    <ClInclude Include="Math\rtm\impl\matrix_common.h" />
+    <ClInclude Include="Math\rtm\impl\memory_utils.h" />
+    <ClInclude Include="Math\rtm\impl\quat_common.h" />
+    <ClInclude Include="Math\rtm\impl\qvv_common.h" />
+    <ClInclude Include="Math\rtm\impl\scalar_common.h" />
+    <ClInclude Include="Math\rtm\impl\type_args.h" />
+    <ClInclude Include="Math\rtm\impl\vector_common.h" />
+    <ClInclude Include="Math\rtm\macros.h" />
+    <ClInclude Include="Math\rtm\mask4d.h" />
+    <ClInclude Include="Math\rtm\mask4f.h" />
+    <ClInclude Include="Math\rtm\mask4i.h" />
+    <ClInclude Include="Math\rtm\mask4q.h" />
+    <ClInclude Include="Math\rtm\math.h" />
+    <ClInclude Include="Math\rtm\matrix3x3d.h" />
+    <ClInclude Include="Math\rtm\matrix3x3f.h" />
+    <ClInclude Include="Math\rtm\matrix3x4d.h" />
+    <ClInclude Include="Math\rtm\matrix3x4f.h" />
+    <ClInclude Include="Math\rtm\matrix4x4d.h" />
+    <ClInclude Include="Math\rtm\matrix4x4f.h" />
+    <ClInclude Include="Math\rtm\packing\quatd.h" />
+    <ClInclude Include="Math\rtm\packing\quatf.h" />
+    <ClInclude Include="Math\rtm\quatd.h" />
+    <ClInclude Include="Math\rtm\quatf.h" />
+    <ClInclude Include="Math\rtm\qvvd.h" />
+    <ClInclude Include="Math\rtm\qvvf.h" />
+    <ClInclude Include="Math\rtm\scalard.h" />
+    <ClInclude Include="Math\rtm\scalarf.h" />
+    <ClInclude Include="Math\rtm\types.h" />
+    <ClInclude Include="Math\rtm\type_traits.h" />
+    <ClInclude Include="Math\rtm\vector4d.h" />
+    <ClInclude Include="Math\rtm\vector4f.h" />
     <ClInclude Include="Miscellaneous\DX12Resource.h" />
     <ClInclude Include="Miscellaneous\RealTimeMath.h" />
     <ClInclude Include="Miscellaneous\SFMLPrerequisite.h" />

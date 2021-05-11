@@ -46,13 +46,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 	::UpdateWindow(windowHandle);
 
 	QBertGame game{ windowHandle };
+
+	game.Start();
+	game.Run();
 	
-	MSG msg{};
-	while(PeekMessage(&msg,windowHandle,0,0,0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+	//MSG msg{};
+	//while(PeekMessage(&msg,windowHandle,0,0,0))
+	//{
+	//	TranslateMessage(&msg);
+	//	DispatchMessage(&msg);
+	//}
 	
 	return 0;
 }

@@ -208,9 +208,13 @@ void SLD::Core::Step()
 	// JOIN THREADS
 
 	// *** Render ***
+	m_MainViewPort->ClearBackBuffer();
+	
 	auto& allRenderComponent{ m_WorldEntity.GetAllRenderComponents() };
 	m_MainRenderer.Render(m_MainViewPort, allRenderComponent);
 
+	m_MainViewPort->Present();
+	
 	m_WorldEntity.EndWorldTime();
 }
 
