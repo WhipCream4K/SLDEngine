@@ -24,10 +24,15 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/types.h"
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/scalarf.h"
-#include "rtm/scalard.h"
+//#include "rtm/types.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/scalarf.h"
+//#include "rtm/scalard.h"
+
+#include "../types.h"
+#include "compiler_utils.h"
+#include "../scalarf.h"
+#include "../scalard.h"
 
 #include <cstdint>
 #include <cstring>

@@ -3,31 +3,58 @@
 
 #include <SFML/Graphics.hpp>
 
-SLD::SFMLInputs::SFMLInputs(const std::any& window)
-	: m_Window(std::any_cast<sf::WindowHandle>(window))
+#include "../Core/Window/SFML/SFMLWindow.h"
+
+//SLD::SFMLInputs::SFMLInputs(const std::any& window)
+//	:(/*std::any_cast<sf::WindowHandle>(window)*/)
+//{
+//	//sf::WindowHandle handle{ std::any_cast<sf::WindowHandle>(window) };
+//	//m_Window.create(handle);
+//	window;
+//}
+
+//SFMLInputs::SFMLInputs(const RefPtr<SFMLWindow>& window)
+//	: m_InputWindow(window)
+//{
+//}
+
+SFMLInputs::SFMLInputs(const std::any& window)
+	: m_InputWindow()
 {
+	window;
+	//sf::WindowHandle handle{ std::any_cast<sf::WindowHandle>(window) };
+	//m_InputWindow.create(handle);
 }
 
-SLD::SFMLInputs::SFMLInputs(SFMLInputs&& other) noexcept
-	: m_Window()
+//SFMLInputs::SFMLInputs(SFMLWindow* ref)
+//	: m_TestRef(ref)
+//{
+//}
+
+SFMLInputs::SFMLInputs(SFMLInputs&& other) noexcept
+	: m_InputWindow()
 {
-	other.m_Window.close();
-	m_Window.create(other.m_Window.getSystemHandle());
+	//sf::WindowHandle handle{ other.m_InputWindow.getSystemHandle() };
+	//other.m_InputWindow.close();
+	//m_InputWindow.create(handle);
+	other;
 }
 
-SLD::ReadOut SLD::SFMLInputs::ReadInputs()
+SLD::ReadOut SFMLInputs::ReadInputs()
 {
-	ReadOut out{};
+	SLD::ReadOut out{};
 
 	sf::Event ev{};
 	uint8_t cnt{};
-
-	while (m_Window.pollEvent(ev))
+	
+	//auto& sfmlWindow{ m_TestRef->GetSubRef() };
+	
+	while (m_InputWindow.pollEvent(ev))
 	{
-		if (cnt == MinimumEventCnt)
+		if (cnt == SLD::MinimumEventCnt)
 			break;
 
-		EventData evData{};
+		SLD::EventData evData{};
 
 		switch (ev.type)
 		{
@@ -62,11 +89,11 @@ SLD::ReadOut SLD::SFMLInputs::ReadInputs()
 
 			switch (ev.mouseButton.button)
 			{
-			case sf::Mouse::Left:		outMouseKey = MouseKey::MK_Left;	break;
-			case sf::Mouse::Right:		outMouseKey = MouseKey::MK_Right;	break;
-			case sf::Mouse::Middle:		outMouseKey = MouseKey::MK_Middle;	break;
-			case sf::Mouse::XButton1:	outMouseKey = MouseKey::MK_Thumb1;	break;
-			case sf::Mouse::XButton2:	outMouseKey = MouseKey::MK_Thumb2;	break;
+			case sf::Mouse::Left:		outMouseKey = SLD::MouseKey::MK_Left;	break;
+			case sf::Mouse::Right:		outMouseKey = SLD::MouseKey::MK_Right;	break;
+			case sf::Mouse::Middle:		outMouseKey = SLD::MouseKey::MK_Middle;	break;
+			case sf::Mouse::XButton1:	outMouseKey = SLD::MouseKey::MK_Thumb1;	break;
+			case sf::Mouse::XButton2:	outMouseKey = SLD::MouseKey::MK_Thumb2;	break;
 			default:														break;
 			}
 
@@ -97,6 +124,7 @@ SLD::ReadOut SLD::SFMLInputs::ReadInputs()
 	}
 
 	out.eventCnt = cnt;
+
 
 	return out;
 }

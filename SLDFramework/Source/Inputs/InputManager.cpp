@@ -27,7 +27,12 @@ SLD::InputManager::InputManager(LLInputs&& subSystem)
 
 bool SLD::InputManager::TranslateWindowsMessages()
 {
-	const auto readOut = std::visit(LLInputRead{}, m_SubSystemInput);
+	auto callReadInputs{ [](auto& subSystem)
+	{
+		return subSystem.ReadInputs();
+	} };
+	
+	const auto readOut = std::visit(callReadInputs, m_SubSystemInput);
 
 	if (!readOut.isExit)
 	{

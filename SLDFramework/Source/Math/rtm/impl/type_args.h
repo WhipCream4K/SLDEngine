@@ -24,7 +24,9 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/types.h"
+//#include "rtm/types.h"
+
+#include "../types.h"
 
 namespace rtm
 {

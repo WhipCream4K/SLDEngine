@@ -64,13 +64,21 @@ bool SLD::Core::CreateViewPortFromHWND(const windowHandle& anyWindowHandle)
 
 	delete[] strWinTitle;
 
-	LLInputs inputSubSystem{
+	
+	LLWindow windowSubSystem{
 #ifdef HAS_SFML
-		SFMLInputs{anyWindowHandle}
+		SFMLWindow{anyWindowHandle,windowWidth,windowHeight}
 #endif
 	};
-	// WINDOWS SUBSYSTEM
-	SFMLWindow windowSubSystem{ anyWindowHandle,windowWidth,windowHeight };
+
+
+	LLInputs inputSubSystem{
+#ifdef HAS_SFML
+		SFMLInputs{windowHandle}
+		//SFMLInputs{RefPtr<SFMLWindow>{std::get_if<SFMLWindow>(&windowSubSystem),[](SFMLWindow*){}}}
+		//SFMLInputs{std::get_if<SFMLWindow>(&windowSubSystem)}
+#endif
+	};
 
 
 	m_MainViewPort = std::make_shared<Window>(windowWidth, windowHeight,
@@ -79,10 +87,12 @@ bool SLD::Core::CreateViewPortFromHWND(const windowHandle& anyWindowHandle)
 		anyWindowHandle,
 		strWindowTitle);
 
+	m_MainRenderer.SetRenderWindow(m_MainViewPort);
+
 	if (!m_GuiDebugger.AttachDrawWindow(m_MainViewPort))
 		return false;
 #endif
-	
+
 	return true;
 }
 
@@ -158,19 +168,40 @@ bool SLD::Core::CreateNewViewPort(uint32_t width, uint32_t height, const std::st
 
 #endif
 
+	//	LLInputs inputSubSystem{
+	//#ifdef HAS_SFML
+	//		SFMLInputs{hWnd}
+	//#endif
+	//	};
+
+//	auto windowSubSystem{
+//#ifdef HAS_SFML
+//		SFMLWindow{hWnd,width,height}
+//#endif
+//	};
+
+	LLWindow windowSubSystem{
+#ifdef HAS_SFML
+		SFMLWindow{hWnd,width,height}
+#endif
+	};
+
+	
 	LLInputs inputSubSystem{
 #ifdef HAS_SFML
+		//SFMLInputs{RefPtr<SFMLWindow>{std::get_if<SFMLWindow>(&windowSubSystem),[](SFMLWindow*){}}}
+		//SFMLInputs{std::get_if<SFMLWindow>(&windowSubSystem)}
 		SFMLInputs{hWnd}
 #endif
 	};
 
 	m_MainViewPort = std::make_shared<Window>(width, height,
-		SFMLWindow{ hWnd,
-		width,
-		height },
+		std::move(windowSubSystem),
 		std::move(inputSubSystem),
 		hWnd,
 		winName);
+
+	m_MainRenderer.SetRenderWindow(m_MainViewPort);
 
 	if (!m_GuiDebugger.AttachDrawWindow(m_MainViewPort))
 		return false;
@@ -184,10 +215,10 @@ bool SLD::Core::TranslateUserInputs()
 {
 	m_WorldEntity.StartWorldTime();
 
-	const bool isQuit{ m_MainViewPort->GetInputManager().TranslateWindowsMessages() };
+	const bool isQuit{ m_MainViewPort->PollUserInputs()};
 	if (!isQuit)
 	{
-		const auto userEvData{ m_MainViewPort->GetInputManager().GetEventQueueHandle() };
+		const auto userEvData{ m_MainViewPort->GetInputData() };
 		ShouldResizeWindow(m_MainViewPort, userEvData);
 
 		// World Input interaction
@@ -209,12 +240,12 @@ void SLD::Core::Step()
 
 	// *** Render ***
 	m_MainViewPort->ClearBackBuffer();
-	
+
 	auto& allRenderComponent{ m_WorldEntity.GetAllRenderComponents() };
-	m_MainRenderer.Render(m_MainViewPort, allRenderComponent);
+	m_MainRenderer.Render(allRenderComponent);
 
 	m_MainViewPort->Present();
-	
+
 	m_WorldEntity.EndWorldTime();
 }
 

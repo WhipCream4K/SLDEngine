@@ -14,12 +14,13 @@ namespace SLD
 	{
 	public:
 
-		void Render(const RefPtr<Window>& renderWindow,
-			const std::vector<RefPtr<RenderingComponent>>& renderingComponents);
+		void Render(const std::vector<RefPtr<RenderingComponent>>& renderingComponents);
 
-		void Render(const RefPtr<Window>& renderWindow,
-			const std::vector<RenderingComponent>& renderingComponents);
+		void Render(const std::vector<RenderingComponent>& renderingComponents);
 
+		void SetRenderWindow(const RefPtr<Window>& renderWindow);
+		void SetRenderWindow(const Window& renderWindow);
+	
 	private:
 
 		LLRenderer m_SubSystemRenderer;

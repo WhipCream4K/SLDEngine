@@ -25,8 +25,11 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/impl/error.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/error.h"
+
+#include "compiler_utils.h"
+#include "error.h"
 
 #ifdef max
 #undef max

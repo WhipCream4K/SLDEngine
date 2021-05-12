@@ -15,7 +15,7 @@ namespace SLD
 	{
 		
 	public:
-
+		
 		using CurrentWindow = std::any;
 		
 		Window(
@@ -39,25 +39,37 @@ namespace SLD
 		[[nodiscard]] const std::any& GetAnyWindowHandle() const { return m_WindowHandle; }
 
 		template<typename WindowType>
-		[[nodiscard]] constexpr WindowType GetWindowSubsystem() const;
+		[[nodiscard]] constexpr std::add_pointer_t<WindowType> GetWindowSubsystem();
 
 		void Resize(uint32_t width, uint32_t height);
+
+		// Must Use at the start of the frame
+		bool PollUserInputs();
 		
+		EventQueueHandle GetInputData() const noexcept;
+
 		void Present();
 		void ClearBackBuffer();
 		
 	private:
-		
-		InputManager m_InputManager;
 
+		bool QueryWindowEvents();
+		
 		// Low-Level window
 		LLWindow m_WindowSubSystem;
+
+		// TODO: Delete Input manager
+		
+		std::array<MessageBus, MinimumEventCnt> m_WindowEvents;
+		uint8_t m_EventCntThisFrame;
+		InputManager m_InputManager;
+
 		
 		std::string m_Name;
 		uint32_t m_Height;
 		uint32_t m_Width;
 		std::any m_WindowHandle;
-		float m_ClearColor[4]{};
+		float m_ClearColor[4];
 		bool m_ShouldVSync{};
 	};
 
@@ -68,9 +80,9 @@ namespace SLD
 	}
 
 	template <typename WindowType>
-	constexpr WindowType Window::GetWindowSubsystem() const
+	constexpr std::add_pointer_t<WindowType> Window::GetWindowSubsystem()
 	{
-		return std::get_if<WindowType>(m_WindowSubSystem);
+		return std::get_if<WindowType>(&m_WindowSubSystem);
 	}
 }
 

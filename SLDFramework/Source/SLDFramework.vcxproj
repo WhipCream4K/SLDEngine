@@ -214,6 +214,7 @@
     <ClInclude Include="Core\Window\MainSubSystem.h" />
     <ClInclude Include="Debugging\GUIDebugComponent.h" />
     <ClInclude Include="GameObject\GameObject.h" />
+    <ClInclude Include="Math\RealTimeMath.h" />
     <ClInclude Include="Math\rtm\constants.h" />
     <ClInclude Include="Math\rtm\impl\compiler_utils.h" />
     <ClInclude Include="Math\rtm\impl\detect_arch.h" />

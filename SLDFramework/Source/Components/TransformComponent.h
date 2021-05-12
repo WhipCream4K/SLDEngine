@@ -3,7 +3,6 @@
 #define SLDFRAMEWORK_TRANSFORMCOMPONENT_H
 
 #include "TickComponent.h"
-//#include "../Miscellaneous/RealTimeMath.h"
 
 namespace SLD
 {

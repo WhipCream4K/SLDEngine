@@ -24,7 +24,8 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/compiler_utils.h"
+#include "impl/compiler_utils.h"
 
 RTM_IMPL_FILE_PRAGMA_PUSH
 

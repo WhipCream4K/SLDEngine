@@ -25,8 +25,10 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/impl/detect_arch.h"
-#include "rtm/impl/detect_compiler.h"
+//#include "rtm/impl/detect_arch.h"
+//#include "rtm/impl/detect_compiler.h"
+#include "impl/detect_arch.h"
+#include "impl/detect_compiler.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Detect which intrinsics the current compilation environment supports.
@@ -111,6 +113,10 @@
 #endif
 
 // By default, we include the type definitions, feature detection, and error handling
-#include "rtm/impl/detect_features.h"
-#include "rtm/impl/error.h"
-#include "rtm/types.h"
+//#include "rtm/impl/detect_features.h"
+//#include "rtm/impl/error.h"
+//#include "rtm/types.h"
+
+#include "impl/detect_features.h"
+#include "impl/error.h"
+#include "types.h"

@@ -4,13 +4,15 @@
 
 SLD::Window::Window(uint32_t width, uint32_t height, LLWindow&& subSystemWindow, LLInputs&& subSystemInput,
 	const CurrentWindow& windowHandle, const std::string& vpName)
-	: m_InputManager(std::move(subSystemInput))
-	, m_WindowSubSystem(std::move(subSystemWindow))
+	: m_WindowSubSystem(std::move(subSystemWindow))
+	, m_WindowEvents()
+	, m_EventCntThisFrame()
+	, m_InputManager(std::move(subSystemInput))
 	, m_Name(vpName)
 	, m_Height(height)
-	, m_Width(width)
+	, m_Width(width) // test color
 	, m_WindowHandle(windowHandle)
-	, m_ClearColor{}
+	, m_ClearColor{ 0.0f,0.0f,0.0f,1.0f }
 	, m_ShouldVSync()
 {
 }
@@ -35,7 +37,30 @@ void SLD::Window::Resize(uint32_t width, uint32_t height)
 	} };
 
 	std::visit(callResize, m_WindowSubSystem);
-	
+
+}
+
+bool SLD::Window::PollUserInputs()
+{
+	auto callReadUserInputs{ [](auto& window)
+	{
+		return window.ReadUserInputs();
+	} };
+
+	ReadOut out{ std::visit(callReadUserInputs,m_WindowSubSystem) };
+
+	if (!out.isExit)
+	{
+		m_WindowEvents = out.buses;
+		m_EventCntThisFrame = out.eventCnt;
+	}
+
+	return out.isExit;
+}
+
+SLD::EventQueueHandle SLD::Window::GetInputData() const noexcept
+{
+	return EventQueueHandle{ m_WindowEvents,m_EventCntThisFrame };
 }
 
 void SLD::Window::Present()

@@ -24,12 +24,19 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/math.h"
-#include "rtm/vector4f.h"
-#include "rtm/vector4d.h"
-#include "rtm/type_traits.h"
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/impl/matrix_cast.h"
+//#include "rtm/math.h"
+//#include "rtm/vector4f.h"
+//#include "rtm/vector4d.h"
+//#include "rtm/type_traits.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/matrix_cast.h"
+
+#include "../math.h"
+#include "../vector4f.h"
+#include "../vector4d.h"
+#include "../type_traits.h"
+#include "compiler_utils.h"
+#include "matrix_cast.h"
 
 RTM_IMPL_FILE_PRAGMA_PUSH
 

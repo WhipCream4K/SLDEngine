@@ -19,7 +19,7 @@
 #ifdef WINMAIN
 
 BOOL InitWindowInstance(HINSTANCE hInstance, HWND& windowHandle);
-ATOM MyRegisterClass(HINSTANCE hInstance);
+ATOM MyRegisterClass(HINSTANCE hInstance, const std::wstring& className);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance,
@@ -30,14 +30,17 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	UNREFERENCED_PARAMETER(nCmdShow);
+	UNREFERENCED_PARAMETER(hInstance);
 
 	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
-	MyRegisterClass(hInstance);
-
-	SLD_LOG_TRACE_HEAP_ALLOC(10);
-	SLD_LOG_TRACE_HEAP_ALLOC(10);
+	const std::wstring className{ L"QBert_SLDFRAMEWORK" };
 	
+	MyRegisterClass(hInstance,className);
+
+	//SLD_LOG_TRACE_HEAP_ALLOC(10);
+	//SLD_LOG_TRACE_HEAP_ALLOC(10);
+	//
 	HWND windowHandle {};
 	if (!InitWindowInstance(hInstance, windowHandle))
 		return FALSE;
@@ -48,19 +51,57 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 	QBertGame game{ windowHandle };
 
 	game.Start();
-	game.Run();
+	//game.Run();
+
+	//sf::RenderWindow window{ sf::WindowHandle{windowHandle} };
+	////window.close();
+	//sf::WindowHandle handle{ window.getSystemHandle() };
+	////window.close();
+	//sf::Window input{handle};
 	
-	//MSG msg{};
-	//while(PeekMessage(&msg,windowHandle,0,0,0))
+	//while(window.isOpen())
 	//{
-	//	TranslateMessage(&msg);
-	//	DispatchMessage(&msg);
+	//	sf::Event ev;
+	//	while(window.pollEvent(ev))
+	//	{
+	//		switch (ev.type)
+	//		{
+	//		case sf::Event::Closed:
+	//			window.close();
+	//			break;
+	//		}
+	//	}
 	//}
+	
+	MSG msg{};
+	while(msg.message != WM_QUIT)
+	{
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		//sf::Event ev;
+		//while(input.pollEvent(ev))
+		//{
+		//	switch (ev.type)
+		//	{
+		//	case sf::Event::Closed:
+		//		quit = true;
+		//		break;
+		//	}
+		//}
+		game.Run();
+	}
+	
+	::DestroyWindow(windowHandle);
+	UnregisterClass(className.c_str(), hInstance);
 	
 	return 0;
 }
 
-ATOM MyRegisterClass(HINSTANCE hInstance)
+ATOM MyRegisterClass(HINSTANCE hInstance,const std::wstring& className)
 {
 	WNDCLASSEXW wcex;
 
@@ -75,7 +116,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex.lpszMenuName = nullptr;
-	wcex.lpszClassName = L"QBert_SLDFRAMEWORK";
+	wcex.lpszClassName = className.c_str();
 	wcex.hIconSm = LoadIcon(wcex.hInstance, nullptr);
 
 	return RegisterClassExW(&wcex);
@@ -118,7 +159,7 @@ BOOL InitWindowInstance(HINSTANCE hInstance, HWND& windowHandle)
 			hInstance,
 			nullptr
 		);
-
+	
 	if (!windowHandle)
 		return FALSE;
 

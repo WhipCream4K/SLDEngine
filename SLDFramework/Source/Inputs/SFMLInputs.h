@@ -5,24 +5,32 @@
 #include "InputParams.h"
 #include "../Core/Base.h"
 
-#include <SFML/Window.hpp>
-#include <any>
+#include "SFML/Graphics.hpp"
+//#include <SFML/Window.hpp>
+//#include <any>
 
-namespace SLD
+class SFMLWindow;
+
+// encapsulate the process of sfml inputs in here
+class SFMLInputs final
 {
-	// encapsulate the process of sfml inputs in here
-	class SFMLInputs final
-	{
-	public:
+public:
 
-		SFMLInputs(const std::any& window);
-		SFMLInputs(SFMLInputs&& other) noexcept;
-		InputParams::ReadOut ReadInputs();
+	SFMLInputs(const std::any& window);
+	//SFMLInputs(const RefPtr<sf::Window>& window);
+	//SFMLInputs(const RefPtr<SFMLWindow>& window);
+	SFMLInputs(SFMLWindow* ref);
+	SFMLInputs(SFMLInputs&& other) noexcept;
+	SLD::InputParams::ReadOut ReadInputs();
 
-	private:
+private:
 
-		sf::Window m_Window;
-	};
-}
+	//RefPtr<sf::Window> m_Window;
+	sf::Window m_InputWindow;
+	//RefPtr<SFMLWindow> m_RefWindow;
+	//RefPtr<sf::RenderWindow> m_TestRef2;
+	//SFMLWindow* m_TestRef;
+};
+
 
 #endif

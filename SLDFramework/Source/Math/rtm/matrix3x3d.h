@@ -24,11 +24,17 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/math.h"
-#include "rtm/vector4d.h"
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/impl/matrix_common.h"
-#include "rtm/impl/matrix_affine_common.h"
+//#include "rtm/math.h"
+//#include "rtm/vector4d.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/matrix_common.h"
+//#include "rtm/impl/matrix_affine_common.h"
+
+#include "math.h"
+#include "vector4d.h"
+#include "impl/compiler_utils.h"
+#include "impl/matrix_common.h"
+#include "impl/matrix_affine_common.h"
 
 RTM_IMPL_FILE_PRAGMA_PUSH
 

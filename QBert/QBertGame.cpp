@@ -22,17 +22,12 @@ void QBertGame::Start()
 void QBertGame::Run()
 {
 	// input layer
-	bool isQuit{};
-	while (!((isQuit = m_Framework.TranslateUserInputs())))
-	{
-		
+	m_Framework.TranslateUserInputs();
 
-		// World Updates
+	// World Updates
 
 
-		// Async update and render
-		m_Framework.Step();
-	}
-
+	// Async update and render
+	m_Framework.Step();
 
 }

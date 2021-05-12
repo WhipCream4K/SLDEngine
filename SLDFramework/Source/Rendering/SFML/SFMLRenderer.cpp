@@ -16,20 +16,24 @@ void SFMLRenderer::Render(const std::vector<RefPtr<SLD::RenderingComponent>>& re
 
 void SFMLRenderer::SetRenderTarget(const SLD::Window& renderWindow)
 {
-	sf::WindowHandle newWindowHandle{ renderWindow.GetWindowHandleToType<sf::WindowHandle>() };
-	if(m_RenderWindow.getSystemHandle() != newWindowHandle)
-	{
-		m_RenderWindow.close();
-		m_RenderWindow.create(newWindowHandle);
-	}
+	//sf::WindowHandle newWindowHandle{ renderWindow.GetWindowHandleToType<sf::WindowHandle>() };
+	//if(m_RenderWindow->getSystemHandle() != newWindowHandle)
+	//{
+	//	m_RenderWindow.create(newWindowHandle);
+	//}
+	renderWindow;
 }
 
 void SFMLRenderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
 {
-	sf::WindowHandle newWindowHandle{ renderWindow->GetWindowHandleToType<sf::WindowHandle>() };
-	if (m_RenderWindow.getSystemHandle() != newWindowHandle)
+	auto windowSubSystem{ renderWindow->GetWindowSubsystem<SFMLWindow>()->GetSubRefPtr() };
+	if(windowSubSystem != m_RenderWindow)
 	{
-		m_RenderWindow.close();
-		m_RenderWindow.create(newWindowHandle);
+		m_RenderWindow = windowSubSystem;
 	}
+	//sf::WindowHandle newWindowHandle{ renderWindow->GetWindowHandleToType<sf::WindowHandle>() };
+	//if (m_RenderWindow->getSystemHandle() != newWindowHandle)
+	//{
+	//	//m_RenderWindow-create(newWindowHandle);
+	//}
 }

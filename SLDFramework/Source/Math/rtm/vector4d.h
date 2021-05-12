@@ -25,11 +25,16 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/math.h"
-#include "rtm/scalard.h"
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/impl/memory_utils.h"
-#include "rtm/impl/vector_common.h"
+//#include "rtm/math.h"
+//#include "rtm/scalard.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/memory_utils.h"
+//#include "rtm/impl/vector_common.h"
+#include "math.h"
+#include "scalard.h"
+#include "impl/compiler_utils.h"
+#include "impl/memory_utils.h"
+#include "impl/vector_common.h"
 
 RTM_IMPL_FILE_PRAGMA_PUSH
 

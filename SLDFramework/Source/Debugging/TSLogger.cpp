@@ -3,6 +3,7 @@
 
 //std::shared_ptr<SLD::TSLogger> SLD::TSLogger::m_Instance{};
 
+// TODO: Stop This Thread when app exits
 void SLD::TSLogger::ThreadTask()
 {
 	while (true)
@@ -40,5 +41,5 @@ void SLD::TSLogger::QueueWorkLoad(const std::function<TaskFnType>& fnPtr)
 
 void SLD::TSLogger::Start()
 {
-	m_FutureObj = std::async(std::launch::async, &TSLogger::ThreadTask, this);
+	//m_FutureObj = std::async(std::launch::async, &TSLogger::ThreadTask, this);
 }

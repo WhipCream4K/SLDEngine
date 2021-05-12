@@ -25,12 +25,19 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/math.h"
-#include "rtm/scalarf.h"
-#include "rtm/vector4f.h"
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/impl/memory_utils.h"
-#include "rtm/impl/quat_common.h"
+//#include "rtm/math.h"
+//#include "rtm/scalarf.h"
+//#include "rtm/vector4f.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/memory_utils.h"
+//#include "rtm/impl/quat_common.h"
+
+#include "math.h"
+#include "scalarf.h"
+#include "vector4f.h"
+#include "impl/compiler_utils.h"
+#include "impl/memory_utils.h"
+#include "impl/quat_common.h"
 
 RTM_IMPL_FILE_PRAGMA_PUSH
 

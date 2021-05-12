@@ -24,8 +24,10 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/impl/detect_arch.h"
-#include "rtm/impl/detect_compiler.h"
+//#include "rtm/impl/detect_arch.h"
+#include "detect_arch.h"
+//#include "rtm/impl/detect_compiler.h"
+#include "detect_compiler.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Helper macro to determine if vrndns_f32 is supported (ARM64 only)

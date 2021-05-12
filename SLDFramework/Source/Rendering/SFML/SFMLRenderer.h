@@ -25,7 +25,7 @@ public:
 
 private:
 	
-	sf::RenderWindow m_RenderWindow;
+	RefPtr<sf::RenderWindow> m_RenderWindow;
 };
 
 #endif

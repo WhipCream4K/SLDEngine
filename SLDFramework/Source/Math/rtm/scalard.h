@@ -25,10 +25,15 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/constants.h"
-#include "rtm/math.h"
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/impl/scalar_common.h"
+//#include "rtm/constants.h"
+//#include "rtm/math.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/scalar_common.h"
+
+#include "constants.h"
+#include "math.h"
+#include "impl/compiler_utils.h"
+#include "impl/scalar_common.h"
 
 #include <algorithm>
 #include <cmath>

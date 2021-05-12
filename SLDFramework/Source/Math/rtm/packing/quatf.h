@@ -24,10 +24,15 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/math.h"
-#include "rtm/quatf.h"
-#include "rtm/vector4f.h"
-#include "rtm/impl/compiler_utils.h"
+//#include "rtm/math.h"
+//#include "rtm/quatf.h"
+//#include "rtm/vector4f.h"
+//#include "rtm/impl/compiler_utils.h"
+
+#include "../math.h"
+#include "../quatf.h"
+#include "../vector4f.h"
+#include "../impl/compiler_utils.h"
 
 RTM_IMPL_FILE_PRAGMA_PUSH
 

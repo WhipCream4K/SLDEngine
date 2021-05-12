@@ -25,12 +25,20 @@
 // SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "rtm/math.h"
-#include "rtm/quatd.h"
-#include "rtm/vector4d.h"
-#include "rtm/matrix3x4d.h"
-#include "rtm/impl/compiler_utils.h"
-#include "rtm/impl/qvv_common.h"
+//#include "rtm/math.h"
+//#include "rtm/quatd.h"
+//#include "rtm/vector4d.h"
+//#include "rtm/matrix3x4d.h"
+//#include "rtm/impl/compiler_utils.h"
+//#include "rtm/impl/qvv_common.h"
+
+#include "math.h"
+#include "quatd.h"
+#include "vector4d.h"
+#include "matrix3x4d.h"
+#include "impl/compiler_utils.h"
+#include "impl/qvv_common.h"
+
 
 RTM_IMPL_FILE_PRAGMA_PUSH
 
