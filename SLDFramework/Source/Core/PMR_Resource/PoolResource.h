@@ -21,13 +21,14 @@ namespace SLD
 
 	private:
 
-		void DoShifBuffer();
+		void DoShifBuffer(size_t newSize);
 		void* Allocate(void* dst, size_t bytes, size_t alignment);
 
 	private:
 
 		std::vector<uint8_t> m_Buffer;
 		std::queue<uint8_t*> m_EmptyAddressSpace;
+		size_t m_CurrentSize;
 		uint8_t* m_pHead{};
 	};
 
@@ -36,8 +37,10 @@ namespace SLD
 	PoolResource<Size>::PoolResource()
 		: m_Buffer()
 		, m_EmptyAddressSpace()
+		, m_CurrentSize()
 	{
 		m_Buffer.reserve(Size);
+		//m_Buffer.resize(Size, 0);
 		m_pHead = m_Buffer.data();
 	}
 
@@ -48,15 +51,15 @@ namespace SLD
 		{
 			if (m_EmptyAddressSpace.empty())
 				return Allocate(m_pHead, _Bytes, _Align);
-			
+
 			void* ptr{ m_EmptyAddressSpace.front() };
 			m_EmptyAddressSpace.pop();
 
 			return Allocate(ptr, _Bytes, _Align);
 		}
 
-		DoShifBuffer();
-
+		DoShifBuffer(_Bytes);
+		
 		return Allocate(m_pHead, _Bytes, _Align);
 	}
 
@@ -76,26 +79,29 @@ namespace SLD
 	}
 
 	template <size_t Size>
-	void PoolResource<Size>::DoShifBuffer()
+	void PoolResource<Size>::DoShifBuffer(size_t newSize)
 	{
-		const size_t newSize{ m_Buffer.size() * 2 };
-		m_Buffer.reserve(newSize); // always increase in power of 2
-		m_pHead = m_Buffer.data() + newSize - 1;
+		const size_t allocSize{ (newSize + 7) & (-8) };
+		m_Buffer.reserve(allocSize); // always increase in multiple of 8
+		m_pHead = m_Buffer.data() + m_CurrentSize;
 	}
 
 	template <size_t Size>
 	void* PoolResource<Size>::Allocate(void* dst, size_t bytes, size_t alignment)
 	{
-		void* outPtr{ dst };
-		size_t bufferAlignSize{};
-		if (std::align(alignment, bytes, outPtr, bufferAlignSize))
-		{
-			if (dst == m_pHead)
-				m_pHead += bytes;
-			return outPtr;
-		}
+		m_pHead += bytes;
+		m_CurrentSize += bytes;
+		alignment;
+		
+		//if (std::align(alignment, bytes, outPtr, bufferAlignSize))
+		//{
+		//	if (dst == m_pHead)
+		//		m_pHead += bytes;
+		//	m_CurrentSize += bytes;
+		//	return outPtr;
+		//}
 
-		return nullptr;
+		return dst;
 	}
 }
 

@@ -30,6 +30,11 @@ const std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderCompon
 	return m_RenderComponents;
 }
 
+std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderingComponentsEditable()
+{
+	return m_RenderComponents;
+}
+
 const SLD::InputSetting& SLD::WorldEntity::GetWorldInputSetting() const
 {
 	return m_InputSetting;
@@ -37,7 +42,7 @@ const SLD::InputSetting& SLD::WorldEntity::GetWorldInputSetting() const
 
 RefPtr<SLD::GameObject> SLD::WorldEntity::CreateGameObject()
 {	
-	return std::make_shared<GameObject>(shared_from_this());
+	return std::make_shared<GameObject>(*this);
 }
 
 float SLD::WorldEntity::GetDeltaTime()

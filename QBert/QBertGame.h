@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SLDFramework.h>
+#include "Player.h"
 
 #include <any>
 class QBertGame
@@ -16,5 +17,8 @@ public:
 private:
 	
 	SLDFramework m_Framework;
+
+	// Game Data
+	Player m_Player;
 };
 

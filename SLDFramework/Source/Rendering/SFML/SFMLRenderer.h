@@ -19,6 +19,7 @@ public:
 	
 	void Render(const std::vector<SLD::RenderingComponent>& renderingComponents);
 	void Render(const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents);
+	void Render(std::vector<SLD::RenderingComponent>& renderingComponents);
 
 	void SetRenderTarget(const SLD::Window& renderWindow);
 	void SetRenderTarget(const RefPtr<SLD::Window>& renderWindow);

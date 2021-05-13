@@ -6,6 +6,7 @@
 #include "Core/Core.h"
 
 using SLDFramework = SLD::Core;
+using SLDWorldEntity = SLD::WorldEntity;
 
 //#ifdef SLD_APPLICATION_CLASS
 //

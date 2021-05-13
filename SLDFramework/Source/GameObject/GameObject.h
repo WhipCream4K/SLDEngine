@@ -15,6 +15,9 @@ namespace SLD
 	public:
 
 		GameObject(const RefPtr<WorldEntity>& world);
+		GameObject(WorldEntity& world);
+		
+		//GameObject(const RefPtr<const WorldEntity>& world);
 
 		[[nodiscard]] RefPtr<TransformComponent> GetTransform();
 
@@ -34,7 +37,7 @@ namespace SLD
 	private:
 
 		std::vector<RefPtr<BaseComponent>> m_ComponentTable;
-		WeakPtr<WorldEntity> m_World;
+		RefPtr<WorldEntity> m_World;
 		WeakPtr<TransformComponent> m_Transform;
 	};
 
@@ -54,17 +57,17 @@ namespace SLD
 	template <typename ComponentType, typename, typename ... Args>
 	RefPtr<ComponentType> GameObject::CreateComponent(Args&&... args)
 	{
-		auto world{ m_World.lock() };
+		//auto world{ m_World.lock() };
 		
 		if constexpr (std::is_base_of_v<NonTickComponent,ComponentType>)
 		{
-			RefPtr<ComponentType> component{ world->AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...) };
+			RefPtr<ComponentType> component{ m_World->AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...) };
 			return component;
 		}
 
 		if constexpr (std::is_base_of_v<TickComponent,ComponentType>)
 		{
-			RefPtr<ComponentType> component{ world->AllocTickComponent<ComponentType>(std::forward<Args>(args)...) };
+			RefPtr<ComponentType> component{ m_World->AllocTickComponent<ComponentType>(std::forward<Args>(args)...) };
 			return component;
 		}
 

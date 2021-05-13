@@ -82,16 +82,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
-		//sf::Event ev;
-		//while(input.pollEvent(ev))
-		//{
-		//	switch (ev.type)
-		//	{
-		//	case sf::Event::Closed:
-		//		quit = true;
-		//		break;
-		//	}
-		//}
 		game.Run();
 	}
 	

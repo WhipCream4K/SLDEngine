@@ -3,7 +3,7 @@
 SLD::LoggingResource::LoggingResource(std::pmr::memory_resource* upStream)
 	: m_UpStream(upStream)
 {
-	assert(upStream == nullptr);
+	assert(upStream != nullptr);
 }
 
 void* SLD::LoggingResource::do_allocate(size_t _Bytes, size_t _Align)

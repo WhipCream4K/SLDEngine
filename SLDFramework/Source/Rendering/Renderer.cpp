@@ -23,6 +23,16 @@ void SLD::Renderer::Render(const std::vector<RenderingComponent>& renderingCompo
 	std::visit(callRender, m_SubSystemRenderer);
 }
 
+void SLD::Renderer::Render(std::vector<RenderingComponent>& renderingComponents)
+{
+	auto callRender{ [&renderingComponents](auto& subsystem) -> void
+{
+	subsystem.Render(renderingComponents);
+} };
+
+	std::visit(callRender, m_SubSystemRenderer);
+}
+
 void SLD::Renderer::SetRenderWindow(const RefPtr<Window>& renderWindow)
 {
 	auto callSetRenderTarget{ [&renderWindow](auto& subSystem) -> void

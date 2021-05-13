@@ -18,6 +18,8 @@ namespace SLD
 
 		void Render(const std::vector<RenderingComponent>& renderingComponents);
 
+		void Render(std::vector<RenderingComponent>& renderingComponents);
+
 		void SetRenderWindow(const RefPtr<Window>& renderWindow);
 		void SetRenderWindow(const Window& renderWindow);
 	

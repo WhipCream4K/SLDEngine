@@ -122,9 +122,9 @@ SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
 		default: break;
 		}
 
-		out.buses[cnt++].data = evData;
-		out.buses[cnt++].eventId = uint8_t(ev.type);
-
+		out.buses[cnt].data = evData;
+		out.buses[cnt].eventId = uint8_t(ev.type);
+		cnt++;
 	}
 
 	out.eventCnt = cnt;
@@ -135,8 +135,9 @@ SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
 
 void SFMLWindow::Resize(uint32_t width, uint32_t height)
 {
-	const auto& view{ m_MainWindow.getView() };
-	m_MainWindow.setView({ view.getCenter(),sf::Vector2f{float(width),float(height)} });
+	//const auto& view{ m_MainWindow.getView() };
+	//m_MainWindow.setView({ view.getCenter(),sf::Vector2f{float(width),float(height)} });
+	m_MainWindow.setSize(sf::Vector2u{ width,height });
 }
 
 void SFMLWindow::ClearColor(const float(&clearColor)[4])
@@ -146,21 +147,6 @@ void SFMLWindow::ClearColor(const float(&clearColor)[4])
 
 void SFMLWindow::Present(bool shouldVSync)
 {
-
-	//if(m_MainWindow.isOpen())
-	//{
-	//	bool some{};
-	//	sf::Event ev{};
-	//	while(m_MainWindow.pollEvent(ev))
-	//	{
-	//		switch (ev.type)
-	//		{
-	//		case sf::Event::Closed:
-	//			some = false;
-	//			break;
-	//		}
-	//	}
-	//}
 	m_MainWindow.setVerticalSyncEnabled(shouldVSync);
 	m_MainWindow.display();
 }

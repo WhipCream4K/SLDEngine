@@ -241,7 +241,7 @@ void SLD::Core::Step()
 	// *** Render ***
 	m_MainViewPort->ClearBackBuffer();
 
-	auto& allRenderComponent{ m_WorldEntity.GetAllRenderComponents() };
+	auto& allRenderComponent{ m_WorldEntity.GetAllRenderingComponentsEditable() };
 	m_MainRenderer.Render(allRenderComponent);
 
 	m_MainViewPort->Present();

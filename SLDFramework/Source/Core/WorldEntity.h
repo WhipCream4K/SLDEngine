@@ -28,7 +28,7 @@ namespace SLD
 			RefPtr<ComponentType> AllocTickComponent(Args&&... args);
 
 		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<TickComponent, ComponentType>>,
+			typename = std::enable_if_t<std::is_base_of_v<NonTickComponent, ComponentType>>,
 			typename ...Args>
 			RefPtr<ComponentType> AllocNonTickComponent(Args&&... args);
 
@@ -37,6 +37,7 @@ namespace SLD
 			void DeAllocTickComponent(const RefPtr<ComponentType>& ptr);
 
 		[[nodiscard]] const std::vector<RenderingComponent>& GetAllRenderComponents() const;
+		[[nodiscard]] std::vector<RenderingComponent>& GetAllRenderingComponentsEditable();
 
 		[[nodiscard]] const InputSetting& GetWorldInputSetting() const;
 
@@ -59,8 +60,16 @@ namespace SLD
 
 		struct TickComponentPool
 		{
+			TickComponentPool()
+				: resource()
+				, logger(&resource)
+				, dataTable()
+			{
+				
+			}
+
 			PoolResource<64> resource{};
-			LoggingResource logger{ &resource };
+			LoggingResource logger;
 			std::vector<RefPtr<TickComponent>> dataTable{};
 		};
 
@@ -89,11 +98,15 @@ namespace SLD
 	RefPtr<ComponentType> WorldEntity::AllocTickComponent(Args&&... args)
 	{
 		// This only works if we map of different types of components
-		// TODO: implement unique id
-		constexpr std::string uniqueId{};
+		constexpr const char* uniqueId{ ComponentType::UniqueId };
+
 		auto it{ m_TickComponent.try_emplace(uniqueId, TickComponentPool{}) };
 
 		auto& logResource{ it.first->second.logger };
+		
+		// NOTE: I don't know I have to reassign this again so it works
+		logResource = LoggingResource{ &it.first->second.resource };
+		
 		auto& table{ it.first->second.dataTable };
 
 		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
@@ -115,9 +128,10 @@ namespace SLD
 	template <typename ComponentType, typename, typename ... Args>
 	RefPtr<ComponentType> WorldEntity::AllocNonTickComponent(Args&&... args)
 	{
-		constexpr std::string uniqueId{ ComponentType::UniqueId };
+		constexpr const char* uniqueId{ ComponentType::UniqueId };
 		auto it{ m_NonTickComponent.try_emplace(uniqueId,NonTickComponentPool{}) };
 		auto& logResource{ it.first->second.logger };
+		logResource = LoggingResource{ &it.first->second.resource };
 		auto& table{ it.first->second.dataTable };
 		void* allocPtr{ logResource.do_allocate(sizeof(InputComponent),alignof(InputComponent)) };
 
