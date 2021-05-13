@@ -29,9 +29,8 @@ enum class SFMLRenderElement
 	WorldMatrix,
 	RenderShapes,
 	RenderSprite,
-	RenderSpriteWithRenderStates,
 	RenderTexture,
-	RenderTextureWithRenderState,
+	RenderStates
 };
 
 #endif

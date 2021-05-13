@@ -28,6 +28,7 @@ Player::Player(SLD::WorldEntity& world)
 		50.0f
 		);
 
-	//m_TestCircle->setFillColor(sf::Color::Blue);
+	sf::FloatRect bounding{ m_TestCircle->getLocalBounds() };
+	m_TestCircle->setOrigin(bounding.width / 2.0f, bounding.height / 2.0f);
 	
 }

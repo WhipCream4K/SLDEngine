@@ -7,13 +7,16 @@
 void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
 {
 	//m_RenderWindow.draw();
+	auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
 
-	for (auto& element : renderingComponents)
+	for (const auto& element : renderingComponents)
 	{
 		// Read Render Identifier
 		const uint8_t* head{ element.GetRenderData() };
 		const uint8_t* end{ head + element.GetMaxDataSize() };
-		rtm::qvvf* objectWorldMatrix{};
+		const rtm::qvvf* objectWorldMatrix{};
+		const sf::Drawable* sfmlDrawable{};
+		sf::RenderStates renderStates{ sf::RenderStates::Default };
 
 		while (head != end)
 		{
@@ -32,36 +35,47 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 			}
 			case SFMLRenderElement::RenderShapes:
 			{
-				const sf::CircleShape* circle{ reinterpret_cast<const sf::CircleShape*>(head) };
 				dataSize = sizeof(sf::CircleShape);
-				m_RenderWindow->draw(*circle);
+				sfmlDrawable = reinterpret_cast<const sf::CircleShape*>(head);
 				break;
 			}
 			case SFMLRenderElement::RenderSprite:
 			{
-				//sf::Sprite spriteData{static_cast<sf::Sprite>(*head)};
-				const sf::Sprite* spriteData{ reinterpret_cast<const sf::Sprite*>(head) };
 				dataSize = sizeof(sf::Sprite);
-				
-				m_RenderWindow->draw(*spriteData);
-				
+				sfmlDrawable = reinterpret_cast<const sf::Sprite*>(head);
 				break;
 			}
-			case SFMLRenderElement::RenderSpriteWithRenderStates:
+			case SFMLRenderElement::RenderStates:
 			{
-				const sf::Sprite* spriteData{ reinterpret_cast<const sf::Sprite*>(head) };
-				head += sizeof(sf::Sprite);
-				const sf::RenderStates* renderStates{ reinterpret_cast<const sf::RenderStates*>(head) };
-
 				dataSize = sizeof(sf::RenderStates);
-			
-				m_RenderWindow->draw(*spriteData, *renderStates);
-
+				renderStates = *reinterpret_cast<const sf::RenderStates*>(head);
 				break;
 			}
 			case SFMLRenderElement::RenderTexture: break;
-			case SFMLRenderElement::RenderTextureWithRenderState: break;
 			default: break;
+			}
+
+			// SFML Drawable
+			if (sfmlDrawable)
+			{
+				if (objectWorldMatrix)
+				{
+					// TODO: Do rotation
+					
+					sf::Vector2f posVec{};
+					sf::Vector2f scaleVec{};
+					rtm::vector_store2(objectWorldMatrix->translation, &posVec.x);
+					rtm::vector_store2(objectWorldMatrix->scale, &scaleVec.x);
+
+					posVec.x += renderTargetCenter.x;
+					posVec.y += renderTargetCenter.y;
+
+					renderStates.transform.translate(posVec);
+					renderStates.transform.scale(scaleVec);
+					//renderStates.transform.rotate()
+				}
+
+				m_RenderWindow->draw(*sfmlDrawable, renderStates);
 			}
 
 			head += dataSize;
@@ -78,6 +92,8 @@ void SFMLRenderer::Render(const std::vector<RefPtr<SLD::RenderingComponent>>& re
 
 void SFMLRenderer::Render(std::vector<SLD::RenderingComponent>& renderingComponents)
 {
+	auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
+
 	for (auto& element : renderingComponents)
 	{
 		// Read Render Identifier
@@ -92,6 +108,10 @@ void SFMLRenderer::Render(std::vector<SLD::RenderingComponent>& renderingCompone
 
 			head += sizeof(SLD::RenderIdentifier);
 
+			sf::Drawable* sfmlDrawable{};
+			sf::RenderStates renderStates{ sf::RenderStates::Default };
+			//sf::FloatRect bounding{};
+
 			switch (SFMLRenderElement(id))
 			{
 			case SFMLRenderElement::WorldMatrix:
@@ -103,54 +123,36 @@ void SFMLRenderer::Render(std::vector<SLD::RenderingComponent>& renderingCompone
 			case SFMLRenderElement::RenderShapes:
 			{
 				dataSize = sizeof(sf::CircleShape);
-					
-				sf::CircleShape* circle{ reinterpret_cast<sf::CircleShape*>(head) };
-
-				if (objectWorldMatrix)
-				{
-					sf::Vector2f scaleVec{};
-					rtm::vector_store2(objectWorldMatrix->scale, &scaleVec.x);
-					circle->setScale(scaleVec.x, scaleVec.y);
-				}
-					
-				m_RenderWindow->draw(*circle);
-					
+				sfmlDrawable = reinterpret_cast<sf::CircleShape*>(head);
 				break;
 			}
 			case SFMLRenderElement::RenderSprite:
 			{
-
 				dataSize = sizeof(sf::Sprite);
-				
-				sf::Sprite* spriteData{ reinterpret_cast<sf::Sprite*>(head) };
-				if(objectWorldMatrix)
-				{
-					sf::Vector2f scaleVec{};
-					rtm::vector_store2(objectWorldMatrix->scale, &scaleVec.x);
-					spriteData->setScale(scaleVec.x, scaleVec.y);
-				}	
-
-				m_RenderWindow->draw(*spriteData);
-
-				break;
-			}
-			case SFMLRenderElement::RenderSpriteWithRenderStates:
-			{
-				const sf::Sprite* spriteData{ reinterpret_cast<const sf::Sprite*>(head) };
-				head += sizeof(sf::Sprite);
-				const sf::RenderStates* renderStates{ reinterpret_cast<const sf::RenderStates*>(head) };
-
-				dataSize = sizeof(sf::RenderStates);
-
-				m_RenderWindow->draw(*spriteData, *renderStates);
-
+				sfmlDrawable = reinterpret_cast<sf::Sprite*>(head);
 				break;
 			}
 			case SFMLRenderElement::RenderTexture: break;
-			case SFMLRenderElement::RenderTextureWithRenderState: break;
+			case SFMLRenderElement::RenderStates: break;
 			default: break;
 			}
-			
+
+			// SFML Drawable
+			if (sfmlDrawable)
+			{
+				if (objectWorldMatrix)
+				{
+					sf::Vector2f posVec{};
+					rtm::vector_store2(objectWorldMatrix->translation, &posVec.x);
+
+					posVec.x += renderTargetCenter.x;
+					posVec.y += renderTargetCenter.y;
+
+					renderStates.transform.translate(posVec);
+				}
+
+				m_RenderWindow->draw(*sfmlDrawable, renderStates);
+			}
 			head += dataSize;
 		}
 	}
