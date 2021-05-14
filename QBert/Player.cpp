@@ -20,15 +20,17 @@ Player::Player(SLD::WorldEntity& world)
 	m_RenderingComponent->PushElement(SLD::RenderIdentifier(SFMLRenderElement::WorldMatrix),&m_TransformComponent.lock()->GetWorldFinishMatrix());
 
 	// Sprite Creation
-	//m_CharacterSprite = m_RenderingComponent->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
-
-	// TEST
-	m_TestCircle = m_RenderingComponent->AllocAndConstructData<sf::CircleShape>(
-		SLD::RenderIdentifier(SFMLRenderElement::RenderShapes),
-		50.0f
-		);
-
-	sf::FloatRect bounding{ m_TestCircle->getLocalBounds() };
-	m_TestCircle->setOrigin(bounding.width / 2.0f, bounding.height / 2.0f);
+	m_CharacterSprite = m_RenderingComponent->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
 	
+}
+
+void Player::SetSpriteTexture(const sf::Texture& texture)
+{
+	m_CharacterSprite->setTexture(texture,true);
+	
+	// Set to correct sprite rect
+	const sf::IntRect spriteRect{
+		0,0,16,16
+	};
+	m_CharacterSprite->setTextureRect(spriteRect);
 }

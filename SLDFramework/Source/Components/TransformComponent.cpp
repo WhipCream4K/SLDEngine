@@ -8,7 +8,6 @@ SLD::TransformComponent::TransformComponent()
 	, m_WorldPos()
 	, m_Scale(rtm::float3f{ 1.0f,1.0f,1.0f })
 	, m_Rotation()
-	, m_WorldMatrix()
 	, m_WorldFinishMatrix()
 	, m_HasUpdateWorldMatrix()
 {
@@ -57,14 +56,34 @@ void SLD::TransformComponent::SetScale(const rtm::float3f& scale)
 	m_Scale = scale;
 }
 
+const rtm::float3f& SLD::TransformComponent::GetWorldPos() const
+{
+	return m_WorldPos;
+}
+
+const rtm::float3f& SLD::TransformComponent::GetLocalScale() const
+{
+	return m_Scale;
+}
+
+const rtm::float4f& SLD::TransformComponent::GetLocalRotationQuat() const
+{
+	return m_Rotation;
+}
+
+rtm::float3f SLD::TransformComponent::GetLocalRotationEuler() const
+{
+	return rtm::float3f{};
+}
+
 const rtm::qvvf& SLD::TransformComponent::GetWorldFinishMatrix() const
 {
 	return m_WorldFinishMatrix;
 }
 
-const rtm::matrix4x4f& SLD::TransformComponent::GetWorldMatrix() const
+void SLD::TransformComponent::AsyncUpdate([[maybe_unused]] float deltaTime)
 {
-	return m_WorldMatrix;
+	UpdateWorldMatrix();
 }
 
 void SLD::TransformComponent::UpdateWorldMatrix()

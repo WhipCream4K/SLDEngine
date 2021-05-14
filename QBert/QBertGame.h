@@ -20,5 +20,8 @@ private:
 
 	// Game Data
 	Player m_Player;
+
+	// Texture Resource
+	sf::Texture m_QBertSprite;
 };
 

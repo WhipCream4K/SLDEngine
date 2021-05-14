@@ -16,7 +16,9 @@ class Player
 public:
 
 	Player(SLD::WorldEntity& world);
-	
+
+	void SetSpriteTexture(const sf::Texture& texture);
+
 private:
 
 	std::shared_ptr<sf::Sprite> m_CharacterSprite;

@@ -303,6 +303,7 @@
     <ClInclude Include="Core\Window\Windows\WindowsWindow.h" />
     <ClInclude Include="Core\WorldEntity.h" />
     <ClInclude Include="Components\TransformComponent.h" />
+    <ClInclude Include="Core\PersistentThreadWorker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Components\BaseComponent.cpp" />
@@ -334,6 +335,7 @@
     <ClCompile Include="Core\Window\SFML\SFMLWindow.cpp" />
     <ClCompile Include="Core\WorldEntity.cpp" />
     <ClCompile Include="Components\TransformComponent.cpp" />
+    <ClCompile Include="Core\PersistentThreadWorker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IMGUI\IMGUI.vcxproj">

@@ -6,6 +6,8 @@
 #include "PMR_Resource/PoolResource.h"
 #include "../Inputs/InputSetting.h"
 #include "../Components/InputComponent.h"
+#include "../Components/TickComponent.h"
+#include "../Core/PersistentThreadWorker.h"
 
 namespace SLD
 {
@@ -13,7 +15,7 @@ namespace SLD
 	class TickComponent;
 	class NonTickComponent;
 	class GameObject;
-	class WorldEntity final : public std::enable_shared_from_this<WorldEntity>
+	class WorldEntity final
 	{
 	public:
 
@@ -45,13 +47,13 @@ namespace SLD
 
 		float GetDeltaTime();
 
-		// Inputs
-		//void ParseUserEvent(const MessageBus& bus);
-
 		// Detach all of the component from this GameObject
 		void Destroy(const RefPtr<GameObject>& object);
 		// Detach all of the component from this GameObject
 		void Destroy(const GameObject& object);
+
+		void WakeAllAsyncUpdates();
+		void JoinAllAsyncUpdates();
 
 		void StartWorldTime();
 		void EndWorldTime();
@@ -65,7 +67,7 @@ namespace SLD
 				, logger(&resource)
 				, dataTable()
 			{
-				
+
 			}
 
 			PoolResource<64> resource{};
@@ -90,6 +92,23 @@ namespace SLD
 		// Uncouple from the base component above
 		std::vector<RenderingComponent> m_RenderComponents;
 
+		// Async Tick Task
+		struct TickTask
+		{
+			std::string id{};
+			PersistentThreadWorker worker{};
+		};
+
+		std::vector<TickTask> m_TickTasks;
+
+		template<typename SubTickComponent,
+			typename = std::enable_if_t<std::is_base_of_v<TickComponent, SubTickComponent>>>
+			void InitializeTickTask(const RefPtr<SubTickComponent>& object);
+
+		template<typename SubTickComponent,
+		typename = std::enable_if_t<std::is_base_of_v<TickComponent,SubTickComponent>>>
+		void InitializeTickTask(SubTickComponent& object);
+
 		std::chrono::system_clock::time_point m_EndTimePoint;
 		float m_DeltaTime;
 	};
@@ -103,10 +122,10 @@ namespace SLD
 		auto it{ m_TickComponent.try_emplace(uniqueId, TickComponentPool{}) };
 
 		auto& logResource{ it.first->second.logger };
-		
+
 		// NOTE: I don't know I have to reassign this again so it works
 		logResource = LoggingResource{ &it.first->second.resource };
-		
+
 		auto& table{ it.first->second.dataTable };
 
 		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
@@ -121,6 +140,9 @@ namespace SLD
 
 		table.emplace_back(out);
 
+		// Assign Tick Task
+		InitializeTickTask(*out);
+
 		return out;
 
 	}
@@ -131,7 +153,10 @@ namespace SLD
 		constexpr const char* uniqueId{ ComponentType::UniqueId };
 		auto it{ m_NonTickComponent.try_emplace(uniqueId,NonTickComponentPool{}) };
 		auto& logResource{ it.first->second.logger };
+
+		// NOTE: I don't know I have to reassign this again so it works
 		logResource = LoggingResource{ &it.first->second.resource };
+
 		auto& table{ it.first->second.dataTable };
 		void* allocPtr{ logResource.do_allocate(sizeof(InputComponent),alignof(InputComponent)) };
 
@@ -150,7 +175,7 @@ namespace SLD
 			return out;
 		}
 
-		ComponentType* initPtr{ new (allocPtr) ComponentType(shared_from_this(),std::forward<Args>(args)...) };
+		ComponentType* initPtr{ new (allocPtr) ComponentType(std::forward<Args>(args)...) };
 
 		RefPtr<ComponentType> out{ initPtr,[&logResource](ComponentType* ptr)
 		{
@@ -173,6 +198,64 @@ namespace SLD
 		auto& table{ tickPool.dataTable };
 
 		table.erase(std::remove(table.begin(), table.end(), ptr));
+	}
+
+	template <typename SubTickComponent, typename>
+	void WorldEntity::InitializeTickTask(const RefPtr<SubTickComponent>& object)
+	{
+		// Check if this component's worker is already initialize
+		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
+			{
+				return item.id.c_str() == SubTickComponent::UniqueId;
+			});
+
+		const bool found{ fIt != m_TickTasks.end() };
+		if (!found)
+		{
+			auto& tickTask = m_TickTasks.emplace_back(TickTask{ SubTickComponent::UniqueId,{} });
+			
+			tickTask.worker.Start();
+			tickTask.worker.AssignTask([&object,this]()
+				{
+					object->AsyncUpdate(this->GetDeltaTime());
+				});
+		}
+		else
+		{
+			fIt->worker.AssignTask([&object, this]()
+				{
+					object->AsyncUpdate(this->GetDeltaTime());
+				});
+		}
+	}
+
+	template <typename SubTickComponent, typename>
+	void WorldEntity::InitializeTickTask(SubTickComponent& object)
+	{
+		// Check if this component's worker is already initialize
+		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
+			{
+				return item.id.c_str() == SubTickComponent::UniqueId;
+			});
+
+		const bool found{ fIt != m_TickTasks.end() };
+		if (!found)
+		{
+			auto& tickTask = m_TickTasks.emplace_back(TickTask{ SubTickComponent::UniqueId,{} });
+
+			tickTask.worker.Start();
+			tickTask.worker.AssignTask([&object, this]()
+				{
+					object.AsyncUpdate(this->GetDeltaTime());
+				});
+		}
+		else
+		{
+			fIt->worker.AssignTask([&object, this]()
+				{
+					object.AsyncUpdate(this->GetDeltaTime());
+				});
+		}
 	}
 }
 

@@ -12,6 +12,18 @@ namespace SLD
 	class TickComponent : public BaseComponent
 	{
 	public:
+
+		enum class Type
+		{
+			TransformComponent,
+
+			Count // Use to keep track of all the tick component
+		};
+
+		virtual void AsyncUpdate([[maybe_unused]] float) {}
+
+		virtual ~TickComponent() = default;
+		
 		//using pointer = typename NonTickComponent<T>::pointer;
 		////using OnCreateEvent = void(*)(const std::any&);
 		////using OnUpdateEvent = void(*)(const std::any&, float);
@@ -40,29 +52,6 @@ namespace SLD
 		//std::any m_Instance;
 
 	};
-
-	//template <typename UserClass>
-	//constexpr auto TickComponent::Bind(
-	//	const RefPtr<UserClass>& instance) noexcept(false) -> void
-	//{
-	//	using value_type = std::remove_all_extents_t<UserClass>;
-	//	using pointer = value_type*;
-	//	
-	//	m_OnUpdate = [](const std::any& objInstance, float dt)
-	//	{
-	//		std::any_cast<pointer>(objInstance)->OnUpdate(dt);
-	//	};
-
-	//	m_OnCreate = [](const std::any& objInstance)
-	//	{
-	//		std::any_cast<pointer>(objInstance)->OnCreate();
-	//	};
-
-	//	static_assert(IsFuncSameType<decltype(&value_type::OnUpdate),void,float>,
-	//		"OnUpdate Function is not the same type as void()(float)");
-
-	//	m_Instance = instance.get();
-	//}
 }
 
 #endif

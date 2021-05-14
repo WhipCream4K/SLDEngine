@@ -5,10 +5,13 @@
 SLD::WorldEntity::WorldEntity()
 	: m_TickComponent()
 	, m_RenderComponents()
+	, m_TickTasks()
 	, m_EndTimePoint()
 	, m_DeltaTime()
 {
+	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
 }
+
 
 RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(size_t elemSize, uint32_t elemCnt)
 {
@@ -60,6 +63,22 @@ void SLD::WorldEntity::Destroy(const GameObject& object)
 	object;
 }
 
+void SLD::WorldEntity::WakeAllAsyncUpdates()
+{
+	for (auto& task : m_TickTasks)
+	{
+		task.worker.Wake();
+	}
+}
+
+void SLD::WorldEntity::JoinAllAsyncUpdates()
+{
+	for (auto& task : m_TickTasks)
+	{
+		task.worker.WaitTillFinished();
+	}
+}
+
 void SLD::WorldEntity::StartWorldTime()
 {
 	auto startTime{ std::chrono::system_clock::now()  };
@@ -70,3 +89,5 @@ void SLD::WorldEntity::EndWorldTime()
 {
 	m_EndTimePoint = std::chrono::system_clock::now();
 }
+
+

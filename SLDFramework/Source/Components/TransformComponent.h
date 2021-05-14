@@ -23,8 +23,14 @@ namespace SLD
 		void SetScale(float x, float y, float z);
 		void SetScale(const rtm::float3f& scale);
 
+		[[nodiscard]] const rtm::float3f& GetWorldPos() const;
+		[[nodiscard]] const rtm::float3f& GetLocalScale() const;
+		[[nodiscard]] const rtm::float4f& GetLocalRotationQuat() const;
+		[[nodiscard]] rtm::float3f GetLocalRotationEuler() const;
 		[[nodiscard]] const rtm::qvvf& GetWorldFinishMatrix() const;
-		[[nodiscard]] const rtm::matrix4x4f& GetWorldMatrix() const;
+		//[[nodiscard]] const rtm::matrix4x4f& GetWorldMatrix() const;
+
+		void AsyncUpdate(float deltaTime) override;
 
 	private:
 
@@ -33,7 +39,7 @@ namespace SLD
 		rtm::float3f m_WorldPos;
 		rtm::float3f m_Scale;
 		rtm::float4f m_Rotation;
-		rtm::matrix4x4f m_WorldMatrix;
+		//rtm::matrix4x4f m_WorldMatrix;
 		rtm::qvvf m_WorldFinishMatrix;
 		bool m_HasUpdateWorldMatrix;
 	};

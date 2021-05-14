@@ -16,10 +16,20 @@ QBertGame::QBertGame(HWND windowHandle)
 
 void QBertGame::Start()
 {
-	// Map generation
+	// Game Sprite Sheet
+	const bool success{ m_QBertSprite.loadFromFile("./Resources/SpriteSheet/QBert_Sprites.png") };
+
+	if(success)
+	{
+		// Player
+		m_Player.SetSpriteTexture(m_QBertSprite);
+
+		// Map generation
+
+		// HUD generation
+	}
 
 
-	// HUD generation
 
 }
 

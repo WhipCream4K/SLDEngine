@@ -234,9 +234,10 @@ bool SLD::Core::TranslateUserInputs()
 void SLD::Core::Step()
 {
 	// *** UPDATE WORLD ***
-
+	m_WorldEntity.WakeAllAsyncUpdates();
 
 	// JOIN THREADS
+	m_WorldEntity.JoinAllAsyncUpdates();
 
 	// *** Render ***
 	m_MainViewPort->ClearBackBuffer();
