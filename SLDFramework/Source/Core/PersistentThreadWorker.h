@@ -26,8 +26,6 @@ namespace SLD
 			typename ...Args>
 			[[noreturn]] void AssignTask(FnType&& task, Class& caller, Args&&... args);
 
-		//template<typename FnType,typename Object,typename Ret = std::result_of_t<FnType>>
-		//[[maybe_unused]] std::future<Ret> AssignTask(FnType&& task, Object& obj);
 
 		// NOTE: Can only call once in the main thread
 		// Not thread safe

@@ -13,7 +13,7 @@ namespace SLD
 	class RenderingComponent final
 	{
 	public:
-
+		// TODO: Make Render buffer updates dynamically
 		RenderingComponent() = default;
 
 		RenderingComponent(size_t elemSize, uint32_t elemCnt);
@@ -40,8 +40,8 @@ namespace SLD
 
 		std::vector<uint8_t> m_PackageData{};
 		RenderTarget m_RenderTarget;
-		uint8_t* m_pCurrentDataPtr;
-		uint32_t m_ElementCnt;
+		uint8_t* m_pCurrentDataPtr{};
+		uint32_t m_ElementCnt{};
 	};
 
 	template <typename DataType>

@@ -13,7 +13,7 @@ Player::Player(SLD::WorldEntity& world)
 	m_TransformComponent.lock()->SetScale(2.5f, 2.5f,1.0f);
 	
 	// Setup Render Component
-	size_t renderData{ sizeof(void*) + sizeof(sf::CircleShape) };
+	size_t renderData{ sizeof(void*) + sizeof(sf::Sprite) };
 	m_RenderingComponent = m_GameObject->CreateRenderingComponent(renderData, 2);
 	
 	// Push transform to Renderer

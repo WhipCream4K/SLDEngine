@@ -8,6 +8,16 @@ namespace SLD
 {
 	class BaseComponent
 	{
+	public:
+
+		void MarkDestroy();
+		
+		BaseComponent() = default;
+		virtual ~BaseComponent() = default;
+
+	private:
+		
+		bool m_IsMarkedDestroy{};
 	};
 }
 

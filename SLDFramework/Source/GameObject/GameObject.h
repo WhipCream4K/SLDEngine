@@ -19,7 +19,7 @@ namespace SLD
 		
 		//GameObject(const RefPtr<const WorldEntity>& world);
 
-		[[nodiscard]] RefPtr<TransformComponent> GetTransform();
+		[[nodiscard]] RefPtr<TransformComponent> GetTransform() const;
 
 		template<typename ComponentType,
 			typename = std::enable_if_t<std::is_base_of_v<BaseComponent, ComponentType>>>

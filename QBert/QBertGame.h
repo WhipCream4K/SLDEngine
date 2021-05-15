@@ -1,9 +1,11 @@
 #pragma once
 
 #include <SLDFramework.h>
-#include "Player.h"
-
 #include <any>
+
+#include "Player.h"
+#include "Level.h"
+
 class QBertGame
 {
 public:
@@ -20,6 +22,7 @@ private:
 
 	// Game Data
 	Player m_Player;
+	Level m_Level;
 
 	// Texture Resource
 	sf::Texture m_QBertSprite;

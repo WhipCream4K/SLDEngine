@@ -13,7 +13,7 @@ SLD::GameObject::GameObject(WorldEntity& world)
 	m_Transform = m_World->AllocTickComponent<TransformComponent>();
 }
 
-RefPtr<SLD::TransformComponent> SLD::GameObject::GetTransform()
+RefPtr<SLD::TransformComponent> SLD::GameObject::GetTransform() const
 {
 	return m_Transform.lock();
 }

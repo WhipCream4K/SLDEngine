@@ -45,7 +45,7 @@ namespace SLD
 
 		[[nodiscard]] RefPtr<GameObject> CreateGameObject();
 
-		float GetDeltaTime();
+		float GetDeltaTime() const noexcept;
 
 		// Detach all of the component from this GameObject
 		void Destroy(const RefPtr<GameObject>& object);
@@ -104,6 +104,8 @@ namespace SLD
 		template<typename SubTickComponent,
 			typename = std::enable_if_t<std::is_base_of_v<TickComponent, SubTickComponent>>>
 			void InitializeAsyncTickTask(SubTickComponent& object);
+
+		PersistentThreadWorker& EmplaceNewWorker(const std::string& id);
 
 		std::chrono::system_clock::time_point m_EndTimePoint;
 		float m_DeltaTime;
@@ -202,20 +204,12 @@ namespace SLD
 		// Check if this component's worker is already initialize
 		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
 			{
-				return item.id.c_str() == SubTickComponent::UniqueId;
+				return std::strcmp(item.id.c_str(),SubTickComponent::UniqueId) == 0;
 			});
 
 		const bool found{ fIt != m_TickTasks.end() };
-		if (!found)
-		{
-			auto& tickTask = m_TickTasks.emplace_back(TickTask{ SubTickComponent::UniqueId,{} });
-
-			tickTask.worker.Start();
-			tickTask.worker.AssignTask(&SubTickComponent::AsyncUpdate, object, this->GetDeltaTime());
-		}
-		else
-			fIt->worker.AssignTask(&SubTickComponent::AsyncUpdate, object, this->GetDeltaTime());
-
+		PersistentThreadWorker& thread{ found ? fIt->worker : EmplaceNewWorker(SubTickComponent::UniqueId)};
+		thread.AssignTask(&SubTickComponent::AsyncUpdate, object, this->GetDeltaTime());
 	}
 }
 

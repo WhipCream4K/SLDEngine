@@ -48,7 +48,7 @@ RefPtr<SLD::GameObject> SLD::WorldEntity::CreateGameObject()
 	return std::make_shared<GameObject>(*this);
 }
 
-float SLD::WorldEntity::GetDeltaTime()
+float SLD::WorldEntity::GetDeltaTime() const noexcept
 {
 	return m_DeltaTime;
 }
@@ -88,6 +88,13 @@ void SLD::WorldEntity::StartWorldTime()
 void SLD::WorldEntity::EndWorldTime()
 {
 	m_EndTimePoint = std::chrono::system_clock::now();
+}
+
+SLD::PersistentThreadWorker& SLD::WorldEntity::EmplaceNewWorker(const std::string& id)
+{
+	auto& thread{ m_TickTasks.emplace_back(TickTask{ id,{} }).worker };
+	thread.Start();
+	return thread;
 }
 
 

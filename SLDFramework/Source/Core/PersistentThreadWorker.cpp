@@ -2,7 +2,8 @@
 
 void SLD::PersistentThreadWorker::Start()
 {
-	m_Task = std::async(std::launch::async, &PersistentThreadWorker::ThreadTask, this);
+	if(!m_Task.valid())
+		m_Task = std::async(std::launch::async, &PersistentThreadWorker::ThreadTask, this);
 }
 
 void SLD::PersistentThreadWorker::Wake()

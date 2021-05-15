@@ -70,8 +70,8 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 					posVec.x += renderTargetCenter.x;
 					posVec.y += renderTargetCenter.y;
 
-					renderStates.transform.translate(posVec);
 					renderStates.transform.scale(scaleVec);
+					renderStates.transform.translate(posVec);
 					//renderStates.transform.rotate()
 				}
 
