@@ -103,11 +103,7 @@ namespace SLD
 
 		template<typename SubTickComponent,
 			typename = std::enable_if_t<std::is_base_of_v<TickComponent, SubTickComponent>>>
-			void InitializeTickTask(const RefPtr<SubTickComponent>& object);
-
-		template<typename SubTickComponent,
-		typename = std::enable_if_t<std::is_base_of_v<TickComponent,SubTickComponent>>>
-		void InitializeTickTask(SubTickComponent& object);
+			void InitializeAsyncTickTask(SubTickComponent& object);
 
 		std::chrono::system_clock::time_point m_EndTimePoint;
 		float m_DeltaTime;
@@ -141,7 +137,7 @@ namespace SLD
 		table.emplace_back(out);
 
 		// Assign Tick Task
-		InitializeTickTask(*out);
+		InitializeAsyncTickTask(*out);
 
 		return out;
 
@@ -201,36 +197,7 @@ namespace SLD
 	}
 
 	template <typename SubTickComponent, typename>
-	void WorldEntity::InitializeTickTask(const RefPtr<SubTickComponent>& object)
-	{
-		// Check if this component's worker is already initialize
-		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
-			{
-				return item.id.c_str() == SubTickComponent::UniqueId;
-			});
-
-		const bool found{ fIt != m_TickTasks.end() };
-		if (!found)
-		{
-			auto& tickTask = m_TickTasks.emplace_back(TickTask{ SubTickComponent::UniqueId,{} });
-			
-			tickTask.worker.Start();
-			tickTask.worker.AssignTask([&object,this]()
-				{
-					object->AsyncUpdate(this->GetDeltaTime());
-				});
-		}
-		else
-		{
-			fIt->worker.AssignTask([&object, this]()
-				{
-					object->AsyncUpdate(this->GetDeltaTime());
-				});
-		}
-	}
-
-	template <typename SubTickComponent, typename>
-	void WorldEntity::InitializeTickTask(SubTickComponent& object)
+	void WorldEntity::InitializeAsyncTickTask(SubTickComponent& object)
 	{
 		// Check if this component's worker is already initialize
 		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
@@ -244,18 +211,11 @@ namespace SLD
 			auto& tickTask = m_TickTasks.emplace_back(TickTask{ SubTickComponent::UniqueId,{} });
 
 			tickTask.worker.Start();
-			tickTask.worker.AssignTask([&object, this]()
-				{
-					object.AsyncUpdate(this->GetDeltaTime());
-				});
+			tickTask.worker.AssignTask(&SubTickComponent::AsyncUpdate, object, this->GetDeltaTime());
 		}
 		else
-		{
-			fIt->worker.AssignTask([&object, this]()
-				{
-					object.AsyncUpdate(this->GetDeltaTime());
-				});
-		}
+			fIt->worker.AssignTask(&SubTickComponent::AsyncUpdate, object, this->GetDeltaTime());
+
 	}
 }
 
