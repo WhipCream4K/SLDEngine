@@ -3,6 +3,8 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
+#include "Core/ObservePtr.h"
+
 namespace SLD
 {
 	class WorldEntity;
@@ -24,7 +26,7 @@ private:
 	std::shared_ptr<sf::Sprite> m_CharacterSprite;
 	std::shared_ptr<sf::CircleShape> m_TestCircle;
 	std::shared_ptr<SLD::RenderingComponent> m_RenderingComponent;
-	std::weak_ptr<SLD::TransformComponent> m_TransformComponent;
+	SLD::ObservePtr<SLD::TransformComponent> m_TransformComponent;
 	std::shared_ptr<SLD::GameObject> m_GameObject;
 };
 

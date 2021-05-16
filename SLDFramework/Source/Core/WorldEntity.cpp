@@ -81,13 +81,13 @@ void SLD::WorldEntity::JoinAllAsyncUpdates()
 
 void SLD::WorldEntity::StartWorldTime()
 {
-	auto startTime{ std::chrono::system_clock::now()  };
+	auto startTime{ std::chrono::high_resolution_clock::now()  };
 	m_DeltaTime = float(std::chrono::duration_cast<std::chrono::milliseconds>(startTime - m_EndTimePoint).count());
 }
 
 void SLD::WorldEntity::EndWorldTime()
 {
-	m_EndTimePoint = std::chrono::system_clock::now();
+	m_EndTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 SLD::PersistentThreadWorker& SLD::WorldEntity::EmplaceNewWorker(const std::string& id)

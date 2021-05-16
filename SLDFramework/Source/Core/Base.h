@@ -18,6 +18,7 @@
 #include "../Helpers/utils.h"
 #include "../Debugging/TSLogger.h"
 #include "../Math/RealTimeMath.h"
+#include "ObservePtr.h"
 //#include "../Miscellaneous/RealTimeMath.h"
 
 template<typename SingletonType>

@@ -47,7 +47,7 @@ namespace SLD
 	template <size_t Size>
 	void* PoolResource<Size>::do_allocate(size_t _Bytes, size_t _Align)
 	{
-		if (_Bytes < m_Buffer.size())
+		if (_Bytes <= size_t(std::abs((long long)(m_Buffer.capacity() - m_Buffer.size()))))
 		{
 			if (m_EmptyAddressSpace.empty())
 				return Allocate(m_pHead, _Bytes, _Align);
@@ -82,17 +82,23 @@ namespace SLD
 	void PoolResource<Size>::DoShifBuffer(size_t newSize)
 	{
 		const size_t allocSize{ (newSize + 7) & (-8) };
-		m_Buffer.reserve(allocSize); // always increase in multiple of 8
-		m_pHead = m_Buffer.data() + m_CurrentSize;
+		m_Buffer.reserve((m_Buffer.size() + allocSize) * 8); // always increase in multiple of 8
+		m_pHead = m_Buffer.data() + m_Buffer.size();
 	}
 
 	template <size_t Size>
 	void* PoolResource<Size>::Allocate(void* dst, size_t bytes, size_t alignment)
 	{
-		m_pHead += bytes;
-		m_CurrentSize += bytes;
+		//m_pHead += bytes;
+		//m_CurrentSize += bytes;
 		alignment;
-		
+
+		if(m_pHead == dst)
+		{
+			m_pHead += bytes;
+			m_Buffer.resize(m_Buffer.size() + bytes);
+		}
+
 		//if (std::align(alignment, bytes, outPtr, bufferAlignSize))
 		//{
 		//	if (dst == m_pHead)

@@ -32,22 +32,29 @@ void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 
 void Level::ConstructPlatform()
 {
-	RefPtr<SLD::TransformComponent> platformTransform{};
+	SLD::ObservePtr<SLD::TransformComponent> platformTransform{};
 
 	//uint8_t colCnt{1};
-	uint8_t num{};
 	const float platformWidth{ float(PlatformDimension[0]) };
 	const float platformHeight{ float(PlatformDimension[1])};
 
 	float startPlatformHeight{ platformHeight * 3.0f };
+
+	// NOTE: EXCEPTION TOP ONE
+	//m_Platforms[0].gameObject->GetTransform()->Translate(0.0f,startPlatformHeight,0.0f);
+	//m_Platforms[0].gameObject->GetTransform()->SetScale(QBert::GlobalScaleX,QBert::GlobalScaleY,1.0f);
+
+	//startPlatformHeight -= platformHeight;
+	
+	uint8_t num{0};
 	for (uint8_t i = 0; i < PlatformMaxRow; ++i)
 	{
-		const uint8_t colCnt{ i + 1u };
-		for (uint8_t j = -colCnt; j < i + 1u; ++j)
+		const int colCnt{ int(i) };
+		for (int j = -colCnt; j <= colCnt; ++j)
 		{
 			if(j == 0)
 			{
-				if((colCnt & 1) == 0) // is even
+				if((colCnt & 1)) // is odd
 					continue;
 			}
 
@@ -55,8 +62,8 @@ void Level::ConstructPlatform()
 			platformTransform->Translate(platformWidth * float(j), startPlatformHeight, 1.0f);
 			platformTransform->SetScale(QBert::GlobalScaleX, QBert::GlobalScaleY, 1.0f);
 			
-			startPlatformHeight -= platformHeight;
 		}
+		startPlatformHeight -= platformHeight;
 	}
 
 	//	//TODO: Set up platform position

@@ -27,6 +27,22 @@ template<typename T>
 using RemoveAllExt = std::remove_all_extents_t<T>;
 
 template<typename T>
+using PointTo = std::add_pointer_t<T>;
+
+template<typename T>
+using RefWrap = std::reference_wrapper<T>;
+
+template<typename T>
+using AddressOfPtr = T**;
+
+template<typename T>
+struct No_Op
+{
+	void operator()(T*) const {}
+};
+
+
+template<typename T>
 struct MemHandle
 {
 	T* pointToHead;

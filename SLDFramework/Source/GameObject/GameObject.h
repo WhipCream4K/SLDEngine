@@ -3,23 +3,24 @@
 #define SLDFRAMEWORK_GAMEOBJECT_H
 
 #include "../Core/Base.h"
-#include "../Components/TransformComponent.h"
 #include "../Components/NonTickComponent.h"
-#include "../Components/TickComponent.h"
+//#include "../Components/TickComponent.h"
+#include "../Components/TransformComponent.h"
 #include "../Core/WorldEntity.h"
 
 namespace SLD
 {
+	class TransformComponent;
 	class GameObject final
 	{
 	public:
 
-		GameObject(const RefPtr<WorldEntity>& world);
+		//GameObject(const RefPtr<WorldEntity>& world);
 		GameObject(WorldEntity& world);
-		
+
 		//GameObject(const RefPtr<const WorldEntity>& world);
 
-		[[nodiscard]] RefPtr<TransformComponent> GetTransform() const;
+		[[nodiscard]] const ObservePtr<TransformComponent>& GetTransform() const;
 
 		template<typename ComponentType,
 			typename = std::enable_if_t<std::is_base_of_v<BaseComponent, ComponentType>>>
@@ -28,17 +29,19 @@ namespace SLD
 		[[nodiscard]] const std::vector<RefPtr<BaseComponent>>& GetAllComponents() const;
 
 		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<BaseComponent, ComponentType>>,
-		typename ...Args>
+			typename = EnableIsBasedOf<BaseComponent, ComponentType>,
+			typename ...Args>
 			[[nodiscard]] RefPtr<ComponentType> CreateComponent(Args&&... args);
 
-		RefPtr<RenderingComponent> CreateRenderingComponent(size_t elemSize,uint32_t elemCnt);
+		RefPtr<RenderingComponent> CreateRenderingComponent(size_t elemSize, uint32_t elemCnt);
+
+		RefWrap<WorldEntity> GetWorld();
 
 	private:
 
 		std::vector<RefPtr<BaseComponent>> m_ComponentTable;
-		RefPtr<WorldEntity> m_World;
-		WeakPtr<TransformComponent> m_Transform;
+		RefWrap<WorldEntity> m_World;
+		ObservePtr<TransformComponent> m_Transform;
 	};
 
 	template <typename ComponentType, typename>
@@ -58,14 +61,14 @@ namespace SLD
 	RefPtr<ComponentType> GameObject::CreateComponent(Args&&... args)
 	{
 		//auto world{ m_World.lock() };
-		
-		if constexpr (std::is_base_of_v<NonTickComponent,ComponentType>)
+
+		if constexpr (std::is_base_of_v<NonTickComponent, ComponentType>)
 		{
 			RefPtr<ComponentType> component{ m_World->AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...) };
 			return component;
 		}
 
-		if constexpr (std::is_base_of_v<TickComponent,ComponentType>)
+		if constexpr (std::is_base_of_v<TickComponent, ComponentType>)
 		{
 			RefPtr<ComponentType> component{ m_World->AllocTickComponent<ComponentType>(std::forward<Args>(args)...) };
 			return component;
