@@ -10,7 +10,7 @@ class QBertGame
 {
 public:
 	
-	QBertGame(const std::any& windowHandle);
+	//QBertGame(const std::any& windowHandle);
 	QBertGame(HWND windowHandle);
 
 	void Start();

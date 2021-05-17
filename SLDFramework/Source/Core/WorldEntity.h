@@ -40,7 +40,7 @@ namespace SLD
 		template<typename ComponentType,
 			typename = EnableIsBasedOf<TickComponent, ComponentType>,
 			typename ...Args>
-			ObservePtr<ComponentType> AllocTickComponent(Args&&... args);
+			RefPtr<ObservePtr<ComponentType>> AllocTickComponent(Args&&... args);
 
 		template<typename ComponentType,
 			typename = EnableIsBasedOf<NonTickComponent, ComponentType>,
@@ -78,13 +78,11 @@ namespace SLD
 			TickComponentPool()
 				: resource()
 				, logger(&resource)
-				, dataTable()
 			{
 			}
 
 			PoolResource<64> resource{};
 			LoggingResource logger;
-			std::vector<RefPtr<ObservePtr<TickComponent>>> dataTable{};
 		};
 
 		struct NonTickComponentPool
@@ -119,7 +117,7 @@ namespace SLD
 
 		template<typename SubTickComponent,
 			typename = EnableIsBasedOf<TickComponent, SubTickComponent>>
-			void InitializeAsyncTickTask(SubTickComponent** pointerToObj);
+			void InitializeAsyncTickTask(const ObservePtr<SubTickComponent>& pointerToObj);
 
 		PersistentThreadWorker& EmplaceNewWorker(const std::string& id);
 
@@ -167,7 +165,7 @@ namespace SLD
 	//}
 
 	template <typename ComponentType, typename, typename ... Args>
-	ObservePtr<ComponentType> WorldEntity::AllocTickComponent(Args&&... args)
+	RefPtr<ObservePtr<ComponentType>> WorldEntity::AllocTickComponent(Args&&... args)
 	{
 		// This only works if we map of different types of components
 		constexpr const char* uniqueId{ ComponentType::UniqueId };
@@ -175,36 +173,29 @@ namespace SLD
 		auto it{ m_TickComponent.try_emplace(uniqueId, TickComponentPool{}) };
 
 		auto& logResource{ it.first->second.logger };
+		auto& realResource{ it.first->second.resource };
 
 		// NOTE: I don't know I have to reassign this again so it works
 		logResource = LoggingResource{ &it.first->second.resource };
 
-		auto& table{ it.first->second.dataTable };
-
 		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
 
-		ComponentType* initPtr{ new (allocPtr) ComponentType(std::forward<Args>(args)...) };
+		new (allocPtr) ComponentType(std::forward<Args>(args)...);
+		auto& bufferHead{ realResource.GetBufferHead() };
+		const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
 
-		ObservePtr<TickComponent>* observeBase{ new ObservePtr<TickComponent>(initPtr) };
-		auto smart{ std::make_shared<ObservePtr<TickComponent>>() };
-		smart.reset(observeBase, [](ObservePtr<TickComponent>* ptr)
-			{
-				delete ptr;
-				ptr = nullptr;
-			});
-	
-		
-		//RefPtr<ObservePtr<TickComponent>> addressValue{ &observeBase,[&logResource](ObservePtr<TickComponent>* ptr)
-		//{
-		//	logResource.do_deallocate(*(*ptr),sizeof(ComponentType),alignof(ComponentType));
-		//	ptr = nullptr;
-		//} };
+		ObservePtr<ComponentType>* ob{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead} };
+		RefPtr<ObservePtr<ComponentType>> out{ ob,[&realResource](ObservePtr<ComponentType>* ptr)
+		{
+			realResource.do_deallocate(ptr->GetPtr(),sizeof(ComponentType),alignof(ComponentType));
+			delete ptr;
+			ptr = nullptr;
+		} };
 
-		auto& outValue = table.emplace_back(smart);
 
-		InitializeAsyncTickTask(&initPtr);
-		
-		return ObservePtr<ComponentType>{static_cast<ComponentType*>(outValue->GetPtr())};
+		InitializeAsyncTickTask(*ob);
+
+		return out;
 	}
 
 	template <typename ComponentType, typename, typename ... Args>
@@ -255,9 +246,8 @@ namespace SLD
 	{
 		constexpr std::string uniqueId{};
 		auto& tickPool{ m_TickComponent.at(uniqueId) };
-		auto& table{ tickPool.dataTable };
 
-		table.erase(std::remove(table.begin(), table.end(), ptr));
+		tickPool;
 	}
 
 	template <typename SubTickComponent, typename>
@@ -275,7 +265,7 @@ namespace SLD
 	}
 
 	template <typename SubTickComponent, typename>
-	void WorldEntity::InitializeAsyncTickTask(SubTickComponent** pointerToObj)
+	void WorldEntity::InitializeAsyncTickTask(const ObservePtr<SubTickComponent>& pointerToObj)
 	{
 		// Check if this component's worker is already initialize
 		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
@@ -285,10 +275,10 @@ namespace SLD
 
 		const bool found{ fIt != m_TickTasks.end() };
 		PersistentThreadWorker& thread{ found ? fIt->worker : EmplaceNewWorker(SubTickComponent::UniqueId) };
-		thread.AssignTask([pointerToObj,this]()
-		{
-				(*pointerToObj)->AsyncUpdate(this->GetDeltaTime());
-		});
+		thread.AssignTask([&pointerToObj, this]()
+			{
+				pointerToObj.GetPtr()->AsyncUpdate(this->GetDeltaTime());
+			});
 	}
 }
 

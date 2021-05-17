@@ -1,8 +1,10 @@
 #include "SFMLRenderer.h"
 
 #include "../../Components/RenderingComponent.h"
+#include "../../Components/TransformComponent.h"
 #include "../../Core/Window/Window.h"
 #include "../../Math/rtm/vector4f.h"
+#include "../../Core/ObservePtr.h"
 
 void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
 {
@@ -14,7 +16,8 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 		// Read Render Identifier
 		const uint8_t* head{ element.GetRenderData() };
 		const uint8_t* end{ head + element.GetMaxDataSize() };
-		const rtm::qvvf* objectWorldMatrix{};
+		//const rtm::qvvf* objectWorldMatrix{};
+		const SLD::ObservePtr<SLD::TransformComponent>* transform{};
 		const sf::Drawable* sfmlDrawable{};
 		sf::RenderStates renderStates{ sf::RenderStates::Default };
 
@@ -29,8 +32,8 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 			{
 			case SFMLRenderElement::WorldMatrix:
 			{
-				dataSize = sizeof(rtm::qvvf*);
-				std::memcpy(&objectWorldMatrix, head, dataSize);
+				dataSize = sizeof(void*);
+				std::memcpy(&transform, head, dataSize);
 				break;
 			}
 			case SFMLRenderElement::RenderShapes:
@@ -58,24 +61,26 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 			// SFML Drawable
 			if (sfmlDrawable)
 			{
-				if (objectWorldMatrix)
+				if (transform)
 				{
 					// TODO: Do rotation
 					
 					sf::Vector2f posVec{};
 					sf::Vector2f scaleVec{};
-					rtm::vector_store2(objectWorldMatrix->translation, &posVec.x);
-					rtm::vector_store2(objectWorldMatrix->scale, &scaleVec.x);
+					auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
+					rtm::vector_store2(objMat.translation, &posVec.x);
+					rtm::vector_store2(objMat.scale, &scaleVec.x);
 
 					posVec.x += renderTargetCenter.x;
+					posVec.y *= -1.0f;
 					posVec.y += renderTargetCenter.y;
 
-					renderStates.transform.scale(scaleVec);
 					renderStates.transform.translate(posVec);
+					renderStates.transform.scale(scaleVec);
 					//renderStates.transform.rotate()
 				}
 
-				m_RenderWindow->draw(*sfmlDrawable, renderStates);
+				m_RenderWindow->draw(*sfmlDrawable,renderStates);
 			}
 
 			head += dataSize;

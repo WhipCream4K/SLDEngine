@@ -6,7 +6,7 @@
 Level::Level(SLDWorldEntity& world)
 {
 	InitializeGameObjects(world);
-	ConstructPlatform();
+	//ConstructPlatform();
 }
 
 void Level::SetTexture(sf::Texture& texture)
@@ -27,42 +27,33 @@ void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 	for (auto& platfornm : m_Platforms)
 	{
 		platfornm.sprite->setTextureRect(textureRect);
+		platfornm.sprite->setOrigin(float(textureRect.width), float(textureRect.height));
 	}
 }
 
 void Level::ConstructPlatform()
 {
-	SLD::ObservePtr<SLD::TransformComponent> platformTransform{};
+	RefPtr<SLD::ObservePtr<SLD::TransformComponent>> platformTransform{};
 
 	//uint8_t colCnt{1};
 	const float platformWidth{ float(PlatformDimension[0]) };
 	const float platformHeight{ float(PlatformDimension[1])};
 
 	float startPlatformHeight{ platformHeight * 3.0f };
-
-	// NOTE: EXCEPTION TOP ONE
-	//m_Platforms[0].gameObject->GetTransform()->Translate(0.0f,startPlatformHeight,0.0f);
-	//m_Platforms[0].gameObject->GetTransform()->SetScale(QBert::GlobalScaleX,QBert::GlobalScaleY,1.0f);
-
-	//startPlatformHeight -= platformHeight;
 	
 	uint8_t num{0};
 	for (uint8_t i = 0; i < PlatformMaxRow; ++i)
 	{
 		const int colCnt{ int(i) };
-		for (int j = -colCnt; j <= colCnt; ++j)
+		float offset{ -(0.5f) * float(colCnt) };
+		for (int j = 0; j <= colCnt; ++j)
 		{
-			if(j == 0)
-			{
-				if((colCnt & 1)) // is odd
-					continue;
-			}
-
 			platformTransform = m_Platforms[num++].gameObject->GetTransform();
-			platformTransform->Translate(platformWidth * float(j), startPlatformHeight, 1.0f);
-			platformTransform->SetScale(QBert::GlobalScaleX, QBert::GlobalScaleY, 1.0f);
-			
+			platformTransform->GetPtr()->Translate(platformWidth * offset, startPlatformHeight, 1.0f);
+			platformTransform->GetPtr()->SetScale(QBert::GlobalScaleX, QBert::GlobalScaleY, 1.0f);
+			offset += 1.0f;
 		}
+
 		startPlatformHeight -= platformHeight;
 	}
 
@@ -92,7 +83,7 @@ void Level::InitializeGameObjects(SLDWorldEntity& worldEntt)
 	{
 		item.gameObject = worldEntt.CreateGameObject();
 		RefPtr<SLD::RenderingComponent> render{ item.gameObject->CreateRenderingComponent(renderSize,renderElemCnt) };
-		render->PushElement(SLD::RenderIdentifier(SFMLRenderElement::WorldMatrix), &item.gameObject->GetTransform()->GetWorldFinishMatrix());
+		render->PushElement(SLD::RenderIdentifier(SFMLRenderElement::WorldMatrix), item.gameObject->GetTransform().get());
 		item.sprite = render->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
 	}
 }

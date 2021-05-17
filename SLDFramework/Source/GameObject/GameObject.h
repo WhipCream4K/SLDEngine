@@ -20,7 +20,7 @@ namespace SLD
 
 		//GameObject(const RefPtr<const WorldEntity>& world);
 
-		[[nodiscard]] const ObservePtr<TransformComponent>& GetTransform() const;
+		[[nodiscard]] const RefPtr<ObservePtr<TransformComponent>>& GetTransform() const;
 
 		template<typename ComponentType,
 			typename = std::enable_if_t<std::is_base_of_v<BaseComponent, ComponentType>>>
@@ -37,11 +37,17 @@ namespace SLD
 
 		RefWrap<WorldEntity> GetWorld();
 
+		GameObject(const GameObject& other);
+		GameObject& operator=(const GameObject& other);
+		GameObject(GameObject&& other) noexcept;
+		GameObject& operator=(GameObject&& other) noexcept;
+		~GameObject();
+
 	private:
 
 		std::vector<RefPtr<BaseComponent>> m_ComponentTable;
 		RefWrap<WorldEntity> m_World;
-		ObservePtr<TransformComponent> m_Transform;
+		RefPtr<ObservePtr<TransformComponent>> m_Transform;
 	};
 
 	template <typename ComponentType, typename>
