@@ -27,6 +27,17 @@ public:
 private:
 	
 	RefPtr<sf::RenderWindow> m_RenderWindow;
+
+	struct DrawComponent
+	{
+		const sf::Drawable* drawObj{};
+		sf::RenderStates renderStates{};
+		float depth{};
+
+		
+	};
+
+	std::vector<DrawComponent> m_SFMLDrawable;
 };
 
 #endif

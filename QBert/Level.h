@@ -11,7 +11,6 @@ public:
 	void SetTexture(sf::Texture& texture);
 	void ChangePlatformTextureRect(const sf::IntRect& textureRect,uint8_t id);
 	void ChangeAllPlatformTextureRect(const sf::IntRect& textureRect);
-	void ConstructPlatform();
 
 private:
 
@@ -21,6 +20,7 @@ private:
 	static constexpr uint8_t PlatformMaxCol{ 7 };
 
 	void InitializeGameObjects(SLDWorldEntity& worldEntt);
+	void ConstructPlatform();
 
 	struct Platform
 	{

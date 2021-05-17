@@ -175,7 +175,7 @@ namespace SLD
 		auto& logResource{ it.first->second.logger };
 		auto& realResource{ it.first->second.resource };
 
-		// NOTE: I don't know I have to reassign this again so it works
+		// NOTE: I don't know I have to reassign this again to make it works
 		logResource = LoggingResource{ &it.first->second.resource };
 
 		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
@@ -185,13 +185,12 @@ namespace SLD
 		const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
 
 		ObservePtr<ComponentType>* ob{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead} };
-		RefPtr<ObservePtr<ComponentType>> out{ ob,[&realResource](ObservePtr<ComponentType>* ptr)
+		RefPtr<ObservePtr<ComponentType>> out{ ob,[&logResource](ObservePtr<ComponentType>* ptr)
 		{
-			realResource.do_deallocate(ptr->GetPtr(),sizeof(ComponentType),alignof(ComponentType));
+			logResource.do_deallocate(ptr->GetPtr(),sizeof(ComponentType),alignof(ComponentType));
 			delete ptr;
 			ptr = nullptr;
 		} };
-
 
 		InitializeAsyncTickTask(*ob);
 

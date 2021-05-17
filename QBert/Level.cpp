@@ -6,7 +6,7 @@
 Level::Level(SLDWorldEntity& world)
 {
 	InitializeGameObjects(world);
-	//ConstructPlatform();
+	ConstructPlatform();
 }
 
 void Level::SetTexture(sf::Texture& texture)
@@ -27,7 +27,7 @@ void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 	for (auto& platfornm : m_Platforms)
 	{
 		platfornm.sprite->setTextureRect(textureRect);
-		platfornm.sprite->setOrigin(float(textureRect.width), float(textureRect.height));
+		platfornm.sprite->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
 	}
 }
 
@@ -36,28 +36,13 @@ void Level::ConstructPlatform()
 	RefPtr<SLD::ObservePtr<SLD::TransformComponent>> platformTransform{};
 
 	//uint8_t colCnt{1};
-	const float platformWidth{ float(PlatformDimension[0]) };
-	const float platformHeight{ float(PlatformDimension[1])};
+	const float scaleX{ QBert::GlobalScaleX };
+	const float scaleY{ QBert::GlobalScaleY };
+	const float platformWidth{ float(PlatformDimension[0]) * scaleX };
+	const float platformHeight{ float(PlatformDimension[1]) * scaleY };
+	const float platformOffSet{ 1.5f * platformHeight * 0.5f };
 
-	float startPlatformHeight{ platformHeight * 3.0f };
-	
-	uint8_t num{0};
-	for (uint8_t i = 0; i < PlatformMaxRow; ++i)
-	{
-		const int colCnt{ int(i) };
-		float offset{ -(0.5f) * float(colCnt) };
-		for (int j = 0; j <= colCnt; ++j)
-		{
-			platformTransform = m_Platforms[num++].gameObject->GetTransform();
-			platformTransform->GetPtr()->Translate(platformWidth * offset, startPlatformHeight, 1.0f);
-			platformTransform->GetPtr()->SetScale(QBert::GlobalScaleX, QBert::GlobalScaleY, 1.0f);
-			offset += 1.0f;
-		}
-
-		startPlatformHeight -= platformHeight;
-	}
-
-	//	//TODO: Set up platform position
+	float startPlatformHeight{ (platformHeight * 3.0f) - platformHeight };
 
 	//	//							0
 	//	//						1		2
@@ -66,10 +51,23 @@ void Level::ConstructPlatform()
 	//	//			10		11		12		13		14
 	//	//		15		16		17		18		19		20
 	//	//	21		22		23		24		25		26		27
+	
+	uint8_t num{ 0 };
+	for (uint8_t i = 0; i < PlatformMaxRow; ++i)
+	{
+		const int colCnt{ int(i) };
+		float offset{ -(0.5f) * float(colCnt) };
+		for (int j = 0; j <= colCnt; ++j)
+		{
+			platformTransform = m_Platforms[num++].gameObject->GetTransform(); // NOTE: DANGER EXCEPTION
+			platformTransform->GetPtr()->Translate(platformWidth * offset, startPlatformHeight, float(QBert::Layer::Map));
+			platformTransform->GetPtr()->SetScale(scaleX, scaleY, 1.0f);
+			offset += 1.0f;
+		}
 
+		startPlatformHeight -= platformOffSet;
+	}
 
-	//	
-	//}
 }
 
 void Level::InitializeGameObjects(SLDWorldEntity& worldEntt)
@@ -78,7 +76,7 @@ void Level::InitializeGameObjects(SLDWorldEntity& worldEntt)
 		sizeof(void*) + sizeof(sf::Sprite)
 	};
 	const size_t renderElemCnt{ 2 };
-	
+
 	for (auto& item : m_Platforms)
 	{
 		item.gameObject = worldEntt.CreateGameObject();

@@ -11,12 +11,14 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 	//m_RenderWindow.draw();
 	auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
 
-	for (const auto& element : renderingComponents)
+	if (m_SFMLDrawable.size() < renderingComponents.size())
+		m_SFMLDrawable.resize(renderingComponents.size());
+
+	for (size_t i = 0; i < renderingComponents.size(); ++i)
 	{
 		// Read Render Identifier
-		const uint8_t* head{ element.GetRenderData() };
-		const uint8_t* end{ head + element.GetMaxDataSize() };
-		//const rtm::qvvf* objectWorldMatrix{};
+		const uint8_t* head{ renderingComponents[i].GetRenderData() };
+		const uint8_t* end{ head + renderingComponents[i].GetMaxDataSize() };
 		const SLD::ObservePtr<SLD::TransformComponent>* transform{};
 		const sf::Drawable* sfmlDrawable{};
 		sf::RenderStates renderStates{ sf::RenderStates::Default };
@@ -58,33 +60,71 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 			default: break;
 			}
 
-			// SFML Drawable
 			if (sfmlDrawable)
 			{
 				if (transform)
 				{
+
 					// TODO: Do rotation
-					
-					sf::Vector2f posVec{};
+
+					sf::Vector3f posVec{};
 					sf::Vector2f scaleVec{};
 					auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
-					rtm::vector_store2(objMat.translation, &posVec.x);
+					rtm::vector_store3(objMat.translation, &posVec.x);
 					rtm::vector_store2(objMat.scale, &scaleVec.x);
 
 					posVec.x += renderTargetCenter.x;
 					posVec.y *= -1.0f;
 					posVec.y += renderTargetCenter.y;
 
-					renderStates.transform.translate(posVec);
+					renderStates.transform.translate(posVec.x, posVec.y);
 					renderStates.transform.scale(scaleVec);
-					//renderStates.transform.rotate()
-				}
 
-				m_RenderWindow->draw(*sfmlDrawable,renderStates);
+					m_SFMLDrawable[i].drawObj = sfmlDrawable;
+					m_SFMLDrawable[i].renderStates = renderStates;
+					m_SFMLDrawable[i].depth = posVec.z;
+				}
 			}
+
+			//// SFML Drawable
+			//if (sfmlDrawable)
+			//{
+			//	if (transform)
+			//	{
+			//		// TODO: Do rotation
+			//		
+			//		sf::Vector2f posVec{};
+			//		sf::Vector2f scaleVec{};
+			//		auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
+			//		rtm::vector_store2(objMat.translation, &posVec.x);
+			//		rtm::vector_store2(objMat.scale, &scaleVec.x);
+
+			//		posVec.x += renderTargetCenter.x;
+			//		posVec.y *= -1.0f;
+			//		posVec.y += renderTargetCenter.y;
+
+			//		renderStates.transform.translate(posVec);
+			//		renderStates.transform.scale(scaleVec);
+			//		//renderStates.transform.rotate()
+			//	}
+
+			//	m_RenderWindow->draw(*sfmlDrawable,renderStates);
+			//}
 
 			head += dataSize;
 		}
+	}
+
+	// Sort Layer
+	std::sort(m_SFMLDrawable.begin(), m_SFMLDrawable.end(), [](const DrawComponent& lhs, const DrawComponent& rhs)
+		{
+			return lhs.depth < rhs.depth;
+		});
+
+	// Draw
+	for (const auto& item : m_SFMLDrawable)
+	{
+		m_RenderWindow->draw(*item.drawObj, item.renderStates);
 	}
 
 }

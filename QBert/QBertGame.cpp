@@ -27,7 +27,6 @@ void QBertGame::Start()
 		m_Player.SetSpriteTexture(m_QBertSprite);
 
 		// Map generation
-		m_Level.ConstructPlatform();
 		m_Level.SetTexture(m_QBertSprite);
 		m_Level.ChangeAllPlatformTextureRect(QBert::Level1::RectPlatFormStart);
 

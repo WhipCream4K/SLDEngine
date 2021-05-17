@@ -12,5 +12,10 @@ namespace QBert
 		inline static const sf::IntRect RectPlatFormStart{0,224,32,32};
 		inline static const sf::IntRect RectPlatFormEnd{0,192,32,32};
 	};
-	
+
+	enum class Layer
+	{
+		Map,
+		Player
+	};
 }

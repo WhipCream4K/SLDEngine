@@ -5,6 +5,8 @@
 #include "GameObject/GameObject.h"
 #include "Rendering/RenderParams.h"
 
+#include "QBertParams.h"
+
 Player::Player(SLD::WorldEntity& world)
 {
 	m_GameObject = world.CreateGameObject();
@@ -23,7 +25,7 @@ Player::Player(SLD::WorldEntity& world)
 	// Sprite Creation
 	m_CharacterSprite = m_RenderingComponent->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
 
-	transform->GetPtr()->Translate(-500.0f, 200.0f, 0.0f);
+	transform->GetPtr()->Translate(0.0f, 0.0f, float(QBert::Layer::Player));
 }
 
 void Player::SetSpriteTexture(const sf::Texture& texture)
@@ -35,5 +37,5 @@ void Player::SetSpriteTexture(const sf::Texture& texture)
 		0,0,16,16
 	};
 	m_CharacterSprite->setTextureRect(spriteRect);
-	m_CharacterSprite->setOrigin(16.0f, 16.0f);
+	m_CharacterSprite->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
 }
