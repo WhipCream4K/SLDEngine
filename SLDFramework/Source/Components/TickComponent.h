@@ -9,6 +9,7 @@
 
 namespace SLD
 {
+	
 	class TickComponent : public BaseComponent
 	{
 	public:
@@ -22,7 +23,7 @@ namespace SLD
 
 		virtual void AsyncUpdate([[maybe_unused]] float) {}
 
-		virtual ~TickComponent() = default;
+		virtual ~TickComponent() override = default;
 	};
 }
 

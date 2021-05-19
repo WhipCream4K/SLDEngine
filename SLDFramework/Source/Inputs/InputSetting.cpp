@@ -53,9 +53,8 @@ void SLD::InputSetting::AddActionKeyToMapping(
 	{
 		actionKeys.emplace_back(key);
 		if (rebuildKeyPool) // for this one just add it to the Keypool
-		{
 			keyPool.insert(key.key);
-		}
+
 	}
 }
 
@@ -92,6 +91,21 @@ void SLD::InputSetting::AddAxisKeysToMapping(
 {
 	axisMappingName;
 	keyVec;
+	rebuildKeyPool;
+}
+
+void SLD::InputSetting::RemoveActionKeyFromMapping(const std::string& groupName, const ActionKey& key,
+	bool rebuildKeyPool)
+{
+	groupName;
+	key;
+	rebuildKeyPool;
+}
+
+void SLD::InputSetting::RemoveAxisKeyFromMapping(const std::string& groupName, const AxisKey& key, bool rebuildKeyPool)
+{
+	groupName;
+	key;
 	rebuildKeyPool;
 }
 
@@ -138,7 +152,7 @@ void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 				const float totalAxisValue{ fIt->second * axisValue };
 				for (const auto& cm : commands)
 				{
-					cm->Invoke(totalAxisValue);
+					cm.callback->Invoke(totalAxisValue);
 				}
 			}
 		}
@@ -149,4 +163,28 @@ void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 	default: break;
 	}
 
+}
+
+void SLD::InputSetting::RemoveCommands(WeakPtr<GameObject> reference)
+{
+	// Delete from both command table
+	
+	for (auto& keyMap : m_ActionKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+
+		commandTable.erase(std::remove_if(commandTable.begin(), commandTable.end(), [&reference](const ActionCommand& item)
+			{
+				return item.referencePointer.lock() == reference.lock();
+			}), commandTable.end());
+	}
+
+	for (auto& keyMap : m_AxisKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+		commandTable.erase(std::remove_if(commandTable.begin(), commandTable.end(), [&reference](const AxisCommand& item)
+			{
+				return item.referencePointer.lock() == reference.lock();
+			}));
+	}
 }

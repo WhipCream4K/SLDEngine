@@ -40,7 +40,7 @@ namespace SLD
 			typename FuncPtr,
 			typename = std::enable_if_t<IsInvokable<Ret, FuncPtr, Object, Args...>>
 		>
-			explicit Delegate(FuncPtr ptr, WeakPtr<Object> pObject)
+			explicit Delegate(FuncPtr ptr, Object* pObject)
 			: m_pFn(ptr)
 			, m_pInstance(pObject)
 		{
@@ -54,12 +54,22 @@ namespace SLD
 			//};
 		}
 
+		template<
+			typename FuncPtr,
+			typename = std::enable_if_t<IsInvokable<Ret, FuncPtr, Object, Args...>>
+		>
+			explicit Delegate(FuncPtr ptr, const RefPtr<Object>& pObject)
+			: m_pFn(ptr)
+			, m_pInstance(pObject.get())
+		{
+		}
+
 		[[maybe_unused]] Ret operator()(Args... args) const
 		{
 			//if (m_pCallback && m_pInstance.lock())
 			//	return (m_pInstance->*m_pFn)(std::forward<Args>(args)...);
-			if (m_pInstance.lock())
-				return (m_pInstance.lock().get()->*m_pFn)(std::forward<Args>(args)...);
+			if (m_pInstance)
+				return (m_pInstance->*m_pFn)(std::forward<Args>(args)...);
 
 			// TODO: This is runtime error and probably should be treat in logging system rather than throw
 			throw std::runtime_error("Callee is no longer exist and can't be reference");
@@ -73,7 +83,7 @@ namespace SLD
 		//std::unique_ptr<CallbackType, std::function<void(CallbackStorageType*)>> m_pCallback;
 
 		FnType m_pFn;
-		WeakPtr<Object> m_pInstance;
+		Object* m_pInstance;
 	};
 
 	template<typename Ret, class Object, typename ...Args>
@@ -91,7 +101,7 @@ namespace SLD
 			typename FuncPtr,
 			typename = std::enable_if_t<IsInvokable<Ret, FuncPtr, Object, Args...>>
 		>
-			explicit Delegate(FuncPtr ptr, WeakPtr<Object> pObject)
+			explicit Delegate(FuncPtr ptr, Object* pObject)
 			: m_pFn(ptr)
 			, m_pInstance(pObject)
 		{
@@ -105,12 +115,22 @@ namespace SLD
 			//};
 		}
 
+		template<
+			typename FuncPtr,
+			typename = std::enable_if_t<IsInvokable<Ret, FuncPtr, Object, Args...>>
+		>
+			explicit Delegate(FuncPtr ptr, const RefPtr<Object>& pObject)
+			: m_pFn(ptr)
+			, m_pInstance(pObject.get())
+		{
+		}
+
 		[[maybe_unused]] Ret operator()(Args... args) const
 		{
 			//if (m_pCallback && m_pInstance.lock())
 			//	return (*m_pCallback)(m_pFn, m_pInstance, std::forward<Args>(args)...);
-			if (m_pInstance.lock())
-				return (m_pInstance.lock().get()->*m_pFn)(std::forward<Args>(args)...);
+			if (m_pInstance)
+				return (m_pInstance->*m_pFn)(std::forward<Args>(args)...);
 
 			// TODO: This is runtime error and probably should be treat in logging system rather than throw
 			throw std::runtime_error("Callee is no longer exist and can't be reference");
@@ -124,7 +144,7 @@ namespace SLD
 		//std::unique_ptr<CallbackType, std::function<void(CallbackStorageType*)>> m_pCallback;
 
 		FnType m_pFn;
-		WeakPtr<Object> m_pInstance;
+		Object* m_pInstance;
 	};
 
 	// static Delegate member size, this is always valid because it always stays the same size

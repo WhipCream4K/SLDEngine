@@ -33,8 +33,8 @@ void QBertGame::Start()
 		// HUD generation
 	}
 
-
-
+	// Binding
+	m_Player.SetUpPlayerInput();
 }
 
 void QBertGame::Run()

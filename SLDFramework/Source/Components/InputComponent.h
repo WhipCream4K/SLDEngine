@@ -7,7 +7,7 @@
 #include "../Core/Event.h"
 #include "../Inputs/InputSetting.h"
 #include "NonTickComponent.h"
-
+#include "../GameObject/GameObject.h"
 
 
 namespace SLD
@@ -92,8 +92,11 @@ namespace SLD
 
 		static constexpr const char* UniqueId{ "InputComponent" };
 		
-		InputComponent(InputSetting& inputRef);
-
+		InputComponent(WeakPtr<GameObject> gameObject);
+		InputComponent(const RefPtr<GameObject>& gameObject);
+		
+		//InputComponent* GetMe();
+		
 		template<typename FuncPtr,
 			typename = EnableIf<IsMemberFunc<FuncPtr>>,
 			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
@@ -104,7 +107,7 @@ namespace SLD
 				FuncPtr fnPtr,
 				const RefPtr<ObjectType>& instance,
 				Args&&... args) noexcept(false) -> ActionHandle;
-
+		
 		template<typename FuncPtr,
 			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
 			typename = EnableIf<IsFuncSameType<FuncPtr, AxisCallbackType>::value>>
@@ -113,41 +116,52 @@ namespace SLD
 				FuncPtr fnPtr,
 				const RefPtr<ObjectType>& instance) noexcept -> AxisHandle;
 
-		//template<typename FuncPtr,
-		//	typename = EnableIf<IsMemberFunc<FuncPtr>>,
-		//	typename ObjectTpye = typename Function_Traits<FuncPtr>::element_type>
-		//	constexpr auto BindWindowEvent(uint8_t eventType, FuncPtr fnPtr, const RefPtr<ObjectTpye>& instance) noexcept -> void;
+		template<typename FuncPtr,
+			typename = EnableIf<IsMemberFunc<FuncPtr>>,
+			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
+			typename ...Args>
+			[[maybe_unused]] constexpr auto BindAction(
+				const std::string& actionName,
+				InputEvent ie,
+				FuncPtr fnPtr,
+				ObjectType* instance,
+				Args&&... args) noexcept ->ActionHandle;
 
-		//template<typename FuncPtr,
-		//	typename = EnableIf<IsMemberFunc<FuncPtr>>,
-		//	typename ObjectTpye = typename Function_Traits<FuncPtr>::element_type>
-		//	constexpr auto BindWindowEvent(sf::Event::EventType eventType, FuncPtr fnPtr, const RefPtr<ObjectTpye>& instance) noexcept -> void;
+		template<typename FuncPtr,
+			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
+			typename = EnableIf<IsFuncSameType<FuncPtr, AxisCallbackType>::value>>
+			[[maybe_unused]] constexpr auto BindAxis(
+				const std::string& axisName,
+				FuncPtr fnPtr,
+				ObjectType* instance) noexcept -> AxisHandle;
 
-		//[[nodiscard]] std::optional<ActionHandle const*> GetActionHandleFromMappingGroup(const std::string& actionName, InputEvent ie) noexcept;
-		//[[nodiscard]] std::optional<AxisHandle const*> GetAxisHandleFromMappingGroup(const std::string& axisName) noexcept;
-		//[[nodiscard]] std::optional<ActionHandle const*> GetActionHandleFromMappingGroup(uint32_t keyId) noexcept;
-		//[[nodiscard]] std::optional<AxisHandle const*> GetAxisHandleFromMappingGroup(uint32_t keyId) noexcept;
-
-		//[[nodiscard]] InputActionKeyBinding& GetActionKeyManager(uint32_t keyId);
-		//[[nodiscard]] InputAxisKeyBinding& GetAxisKeyManager(uint32_t keyId);
+		~InputComponent() override;
 	
 	private:
 
-		// NOTE: resource for all the bindings
-
-		InputSetting& m_InputSettingRef;
+		// InputComponent is the only component that hardly tied to the owner (GameObject)
+		// Because in order to destroy commands create by this InputComponent
+		// We need some sort of reference point to delete from the table
+		WeakPtr<GameObject> m_Parent;
 	};
 
 	template <typename FuncPtr, typename, typename ObjectType, typename ... Args>
-	constexpr auto InputComponent::BindAction(
-		const std::string& actionName,
-		InputEvent ie,
-		FuncPtr fnPtr,
-		const RefPtr<ObjectType>& instance,
-		Args&&... args) noexcept(false) -> ActionHandle
+	constexpr auto InputComponent::BindAction(const std::string& actionName, InputEvent ie, FuncPtr fnPtr,
+		const RefPtr<ObjectType>& instance, Args&&... args) noexcept(false) -> ActionHandle
 	{
 		ActionHandle handle{};
-		m_InputSettingRef.RegisterActionCommand(actionName, ie, fnPtr, instance, &handle.m_IsValid, std::forward<Args>(args)...);
+
+		if (auto parentPointer{ m_Parent.lock() }; parentPointer)
+			parentPointer->GetWorld().get().GetWorldInputSetting().CreateActionCommand(
+				actionName,
+				m_Parent,
+				ie,
+				fnPtr,
+				instance.get(),
+				&handle.m_IsValid,
+				std::forward<Args>(args)...
+			);
+
 		return handle;
 	}
 
@@ -158,7 +172,52 @@ namespace SLD
 		const RefPtr<ObjectType>& instance) noexcept -> AxisHandle
 	{
 		AxisHandle handle{};
-		m_InputSettingRef.RegisterAxisCommand(axisName, fnPtr, instance, &handle.m_ResultAxis);
+		if (auto parentPtr{ m_Parent.lock() }; parentPtr)
+			parentPtr->GetWorld().get().GetWorldInputSetting().CreateAxisCommand(
+				axisName,
+				m_Parent,
+				fnPtr,
+				instance.get(),
+				&handle.m_ResultAxis
+			);
+
+		return handle;
+	}
+
+	template <typename FuncPtr, typename, typename ObjectType, typename ... Args>
+	constexpr auto InputComponent::BindAction(const std::string& actionName, InputEvent ie, FuncPtr fnPtr,
+		ObjectType* instance, Args&&... args) noexcept -> ActionHandle
+	{
+		ActionHandle handle{};
+
+		if (auto parentPointer{ m_Parent.lock() }; parentPointer)
+			parentPointer->GetWorld().get().GetWorldInputSetting().CreateActionCommand(
+				actionName,
+				m_Parent,
+				ie,
+				fnPtr,
+				instance,
+				&handle.m_IsValid,
+				std::forward<Args>(args)...
+			);
+		
+		return handle;
+	}
+
+	template <typename FuncPtr, typename ObjectType, typename>
+	constexpr auto InputComponent::BindAxis(const std::string& axisName, FuncPtr fnPtr,
+		ObjectType* instance) noexcept -> AxisHandle
+	{
+		AxisHandle handle{};
+		if (auto parentPtr{ m_Parent.lock() }; parentPtr)
+			parentPtr->GetWorld().get().GetWorldInputSetting().CreateAxisCommand(
+				axisName,
+				m_Parent,
+				fnPtr,
+				instance,
+				&handle.m_ResultAxis
+		);
+
 		return handle;
 	}
 

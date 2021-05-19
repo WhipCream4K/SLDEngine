@@ -4,14 +4,25 @@
 
 #include "../Core/Base.h"
 #include "../Components/NonTickComponent.h"
-//#include "../Components/TickComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Core/WorldEntity.h"
 
 namespace SLD
 {
 	class TransformComponent;
-	class GameObject final
+
+	//struct ComponentPointerWrapper
+	//{
+	//	ComponentPointerWrapper(ObservePtr ptr)
+	//		: resourcePointer(ptr)
+	//	{
+	//	}
+	//	
+	//	ObservePtr resourcePointer;
+	//	RefPtr<BaseComponent> component;
+	//};
+	
+	class GameObject final : public std::enable_shared_from_this<GameObject>
 	{
 	public:
 
@@ -23,15 +34,14 @@ namespace SLD
 		[[nodiscard]] const RefPtr<ObservePtr<TransformComponent>>& GetTransform() const;
 
 		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<BaseComponent, ComponentType>>>
-			[[nodiscard]] RefPtr<ComponentType> GetComponent();
+			typename = EnableIsBasedOf<BaseComponent,ComponentType>>
+			[[nodiscard]] WeakPtr<ObservePtr<ComponentType>> GetComponent();
 
-		[[nodiscard]] const std::vector<RefPtr<BaseComponent>>& GetAllComponents() const;
 
 		template<typename ComponentType,
 			typename = EnableIsBasedOf<BaseComponent, ComponentType>,
 			typename ...Args>
-			[[nodiscard]] RefPtr<ComponentType> CreateComponent(Args&&... args);
+			[[nodiscard]] WeakPtr<ObservePtr<ComponentType>> CreateComponent(Args&&... args);
 
 		RefPtr<RenderingComponent> CreateRenderingComponent(size_t elemSize, uint32_t elemCnt);
 
@@ -45,43 +55,64 @@ namespace SLD
 
 	private:
 
-		std::vector<RefPtr<BaseComponent>> m_ComponentTable;
+		std::vector<RefPtr<ObservePtr<BaseComponent>>> m_ComponentTable;
 		RefWrap<WorldEntity> m_World;
 		RefPtr<ObservePtr<TransformComponent>> m_Transform;
 	};
 
 	template <typename ComponentType, typename>
-	RefPtr<ComponentType> GameObject::GetComponent()
+	WeakPtr<ObservePtr<ComponentType>> GameObject::GetComponent()
 	{
-		for (const auto& component : m_ComponentTable)
+		for (auto& component : m_ComponentTable)
 		{
-			const auto& out{ std::static_pointer_cast<ComponentType>(component) };
-			if (out)
-				return out;
+			if (dynamic_cast<ComponentType*>(component->GetPtr()))
+				return reinterpret_cast<RefPtr<ObservePtr<ComponentType>>&>(component);
 		}
 
-		return nullptr;
+		return {};
 	}
 
 	template <typename ComponentType, typename, typename ... Args>
-	RefPtr<ComponentType> GameObject::CreateComponent(Args&&... args)
+	WeakPtr<ObservePtr<ComponentType>> GameObject::CreateComponent(Args&&... args)
 	{
-		//auto world{ m_World.lock() };
+		// TODO: Fix me
+		
+		RefPtr<ObservePtr<ComponentType>> component{};
 
-		if constexpr (std::is_base_of_v<NonTickComponent, ComponentType>)
-		{
-			RefPtr<ComponentType> component{ m_World->AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...) };
-			return component;
-		}
+		if constexpr (std::is_same_v<InputComponent, ComponentType>)
+			component = m_World.get().AllocNonTickComponent<ComponentType>(shared_from_this());
+		
+		else if constexpr (std::is_base_of_v<TickComponent,ComponentType>)
+			component = m_World.get().AllocTickComponent<ComponentType>(std::forward<Args>(args)...);
+		
+		else if constexpr (std::is_base_of_v<NonTickComponent,ComponentType>)
+			component = m_World.get().AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...);
 
-		if constexpr (std::is_base_of_v<TickComponent, ComponentType>)
-		{
-			RefPtr<ComponentType> component{ m_World->AllocTickComponent<ComponentType>(std::forward<Args>(args)...) };
-			return component;
-		}
-
-		return nullptr;
+		if(component)
+			m_ComponentTable.emplace_back(reinterpret_cast<RefPtr<ObservePtr<BaseComponent>>&>(component));
+		
+		return component;
 	}
+
+	//template <typename ComponentType, typename, typename ... Args>
+	//RefPtr<ComponentType> GameObject::CreateComponent(Args&&... args)
+	//{
+	//	//auto world{ m_World.lock() };
+
+	//	if constexpr (std::is_base_of_v<NonTickComponent, ComponentType>)
+	//	{
+	//		RefPtr<ComponentType> component{ m_World->AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...) };
+	//		return component;
+	//	}
+
+	//	if constexpr (std::is_base_of_v<TickComponent, ComponentType>)
+	//	{
+	//		RefPtr<ComponentType> component{ m_World->AllocTickComponent<ComponentType>(std::forward<Args>(args)...) };
+	//		return component;
+	//	}
+
+	//	return nullptr;
+	//}
 }
 
 #endif

@@ -102,8 +102,19 @@
 //	, m_InputSettingRef(const_cast<InputSetting&>(world->GetWorldInputSetting()))
 //{
 //}
-SLD::InputComponent::InputComponent(InputSetting& inputRef)
-	: NonTickComponent()
-	, m_InputSettingRef(inputRef)
+
+SLD::InputComponent::InputComponent(WeakPtr<GameObject> gameObject)
+	: m_Parent(gameObject)
 {
+}
+
+SLD::InputComponent::InputComponent(const RefPtr<GameObject>& gameObject)
+	: m_Parent(gameObject)
+{
+}
+
+SLD::InputComponent::~InputComponent()
+{
+	if (auto parent{ m_Parent.lock() }; parent)
+		parent->GetWorld().get().GetWorldInputSetting().RemoveCommands(m_Parent);
 }

@@ -37,10 +37,16 @@ namespace SLD
 		
 		template<typename FuncPtr>
 		CAction(FuncPtr ptr, WeakPtr<Object> usrObj)
-			: m_Delegate(ptr, usrObj)
+			: m_Delegate(ptr, usrObj.lock().get())
 		{
 		}
 
+		template<typename FuncPtr>
+		CAction(FuncPtr ptr, Object* usrObj)
+			: m_Delegate(ptr,usrObj)
+		{
+		}
+		
 		template<typename FuncPtr>
 		CAction(FuncPtr ptr)
 			: m_Delegate(ptr)

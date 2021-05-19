@@ -86,31 +86,6 @@ void SFMLRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingC
 				}
 			}
 
-			//// SFML Drawable
-			//if (sfmlDrawable)
-			//{
-			//	if (transform)
-			//	{
-			//		// TODO: Do rotation
-			//		
-			//		sf::Vector2f posVec{};
-			//		sf::Vector2f scaleVec{};
-			//		auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
-			//		rtm::vector_store2(objMat.translation, &posVec.x);
-			//		rtm::vector_store2(objMat.scale, &scaleVec.x);
-
-			//		posVec.x += renderTargetCenter.x;
-			//		posVec.y *= -1.0f;
-			//		posVec.y += renderTargetCenter.y;
-
-			//		renderStates.transform.translate(posVec);
-			//		renderStates.transform.scale(scaleVec);
-			//		//renderStates.transform.rotate()
-			//	}
-
-			//	m_RenderWindow->draw(*sfmlDrawable,renderStates);
-			//}
-
 			head += dataSize;
 		}
 	}

@@ -4,11 +4,13 @@
 
 #include "GameObject/GameObject.h"
 #include "Rendering/RenderParams.h"
+#include "Components/InputComponent.h"
 
 #include "QBertParams.h"
 
 Player::Player(SLD::WorldEntity& world)
 {
+
 	m_GameObject = world.CreateGameObject();
 
 	m_TransformComponent = m_GameObject->GetTransform();
@@ -26,9 +28,15 @@ Player::Player(SLD::WorldEntity& world)
 	m_CharacterSprite = m_RenderingComponent->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
 
 	transform->GetPtr()->Translate(0.0f, 0.0f, float(QBert::Layer::Player));
+
+	m_InputComponent = m_GameObject->CreateComponent<SLD::InputComponent>();
+
+	auto inputTest{ m_GameObject->GetComponent<SLD::InputComponent>() };
+
+	//m_InputComponent.lock()->GetPtr()->BindAction("Horizontal", SLD::InputEvent::IE_Released, &Player::SetSpriteTexture, this);
 }
 
-void Player::SetSpriteTexture(const sf::Texture& texture)
+void Player::SetSpriteTexture(const sf::Texture& texture) const
 {
 	m_CharacterSprite->setTexture(texture,true);
 	
@@ -38,4 +46,22 @@ void Player::SetSpriteTexture(const sf::Texture& texture)
 	};
 	m_CharacterSprite->setTextureRect(spriteRect);
 	m_CharacterSprite->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
+}
+
+void Player::SetUpPlayerInput()
+{
+	if(const auto inputComponent{ m_InputComponent.lock() }; inputComponent)
+	{
+		inputComponent->GetPtr()->BindAxis("Horizontal", &Player::MoveHorizontal, this);
+	}
+}
+
+void Player::MoveHorizontal(float value)
+{
+	if (const auto transform{ m_TransformComponent.lock() })
+	{
+		const rtm::float3f& pos{ transform->GetPtr()->GetWorldPos() };
+		const float speed{ 60.0f };
+		transform->GetPtr()->Translate(speed * pos.x * value, pos.y, pos.z);
+	}
 }

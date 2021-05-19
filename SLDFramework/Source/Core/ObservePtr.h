@@ -9,10 +9,12 @@ namespace SLD
 {
 	// A class that watch over some un-owned pointer
 	template<typename T>
-	class ObservePtr final
+	class ObservePtr
 	{
 	public:
 
+		// Quality of life
+		ObservePtr();
 		ObservePtr(std::add_pointer_t<void> const& voidException, size_t offset);
 		ObservePtr(std::add_pointer_t<uint8_t> const& ptrValue, size_t offset);
 		ObservePtr(const ObservePtr& other);
@@ -20,18 +22,22 @@ namespace SLD
 		ObservePtr(ObservePtr&& other) noexcept;
 		ObservePtr& operator=(ObservePtr&& other) noexcept;
 
-		//ObservePtr& operator=(std::add_pointer_t<T>& ptrValue) noexcept;
-
-		~ObservePtr();
+		virtual ~ObservePtr();
 
 		operator bool() const
 		{
 			return m_BufferStart;
 		}
 
-		T* GetPtr() const noexcept
+		//template<typename T>
+		[[nodiscard]] T* GetPtr() const noexcept
 		{
 			return (m_BufferStart) ? reinterpret_cast<T*>(m_BufferStart + m_Offset) : nullptr;
+		}
+
+		[[nodiscard]] uint8_t* GetPtrPointTo() const
+		{
+			return m_BufferStart + m_Offset;
 		}
 
 		T* operator*() const noexcept
@@ -51,8 +57,15 @@ namespace SLD
 	};
 
 	template <typename T>
+	ObservePtr<T>::ObservePtr()
+		: m_BufferStart(nullptr)
+		, m_Offset()
+	{
+	}
+
+	template <typename T>
 	ObservePtr<T>::ObservePtr(std::add_pointer_t<void>const& voidException, size_t offset)
-		: m_BufferStart((uint8_t*const&)voidException)
+		: m_BufferStart((uint8_t* const&)voidException)
 		, m_Offset(offset)
 	{
 	}
@@ -76,7 +89,7 @@ namespace SLD
 	{
 		if (this != &other)
 		{
-			m_BufferStart = other.m_BufferStart;
+			const_cast<uint8_t*&>(m_BufferStart) = other.m_BufferStart;
 			m_Offset = other.m_Offset;
 		}
 
@@ -95,7 +108,7 @@ namespace SLD
 	{
 		if (this != &other)
 		{
-			m_BufferStart = std::move(other.m_BufferStart);
+			const_cast<uint8_t*&>(m_BufferStart) = std::move(other.m_BufferStart);
 			m_Offset = std::move(other.m_Offset);
 		}
 

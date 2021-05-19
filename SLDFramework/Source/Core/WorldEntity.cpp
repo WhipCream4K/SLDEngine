@@ -38,7 +38,7 @@ std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderingComponent
 	return m_RenderComponents;
 }
 
-const SLD::InputSetting& SLD::WorldEntity::GetWorldInputSetting() const
+SLD::InputSetting& SLD::WorldEntity::GetWorldInputSetting()
 {
 	return m_InputSetting;
 }

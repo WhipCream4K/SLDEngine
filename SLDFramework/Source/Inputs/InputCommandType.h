@@ -7,12 +7,21 @@
 
 namespace SLD
 {
+	class GameObject;
+	class InputComponent;
 	using AxisCallbackType = void(float);
 	
-	struct ActionCommandType
+	struct ActionCommand
 	{
 		RefPtr<EventHandler> callback{};
 		InputEvent iEvent{ InputEvent::IE_None };
+		WeakPtr<GameObject> referencePointer{};
+	};
+
+	struct AxisCommand
+	{
+		RefPtr<VirMemDelegate<AxisCallbackType>> callback{};
+		WeakPtr<GameObject> referencePointer{};
 	};
 	
 	using AxisCommandType = RefPtr<VirMemDelegate<AxisCallbackType>>;
