@@ -38,7 +38,7 @@ namespace SLD
 		// TODO: Can't find a smart pointer that takes no ownership
 		// until I can find one I will return raw pointers :(
 		template<typename ComponentType,
-			typename = EnableIsBasedOf<TickComponent, ComponentType > ,
+			typename = EnableIsBasedOf<TickComponent, ComponentType >,
 			typename ...Args>
 			RefPtr<ObservePtr<ComponentType>> AllocTickComponent(Args&&... args);
 
@@ -122,7 +122,9 @@ namespace SLD
 
 		// Game Related
 		std::chrono::high_resolution_clock::time_point m_EndTimePoint;
+		std::chrono::high_resolution_clock::time_point m_CurrentTimePoint;
 		float m_DeltaTime;
+		bool m_IsFirstFrame{ true };
 	};
 
 	template <typename ComponentType, typename, typename ... Args>
@@ -143,7 +145,7 @@ namespace SLD
 
 		auto& bufferHead{ realResource.GetBufferHead() };
 		const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
-		
+
 		new (allocPtr) ComponentType(std::forward<Args>(args)...);
 
 		RefPtr<ObservePtr<ComponentType>> out{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead},[&logResource](ObservePtr<ComponentType>* ptr)
@@ -152,7 +154,7 @@ namespace SLD
 			delete ptr;
 			ptr = nullptr;
 		} };
-		
+
 		InitializeAsyncTickTask(*out.get());
 
 		return out;
@@ -170,9 +172,9 @@ namespace SLD
 		auto& realResource{ it.first->second.resource };
 
 		//void* allocPtr{ logResource.do_allocate(sizeof(InputComponent),alignof(InputComponent)) };
-		
+
 		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
-		
+
 		// special case for InputComponent
 		//if constexpr (std::is_same_v<ComponentType, InputComponent>)
 		//{
@@ -187,14 +189,14 @@ namespace SLD
 
 		//	return out;
 		//}
-		
+
 		new (allocPtr) ComponentType{ std::forward<Args>(args)... };
-		
+
 		auto& bufferHead{ realResource.GetBufferHead() };
 		const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
-		
+
 		ObservePtr<ComponentType>* ob{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead} };
-		
+
 		RefPtr<ObservePtr<ComponentType>> out{ ob,[&logResource](ObservePtr<ComponentType>* ptr)
 		{
 			logResource.do_deallocate(ptr->GetPtr(),sizeof(ComponentType),alignof(ComponentType));

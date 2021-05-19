@@ -1,5 +1,9 @@
 #include "QBertGame.h"
 #include "QBertParams.h"
+#include "GameObject/GameObject.h"
+
+//#include <SFML/Window.hpp>
+//#include <SFML/Graphics.hpp>
 
 //QBertGame::QBertGame(const std::any& windowHandle)
 //	: m_Framework()
@@ -18,10 +22,12 @@ QBertGame::QBertGame(HWND windowHandle)
 
 void QBertGame::Start()
 {
+	using namespace SLD;
+
 	// Game Sprite Sheet
 	const bool success{ m_QBertSprite.loadFromFile("./Resources/SpriteSheet/QBert_Sprites.png") };
 
-	if(success)
+	if (success)
 	{
 		// Player
 		m_Player.SetSpriteTexture(m_QBertSprite);
@@ -34,6 +40,14 @@ void QBertGame::Start()
 	}
 
 	// Binding
+
+	InputSetting& gameInput{ m_Framework.GetDefaultWorldEntity().GetWorldInputSetting() };
+	
+	gameInput.AddAxisMapping("Horizontal", {
+		AxisKey{Key{InputDevice::D_Keyboard,sf::Keyboard::A},-1.0f},
+		AxisKey{Key{InputDevice::D_Keyboard,sf::Keyboard::D},1.0f}
+	});
+	
 	m_Player.SetUpPlayerInput();
 }
 
@@ -43,6 +57,13 @@ void QBertGame::Run()
 	m_Framework.TranslateUserInputs();
 
 	// World Updates
+	//if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	//{
+	//	auto& currentTransform{ m_Player.GetGameObject()->GetTransform() };
+	//	const auto& currPos{ currentTransform->GetPtr()->GetWorldPos() };
+	//	float newPosX{ currPos.x + (1000.0f * 1.0f * m_Framework.GetDefaultWorldEntity().GetDeltaTime()) };
+	//	currentTransform->GetPtr()->Translate(newPosX, currPos.y, currPos.z);
+	//}
 
 
 	// Async update and render

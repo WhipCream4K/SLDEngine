@@ -69,6 +69,47 @@ namespace SLD
 		Delegate<FnTpye, Object> m_Delegate;
 	};
 
+	template<typename Ret, class Object, typename ...Args>
+	class CAction<Ret(Object::*)(Args...), Object> : public IAction<Ret(Args...)>
+	{
+		using FnTpye = Ret(Args...);
+
+	public:
+
+		template<typename FuncPtr>
+		CAction(FuncPtr ptr, WeakPtr<Object> usrObj)
+			: m_Delegate(ptr, usrObj.lock().get())
+		{
+		}
+
+		template<typename FuncPtr>
+		CAction(FuncPtr ptr, Object* usrObj)
+			: m_Delegate(ptr, usrObj)
+		{
+		}
+
+		template<typename FuncPtr>
+		CAction(FuncPtr ptr)
+			: m_Delegate(ptr)
+		{
+		}
+
+		[[maybe_unused]] Ret Invoke(Args... args) const override
+		{
+			return m_Delegate(std::forward<Args>(args)...);
+		}
+
+		~CAction() override = default;
+		CAction(const CAction&) = delete;
+		CAction(CAction&&) = delete;
+		CAction& operator=(const CAction&) = delete;
+		CAction& operator=(CAction&&) = delete;
+
+	private:
+
+		Delegate<FnTpye, Object> m_Delegate;
+	};
+
 	template<typename Fntype>
 	using VirMemDelegate = IAction<Fntype>;
 

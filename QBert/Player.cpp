@@ -8,9 +8,12 @@
 
 #include "QBertParams.h"
 
+//#include <SFML/Graphics.hpp>
+
 Player::Player(SLD::WorldEntity& world)
 {
-
+	m_World = &world;
+	
 	m_GameObject = world.CreateGameObject();
 
 	m_TransformComponent = m_GameObject->GetTransform();
@@ -56,12 +59,25 @@ void Player::SetUpPlayerInput()
 	}
 }
 
+void Player::MoveDiagonal()
+{
+	
+}
+
 void Player::MoveHorizontal(float value)
 {
 	if (const auto transform{ m_TransformComponent.lock() })
 	{
 		const rtm::float3f& pos{ transform->GetPtr()->GetWorldPos() };
-		const float speed{ 60.0f };
-		transform->GetPtr()->Translate(speed * pos.x * value, pos.y, pos.z);
+		const float speed{ 1000.0f };
+		const float horizon{ pos.x + (speed * value * m_World->GetDeltaTime()) };
+		//m_Horizontal += speed * value * m_World->GetDeltaTime();
+		//pos.x += speed * value * m_World->GetDeltaTime();
+		transform->GetPtr()->Translate(horizon, pos.y, pos.z);
 	}
+}
+
+std::shared_ptr<SLD::GameObject> Player::GetGameObject()
+{
+	return m_GameObject;
 }

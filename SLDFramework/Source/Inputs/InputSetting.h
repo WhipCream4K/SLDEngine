@@ -247,7 +247,7 @@ namespace SLD
 
 		void* resourcePtr{ logResource.do_allocate(commandSize,alignof(EventType)) };
 		CallbackType* ev{ new (resourcePtr) EventType{fnPtr,objRef} };
-
+		
 		RefPtr<CallbackType> smartEv{ ev,[&logResource](CallbackType* ptr)
 		{
 			logResource.do_deallocate(ptr,sizeof(EventType),alignof(EventType));

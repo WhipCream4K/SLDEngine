@@ -1,4 +1,5 @@
 #include "InputSetting.h"
+//#include <Windows.h>
 
 const std::vector<SLD::ActionKey>& SLD::InputSetting::GetActionKeyByName(const std::string& groupName) const
 {
@@ -138,9 +139,9 @@ void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 	case EventType::KeyPressed:
 	{
 		const Key inKey{ InputDevice::D_Keyboard,uint16_t(message.data.keyboard.key) };
-		const InputEvent ie{ InputEvent::IE_Pressed };
+		//const InputEvent ie{ InputEvent::IE_Pressed };
 		const float axisValue{ 1.0f };
-
+		//OutputDebugString(L"1\n");
 		for (const auto& axisMap : m_AxisKeyMappings)
 		{
 			const auto& keyPool{ axisMap.second.keyPool };

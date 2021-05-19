@@ -7,6 +7,7 @@ SLD::WorldEntity::WorldEntity()
 	, m_RenderComponents()
 	, m_TickTasks()
 	, m_EndTimePoint()
+	, m_CurrentTimePoint()
 	, m_DeltaTime()
 {
 	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
@@ -44,7 +45,7 @@ SLD::InputSetting& SLD::WorldEntity::GetWorldInputSetting()
 }
 
 RefPtr<SLD::GameObject> SLD::WorldEntity::CreateGameObject()
-{	
+{
 	return std::make_shared<GameObject>(*this);
 }
 
@@ -81,13 +82,21 @@ void SLD::WorldEntity::JoinAllAsyncUpdates()
 
 void SLD::WorldEntity::StartWorldTime()
 {
-	auto startTime{ std::chrono::high_resolution_clock::now()  };
-	m_DeltaTime = float(std::chrono::duration_cast<std::chrono::milliseconds>(startTime - m_EndTimePoint).count());
+	m_CurrentTimePoint = std::chrono::high_resolution_clock::now();
+	if (m_IsFirstFrame)
+	{
+		m_EndTimePoint = m_CurrentTimePoint;
+		m_IsFirstFrame = false;
+	}
+
+	// https://stackoverflow.com/questions/34141522/c-incorrect-fps-and-deltatime-measuring-using-stdchrono
+	using ms = std::chrono::duration<float, std::milli>;
+	m_DeltaTime = std::chrono::duration_cast<ms>(m_CurrentTimePoint - m_EndTimePoint).count() * 0.001f;
 }
 
 void SLD::WorldEntity::EndWorldTime()
 {
-	m_EndTimePoint = std::chrono::high_resolution_clock::now();
+	m_EndTimePoint = m_CurrentTimePoint;
 }
 
 SLD::PersistentThreadWorker& SLD::WorldEntity::EmplaceNewWorker(const std::string& id)
