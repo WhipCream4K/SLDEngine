@@ -208,7 +208,7 @@ namespace SLD
 		WeakPtr<GameObject> reference, InputEvent ie, FuncPtr fnPtr, Object* objRef, bool** outHandle,
 		Args&&... args)
 	{
-		using EventType = Event<FuncPtr, Object>;
+		using EventType = Event<FuncPtr>;
 		using CallbackType = EventHandler;
 
 		auto& actionMap{ m_ActionKeyMappings.at(actionGroupName) };

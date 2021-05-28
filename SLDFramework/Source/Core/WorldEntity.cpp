@@ -92,6 +92,7 @@ void SLD::WorldEntity::StartWorldTime()
 	// https://stackoverflow.com/questions/34141522/c-incorrect-fps-and-deltatime-measuring-using-stdchrono
 	using ms = std::chrono::duration<float, std::milli>;
 	m_DeltaTime = std::chrono::duration_cast<ms>(m_CurrentTimePoint - m_EndTimePoint).count() * 0.001f;
+	//m_DeltaTime = 1.0f / 60.0f;
 }
 
 void SLD::WorldEntity::EndWorldTime()

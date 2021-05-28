@@ -16,7 +16,8 @@ namespace SLD
 class SFMLRenderer final
 {
 public:
-	
+
+	class ImplSFMLRenderer;
 	void Render(const std::vector<SLD::RenderingComponent>& renderingComponents);
 	void Render(const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents);
 	void Render(std::vector<SLD::RenderingComponent>& renderingComponents);
@@ -27,14 +28,13 @@ public:
 private:
 	
 	RefPtr<sf::RenderWindow> m_RenderWindow;
+	OwnedPtr<ImplSFMLRenderer> m_pImplRenderWindow;
 
 	struct DrawComponent
 	{
 		const sf::Drawable* drawObj{};
 		sf::RenderStates renderStates{};
 		float depth{};
-
-		
 	};
 
 	std::vector<DrawComponent> m_SFMLDrawable;

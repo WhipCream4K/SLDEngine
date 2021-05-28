@@ -47,6 +47,11 @@ void QBertGame::Start()
 		AxisKey{Key{InputDevice::D_Keyboard,sf::Keyboard::A},-1.0f},
 		AxisKey{Key{InputDevice::D_Keyboard,sf::Keyboard::D},1.0f}
 	});
+
+	gameInput.AddActionMapping("MoveDiagonal",
+		{
+			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::H}}
+		});
 	
 	m_Player.SetUpPlayerInput();
 }
@@ -57,6 +62,7 @@ void QBertGame::Run()
 	m_Framework.TranslateUserInputs();
 
 	// World Updates
+	m_Player.PlayerMove();
 	//if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	//{
 	//	auto& currentTransform{ m_Player.GetGameObject()->GetTransform() };

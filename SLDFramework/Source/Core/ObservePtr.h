@@ -9,7 +9,7 @@ namespace SLD
 {
 	// A class that watch over some un-owned pointer
 	template<typename T>
-	class ObservePtr
+	class ObservePtr final
 	{
 	public:
 
@@ -22,7 +22,7 @@ namespace SLD
 		ObservePtr(ObservePtr&& other) noexcept;
 		ObservePtr& operator=(ObservePtr&& other) noexcept;
 
-		virtual ~ObservePtr();
+		~ObservePtr();
 
 		operator bool() const
 		{
@@ -118,6 +118,7 @@ namespace SLD
 	template <typename T>
 	ObservePtr<T>::~ObservePtr()
 	{
+		m_BufferStart = nullptr;
 	}
 }
 

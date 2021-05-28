@@ -13,19 +13,19 @@
 Player::Player(SLD::WorldEntity& world)
 {
 	m_World = &world;
-	
+
 	m_GameObject = world.CreateGameObject();
 
 	m_TransformComponent = m_GameObject->GetTransform();
-	m_TransformComponent.lock()->GetPtr()->SetScale(2.5f, 2.5f,1.0f);
+	m_TransformComponent.lock()->GetPtr()->SetScale(2.5f, 2.5f, 1.0f);
 	const auto transform{ m_TransformComponent.lock() };
-	
+
 	// Setup Render Component
 	size_t renderData{ sizeof(void*) + sizeof(sf::Sprite) };
 	m_RenderingComponent = m_GameObject->CreateRenderingComponent(renderData, 2);
-	
+
 	// Push transform to Renderer
-	m_RenderingComponent->PushElement(SLD::RenderIdentifier(SFMLRenderElement::WorldMatrix),transform.get());
+	m_RenderingComponent->PushElement(SLD::RenderIdentifier(SFMLRenderElement::WorldMatrix), transform.get());
 
 	// Sprite Creation
 	m_CharacterSprite = m_RenderingComponent->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
@@ -41,8 +41,8 @@ Player::Player(SLD::WorldEntity& world)
 
 void Player::SetSpriteTexture(const sf::Texture& texture) const
 {
-	m_CharacterSprite->setTexture(texture,true);
-	
+	m_CharacterSprite->setTexture(texture, true);
+
 	// Set to correct sprite rect
 	const sf::IntRect spriteRect{
 		0,0,16,16
@@ -53,14 +53,17 @@ void Player::SetSpriteTexture(const sf::Texture& texture) const
 
 void Player::SetUpPlayerInput()
 {
-	if(const auto inputComponent{ m_InputComponent.lock() }; inputComponent)
+	if (const auto inputComponent{ m_InputComponent.lock() }; inputComponent)
 	{
 		inputComponent->GetPtr()->BindAxis("Horizontal", &Player::MoveHorizontal, this);
+		inputComponent->GetPtr()->BindAction("MoveDiagonal", SLD::InputEvent::IE_Released, &Player::MoveDiagonal, this);
 	}
 }
 
 void Player::MoveDiagonal()
 {
+	m_IsMoving = true;
+
 	
 }
 
@@ -69,12 +72,21 @@ void Player::MoveHorizontal(float value)
 	if (const auto transform{ m_TransformComponent.lock() })
 	{
 		const rtm::float3f& pos{ transform->GetPtr()->GetWorldPos() };
-		const float speed{ 1000.0f };
+		const float speed{ 100.0f };
 		const float horizon{ pos.x + (speed * value * m_World->GetDeltaTime()) };
-		//m_Horizontal += speed * value * m_World->GetDeltaTime();
-		//pos.x += speed * value * m_World->GetDeltaTime();
 		transform->GetPtr()->Translate(horizon, pos.y, pos.z);
 	}
+}
+
+void Player::Update(float deltaTime)
+{
+	
+}
+
+
+void Player::LerpTo(const rtm::float3f& to)
+{
+
 }
 
 std::shared_ptr<SLD::GameObject> Player::GetGameObject()

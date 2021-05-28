@@ -3,7 +3,6 @@
 #define SLDFRAMEWORK_VIEWPORT_H
 
 #include "../../Inputs/InputManager.h"
-#include "../../Rendering/RenderTarget.h"
 
 #include "MainSubSystem.h"
 
@@ -27,7 +26,7 @@ namespace SLD
 			const std::string& vpName);
 		
 		
-		[[nodiscard]] InputManager& GetInputManager() { return m_InputManager; }
+		//[[nodiscard]] InputManager& GetInputManager() { return m_InputManager; }
 
 		[[nodiscard]] uint32_t GetWidth() const { return m_Width; }
 		[[nodiscard]] uint32_t GetHeight() const { return m_Height; }
@@ -50,10 +49,12 @@ namespace SLD
 
 		void Present();
 		void ClearBackBuffer();
-		
+
+		~Window();
+	
 	private:
 
-		bool QueryWindowEvents();
+		//bool QueryWindowEvents();
 		
 		// Low-Level window
 		LLWindow m_WindowSubSystem;
@@ -62,7 +63,7 @@ namespace SLD
 		
 		std::array<MessageBus, MinimumEventCnt> m_WindowEvents;
 		uint8_t m_EventCntThisFrame;
-		InputManager m_InputManager;
+		//InputManager m_InputManager;
 
 		
 		std::string m_Name;

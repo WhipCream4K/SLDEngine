@@ -7,13 +7,13 @@ SLD::Window::Window(uint32_t width, uint32_t height, LLWindow&& subSystemWindow,
 	: m_WindowSubSystem(std::move(subSystemWindow))
 	, m_WindowEvents()
 	, m_EventCntThisFrame()
-	, m_InputManager(std::move(subSystemInput))
+	//, m_InputManager(std::move(subSystemInput))
 	, m_Name(vpName)
 	, m_Height(height)
 	, m_Width(width) // test color
 	, m_WindowHandle(windowHandle)
 	, m_ClearColor{ 0.0f,0.0f,0.0f,1.0f }
-	, m_ShouldVSync()
+	, m_ShouldVSync(true)
 {
 }
 
@@ -103,6 +103,17 @@ void SLD::Window::ClearBackBuffer()
 	} };
 
 	std::visit(callClearBackBuffer, m_WindowSubSystem);
+}
+
+SLD::Window::~Window()
+{
+	auto callClose{ [](auto& window)
+	{
+		window.Close();
+	} };
+
+	std::visit(callClose, m_WindowSubSystem);
+
 }
 
 

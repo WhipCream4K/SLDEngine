@@ -109,7 +109,7 @@ namespace SLD
 
 		Delegate<FnTpye, Object> m_Delegate;
 	};
-
+	
 	template<typename Fntype>
 	using VirMemDelegate = IAction<Fntype>;
 

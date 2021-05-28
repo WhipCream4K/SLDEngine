@@ -1,56 +1,53 @@
 #include "SFMLWindow.h"
+#include "../../Miscellaneous/SFMLPrerequisite.h"
+
 
 #ifdef HAS_SFML
 
-SFMLWindow::SFMLWindow(const std::any& windowHandle, uint32_t width, uint32_t height)
-	: m_MainWindow()
+class SFMLWindow::ImpleSFMLWindow
 {
-	sf::WindowHandle handle = std::any_cast<sf::WindowHandle>(windowHandle);
-	m_MainWindow.create(handle);
-	width;
-	height;
+public:
+
+	ImpleSFMLWindow(sf::WindowHandle winHandle);
+
+	void Resize(uint32_t width, uint32_t height);
+	void ClearColor(const float(&clearColor)[4]);
+	void Present(bool shouldVSync);
+	SLD::InputParams::ReadOut ReadUserInputs();
+	void Close();
+
+private:
+	
+	sf::RenderWindow m_MainWindow;
+};
+
+SFMLWindow::ImpleSFMLWindow::ImpleSFMLWindow(sf::WindowHandle winHandle)
+	: m_MainWindow(winHandle)
+{
 }
 
-SFMLWindow::SFMLWindow(SFMLWindow&& other) noexcept
-	: m_MainWindow()
+void SFMLWindow::ImpleSFMLWindow::Resize(uint32_t width, uint32_t height)
 {
-	sf::WindowHandle handle{ other.m_MainWindow.getSystemHandle() };
-	other.m_MainWindow.close();
-	m_MainWindow.create(handle);
+	m_MainWindow.setSize(sf::Vector2u{ width,height });
 }
 
-SFMLWindow& SFMLWindow::operator=(SFMLWindow&& other) noexcept
+void SFMLWindow::ImpleSFMLWindow::ClearColor(const float(&clearColor)[4])
 {
-	if(this != &other)
-	{
-		sf::WindowHandle handle{ other.m_MainWindow.getSystemHandle() };
-		other.m_MainWindow.close();
-		m_MainWindow.create(handle);
-	}
-
-	return *this;
+	m_MainWindow.clear(Float4ToSfColor(clearColor));
 }
 
-sf::RenderWindow& SFMLWindow::GetSubRef()
+void SFMLWindow::ImpleSFMLWindow::Present(bool shouldVSync)
 {
-	return m_MainWindow;
+	m_MainWindow.setVerticalSyncEnabled(shouldVSync);
+	m_MainWindow.display();
 }
 
-
-RefPtr<sf::RenderWindow> SFMLWindow::GetSubRefPtr() 
-{
-	return RefPtr<sf::RenderWindow>{&m_MainWindow, [](sf::RenderWindow*)
-	{
-	}};
-}
-
-SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
+SLD::InputParams::ReadOut SFMLWindow::ImpleSFMLWindow::ReadUserInputs()
 {
 	SLD::InputParams::ReadOut out{};
 
 	sf::Event ev{};
 	uint8_t cnt{};
-
 
 	while (m_MainWindow.pollEvent(ev))
 	{
@@ -133,22 +130,57 @@ SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
 	return out;
 }
 
+void SFMLWindow::ImpleSFMLWindow::Close()
+{
+	m_MainWindow.close();
+}
+
+#endif
+
+SFMLWindow::SFMLWindow(
+	const std::any& windowHandle,
+	[[maybe_unused]] uint32_t width,
+	[[maybe_unused]] uint32_t height)
+	: m_pMainWindow(std::make_unique<ImpleSFMLWindow>(std::any_cast<sf::WindowHandle>(windowHandle)))
+{
+}
+
+SFMLWindow::SFMLWindow(SFMLWindow&& other) noexcept
+	: m_pMainWindow(std::move(other.m_pMainWindow))
+{
+}
+
+SFMLWindow& SFMLWindow::operator=(SFMLWindow&& other) noexcept
+{
+	if(this != &other)
+	{
+		m_pMainWindow = std::move(other.m_pMainWindow);
+	}
+
+	return *this;
+}
+
+SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
+{
+	return m_pMainWindow->ReadUserInputs();
+}
+
 void SFMLWindow::Resize(uint32_t width, uint32_t height)
 {
-	//const auto& view{ m_MainWindow.getView() };
-	//m_MainWindow.setView({ view.getCenter(),sf::Vector2f{float(width),float(height)} });
-	m_MainWindow.setSize(sf::Vector2u{ width,height });
+	m_pMainWindow->Resize(std::move(width), std::move(height));
 }
 
 void SFMLWindow::ClearColor(const float(&clearColor)[4])
 {
-	m_MainWindow.clear(Float4ToSfColor(clearColor));
+	m_pMainWindow->ClearColor(clearColor);
 }
 
 void SFMLWindow::Present(bool shouldVSync)
 {
-	m_MainWindow.setVerticalSyncEnabled(shouldVSync);
-	m_MainWindow.display();
+	m_pMainWindow->Present(shouldVSync);
 }
 
-#endif
+void SFMLWindow::Close()
+{
+	m_pMainWindow->Close();
+}

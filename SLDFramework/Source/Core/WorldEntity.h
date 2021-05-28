@@ -110,10 +110,6 @@ namespace SLD
 
 		std::vector<TickTask> m_TickTasks;
 
-		//template<typename SubTickComponent,
-		//	typename = EnableIsBasedOf<TickComponent, SubTickComponent>>
-		//	void InitializeAsyncTickTask(SubTickComponent& object);
-
 		template<typename SubTickComponent,
 			typename = EnableIsBasedOf<TickComponent, SubTickComponent>>
 			void InitializeAsyncTickTask(const ObservePtr<SubTickComponent>& pointerToObj);

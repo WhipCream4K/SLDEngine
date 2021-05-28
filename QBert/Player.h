@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Core/ObservePtr.h"
+#include "Math/rtm/vector4f.h"
 
 namespace SLD
 {
@@ -17,6 +18,15 @@ namespace SLD
 class Player
 {
 public:
+	
+	enum class MoveDirection
+	{
+		None,
+		DownRight,
+		DownLeft,
+		UpRight,
+		UpLeft
+	};
 
 	Player(SLD::WorldEntity& world);
 
@@ -25,6 +35,8 @@ public:
 
 	void MoveDiagonal();
 	void MoveHorizontal(float value);
+	void Update(float deltaTime);
+	void LerpTo(const rtm::float3f& to);
 	std::shared_ptr<SLD::GameObject> GetGameObject();
 
 private:
@@ -36,7 +48,6 @@ private:
 	std::weak_ptr<SLD::ObservePtr<SLD::TransformComponent>> m_TransformComponent;
 	std::weak_ptr<SLD::ObservePtr<SLD::InputComponent>> m_InputComponent;
 	std::shared_ptr<SLD::GameObject> m_GameObject;
-	float m_Horizontal{};
 	bool m_IsMoving{};
 };
 
