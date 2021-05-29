@@ -4,7 +4,7 @@
 
 SLD::WorldEntity::WorldEntity()
 	: m_TickComponent()
-	, m_RenderComponents()
+	//, m_RenderComponents()
 	, m_TickTasks()
 	, m_EndTimePoint()
 	, m_CurrentTimePoint()
@@ -13,28 +13,48 @@ SLD::WorldEntity::WorldEntity()
 	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
 }
 
-
-RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(size_t elemSize, uint32_t elemCnt)
+RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize,
+                                                                       uint32_t elemCnt)
 {
-	auto& component{ m_RenderComponents.emplace_back(elemSize,elemCnt) };
-	RefPtr<RenderingComponent> smart{ &component,[](RenderingComponent* component)
-	{
-		component = nullptr;
-	} };
-	return smart;
+	auto& buffer{ m_RenderingPoolComponent.buffer };
+	auto& head{ m_RenderingPoolComponent.head };
+
+	const size_t offset{ buffer.size() };
+	buffer.resize(elemSize);
+	head = buffer.data();
+
+	RenderingComponent component{ transform,head,offset,elemSize,elemCnt };
+	auto& emplace{ m_RenderComponents.emplace_back(component) };
+
+	return RefPtr<RenderingComponent>{&emplace, [](RenderingComponent* ptr)
+		{
+			
+			ptr = nullptr;
+		}};
 }
 
-SLD::RenderingComponent& SLD::WorldEntity::AllocRefRenderComponent(size_t elemSize, uint32_t elemCnt)
-{
-	return m_RenderComponents.emplace_back(elemSize, elemCnt);
-}
 
+//RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(size_t elemSize, uint32_t elemCnt)
+//{
+//	auto& component{ m_RenderComponents.emplace_back(elemSize,elemCnt) };
+//	RefPtr<RenderingComponent> smart{ &component,[](RenderingComponent* component)
+//	{
+//		component = nullptr;
+//	} };
+//	return smart;
+//}
+//
+//SLD::RenderingComponent& SLD::WorldEntity::AllocRefRenderComponent(size_t elemSize, uint32_t elemCnt)
+//{
+//	return m_RenderComponents.emplace_back(elemSize, elemCnt);
+//}
+//
 const std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderComponents() const
 {
 	return m_RenderComponents;
 }
 
-std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderingComponentsEditable()
+std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderingComponents()
 {
 	return m_RenderComponents;
 }
@@ -83,11 +103,11 @@ void SLD::WorldEntity::JoinAllAsyncUpdates()
 void SLD::WorldEntity::StartWorldTime()
 {
 	m_CurrentTimePoint = std::chrono::high_resolution_clock::now();
-	if (m_IsFirstFrame)
-	{
-		m_EndTimePoint = m_CurrentTimePoint;
-		m_IsFirstFrame = false;
-	}
+	//if (m_IsFirstFrame)
+	//{
+	//	m_EndTimePoint = m_CurrentTimePoint;
+	//	m_IsFirstFrame = false;
+	//}
 
 	// https://stackoverflow.com/questions/34141522/c-incorrect-fps-and-deltatime-measuring-using-stdchrono
 	using ms = std::chrono::duration<float, std::milli>;

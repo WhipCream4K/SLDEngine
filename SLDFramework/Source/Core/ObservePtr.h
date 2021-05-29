@@ -65,7 +65,7 @@ namespace SLD
 
 	template <typename T>
 	ObservePtr<T>::ObservePtr(std::add_pointer_t<void>const& voidException, size_t offset)
-		: m_BufferStart((uint8_t* const&)voidException)
+		: m_BufferStart(reinterpret_cast<uint8_t* const&>(voidException))
 		, m_Offset(offset)
 	{
 	}

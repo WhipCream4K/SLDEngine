@@ -15,6 +15,7 @@ namespace SLD
 	class RenderingComponent;
 	//class TickComponent;
 	class NonTickComponent;
+	class TransformComponent;
 	class GameObject;
 	class WorldEntity final
 	{
@@ -22,18 +23,11 @@ namespace SLD
 
 		WorldEntity();
 
-		RefPtr<RenderingComponent> AllocRenderComponent(size_t elemSize, uint32_t elemCnt);
-		RenderingComponent& AllocRefRenderComponent(size_t elemSize, uint32_t elemCnt);
+		//RefPtr<RenderingComponent> AllocRenderComponent(size_t elemSize, uint32_t elemCnt);
+		//RenderingComponent& AllocRefRenderComponent(size_t elemSize, uint32_t elemCnt);
 
-		//template<typename ComponentType,
-		//	typename = EnableIsBasedOf<TickComponent,ComponentType>,
-		//	typename ...Args>
-		//	RefPtr<ComponentType> AllocTickComponent(Args&&... args);
-
-		//template<typename ComponentType,
-		//	typename = EnableIsBasedOf<TickComponent, ComponentType>,
-		//	typename ...Args>
-		//	OwnedPtr<ComponentType, No_Op<ComponentType>> AllocTickComponent(Args&&... args);
+		// Won't return anything because vector loses reference when moved
+		RefPtr<RenderingComponent> AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt);
 
 		// TODO: Can't find a smart pointer that takes no ownership
 		// until I can find one I will return raw pointers :(
@@ -52,7 +46,7 @@ namespace SLD
 			void DeAllocTickComponent(const RefPtr<ComponentType>& ptr);
 
 		[[nodiscard]] const std::vector<RenderingComponent>& GetAllRenderComponents() const;
-		[[nodiscard]] std::vector<RenderingComponent>& GetAllRenderingComponentsEditable();
+		[[nodiscard]] std::vector<RenderingComponent>& GetAllRenderingComponents();
 
 		[[nodiscard]] InputSetting& GetWorldInputSetting();
 
@@ -99,7 +93,16 @@ namespace SLD
 		std::unordered_map<std::string, TickComponentPool> m_TickComponent;
 
 		// Uncouple from the base component above
-		std::vector<RenderingComponent> m_RenderComponents;
+		struct RenderingDataPool
+		{
+			// TODO: Maybe use pmr resource
+			std::vector<uint8_t> buffer{};
+			uint8_t* head{ buffer.data() };
+		};
+
+		RenderingDataPool m_RenderingPoolComponent;
+		//std::vector<RenderingComponent> m_RenderComponents;
+		std::vector<RefPtr<RenderingComponent>> m_RenderingComponents;
 
 		// Async Tick Task
 		struct TickTask

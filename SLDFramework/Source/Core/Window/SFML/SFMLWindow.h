@@ -5,6 +5,10 @@
 #include "../../Core/Base.h"
 #include "../../Inputs/InputParams.h"
 
+namespace sf
+{
+	class RenderWindow;
+}
 
 class SFMLWindow
 {
@@ -20,10 +24,10 @@ public:
 	SFMLWindow& operator=(SFMLWindow&& other) noexcept;
 
 	SLD::InputParams::ReadOut ReadUserInputs();
+	sf::RenderWindow& GetSFMLWindow();
 	void Resize(uint32_t width,uint32_t height);
 	void ClearColor(const float(&clearColor)[4]);
 	void Present(bool shouldVSync);
-	void Close();
 
 private:
 

@@ -294,7 +294,7 @@
     <ClInclude Include="Rendering\RenderTarget.h" />
     <ClInclude Include="Core\ScriptableChecks.h" />
     <ClInclude Include="Inputs\SFMLInputs.h" />
-    <ClInclude Include="Rendering\SFML\SFMLRenderer.h" />
+    <ClInclude Include="Rendering\SFML\SFML2DRenderer.h" />
     <ClInclude Include="Core\Window\SFML\SFMLWindow.h" />
     <ClInclude Include="SLDFramework.h" />
     <ClInclude Include="Components\TickComponent.h" />
@@ -333,7 +333,7 @@
     <ClCompile Include="Inputs\SFMLInputs.cpp" />
     <ClCompile Include="Core\Window\Windows\WindowsWindow.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
-    <ClCompile Include="Rendering\SFML\SFMLRenderer.cpp" />
+    <ClCompile Include="Rendering\SFML\SFML2DRenderer.cpp" />
     <ClCompile Include="Core\Window\SFML\SFMLWindow.cpp" />
     <ClCompile Include="Core\WorldEntity.cpp" />
     <ClCompile Include="Components\TransformComponent.cpp" />

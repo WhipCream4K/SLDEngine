@@ -105,15 +105,4 @@ void SLD::Window::ClearBackBuffer()
 	std::visit(callClearBackBuffer, m_WindowSubSystem);
 }
 
-SLD::Window::~Window()
-{
-	auto callClose{ [](auto& window)
-	{
-		window.Close();
-	} };
-
-	std::visit(callClose, m_WindowSubSystem);
-
-}
-
 

@@ -18,7 +18,7 @@ const RefPtr<SLD::ObservePtr<SLD::TransformComponent>>& SLD::GameObject::GetTran
 
 RefPtr<SLD::RenderingComponent> SLD::GameObject::CreateRenderingComponent(size_t elemSize, uint32_t elemCnt)
 {
-	return m_World.get().AllocRenderComponent(elemSize, elemCnt);
+	return m_World.get().AllocRenderComponent(m_Transform,elemSize,elemCnt);
 }
 
 RefWrap<SLD::WorldEntity> SLD::GameObject::GetWorld()

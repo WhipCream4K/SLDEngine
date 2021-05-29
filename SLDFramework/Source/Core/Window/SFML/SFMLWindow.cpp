@@ -1,29 +1,32 @@
 #include "SFMLWindow.h"
 #include "../../Miscellaneous/SFMLPrerequisite.h"
 
-
-#ifdef HAS_SFML
-
 class SFMLWindow::ImpleSFMLWindow
 {
 public:
 
 	ImpleSFMLWindow(sf::WindowHandle winHandle);
+	~ImpleSFMLWindow();
 
 	void Resize(uint32_t width, uint32_t height);
 	void ClearColor(const float(&clearColor)[4]);
 	void Present(bool shouldVSync);
 	SLD::InputParams::ReadOut ReadUserInputs();
-	void Close();
+	sf::RenderWindow& GetWindow();
 
 private:
 	
-	sf::RenderWindow m_MainWindow;
+	sf::RenderWindow m_MainWindow{};
 };
 
 SFMLWindow::ImpleSFMLWindow::ImpleSFMLWindow(sf::WindowHandle winHandle)
 	: m_MainWindow(winHandle)
 {
+}
+
+SFMLWindow::ImpleSFMLWindow::~ImpleSFMLWindow()
+{
+	m_MainWindow.close();
 }
 
 void SFMLWindow::ImpleSFMLWindow::Resize(uint32_t width, uint32_t height)
@@ -130,12 +133,10 @@ SLD::InputParams::ReadOut SFMLWindow::ImpleSFMLWindow::ReadUserInputs()
 	return out;
 }
 
-void SFMLWindow::ImpleSFMLWindow::Close()
+sf::RenderWindow& SFMLWindow::ImpleSFMLWindow::GetWindow()
 {
-	m_MainWindow.close();
+	return m_MainWindow;
 }
-
-#endif
 
 SFMLWindow::SFMLWindow(
 	const std::any& windowHandle,
@@ -165,6 +166,11 @@ SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
 	return m_pMainWindow->ReadUserInputs();
 }
 
+sf::RenderWindow& SFMLWindow::GetSFMLWindow()
+{
+	return m_pMainWindow->GetWindow();
+}
+
 void SFMLWindow::Resize(uint32_t width, uint32_t height)
 {
 	m_pMainWindow->Resize(std::move(width), std::move(height));
@@ -178,9 +184,4 @@ void SFMLWindow::ClearColor(const float(&clearColor)[4])
 void SFMLWindow::Present(bool shouldVSync)
 {
 	m_pMainWindow->Present(shouldVSync);
-}
-
-void SFMLWindow::Close()
-{
-	m_pMainWindow->Close();
 }

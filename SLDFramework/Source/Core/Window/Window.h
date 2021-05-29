@@ -50,7 +50,6 @@ namespace SLD
 		void Present();
 		void ClearBackBuffer();
 
-		~Window();
 	
 	private:
 
