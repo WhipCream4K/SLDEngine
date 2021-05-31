@@ -5,12 +5,13 @@
 #include "../Core/Base.h"
 //#include "../Rendering/RenderTarget.h"
 
+#include "BaseComponent.h"
 #include "../Rendering/RenderParams.h"
 
 namespace SLD
 {
 	class TransformComponent;
-	class RenderingComponent final
+	class RenderingComponent final : public BaseComponent
 	{
 	public:
 
@@ -58,6 +59,7 @@ namespace SLD
 		//RenderTarget m_RenderTarget;
 
 		WeakPtr<ObservePtr<TransformComponent>> m_Transform;
+		//ObservePtr<uint8_t> m_RenderBufferObserver;
 		uint8_t* const& m_pBufferHead;
 		size_t m_MaxSize;
 		size_t m_FromBufferHeadOffset;

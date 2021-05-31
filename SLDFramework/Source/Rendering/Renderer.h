@@ -15,7 +15,7 @@ namespace SLD
 	public:
 
 		void Render(const std::vector<RefPtr<RenderingComponent>>& renderingComponents);
-		void Render(uint8_t* bufferHead, size_t maxElementSize);
+		void Render(uint8_t* bufferHead, size_t bufferSize);
 
 		void Render(const std::vector<RenderingComponent>& renderingComponents);
 

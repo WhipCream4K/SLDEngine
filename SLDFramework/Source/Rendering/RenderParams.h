@@ -26,7 +26,6 @@ enum class Dx12RenderElement
 
 enum class SFMLRenderElement
 {
-	WorldMatrix,
 	RenderShapes,
 	RenderSprite,
 	RenderTexture,

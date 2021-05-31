@@ -74,9 +74,7 @@ namespace SLD
 
 	template <typename ComponentType, typename, typename ... Args>
 	WeakPtr<ObservePtr<ComponentType>> GameObject::CreateComponent(Args&&... args)
-	{
-		// TODO: Fix me
-		
+	{		
 		RefPtr<ObservePtr<ComponentType>> component{};
 
 		if constexpr (std::is_same_v<InputComponent, ComponentType>)

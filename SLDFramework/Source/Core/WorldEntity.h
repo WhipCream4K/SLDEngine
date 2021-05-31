@@ -9,6 +9,7 @@
 #include "../Components/TickComponent.h"
 //#include "ComponentToResourceWrapper.h"
 #include "../Core/PersistentThreadWorker.h"
+#include "PMR_Resource/SpaialResource.h"
 
 namespace SLD
 {
@@ -101,8 +102,10 @@ namespace SLD
 		};
 
 		RenderingDataPool m_RenderingPoolComponent;
+		
 		//std::vector<RenderingComponent> m_RenderComponents;
-		std::vector<RefPtr<RenderingComponent>> m_RenderingComponents;
+		//std::vector<RefPtr<RenderingComponent>> m_RenderingComponents;
+		std::list<RenderingComponent> m_RenderComponents;
 
 		// Async Tick Task
 		struct TickTask

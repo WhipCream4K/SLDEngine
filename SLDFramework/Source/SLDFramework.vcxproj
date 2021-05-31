@@ -301,10 +301,11 @@
     <ClInclude Include="Core\Window\Window.h" />
     <ClInclude Include="Debugging\TSLogger.h" />
     <ClInclude Include="Core\PMR_Resource\UnsafeSpatialResource.h" />
-    <ClInclude Include="Core\Window\Windows\WindowsWindow.h" />
     <ClInclude Include="Core\WorldEntity.h" />
     <ClInclude Include="Components\TransformComponent.h" />
     <ClInclude Include="Core\PersistentThreadWorker.h" />
+    <ClInclude Include="Core\Window\Windows\WindowSubSystem.h" />
+    <ClInclude Include="Core\PMR_Resource\SpaialResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Components\BaseComponent.cpp" />
@@ -331,13 +332,14 @@
     <ClCompile Include="Debugging\TSLogger.cpp" />
     <ClCompile Include="Core\PMR_Resource\UnsafeSpatialResource.cpp" />
     <ClCompile Include="Inputs\SFMLInputs.cpp" />
-    <ClCompile Include="Core\Window\Windows\WindowsWindow.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
     <ClCompile Include="Rendering\SFML\SFML2DRenderer.cpp" />
     <ClCompile Include="Core\Window\SFML\SFMLWindow.cpp" />
     <ClCompile Include="Core\WorldEntity.cpp" />
     <ClCompile Include="Components\TransformComponent.cpp" />
     <ClCompile Include="Core\PersistentThreadWorker.cpp" />
+    <ClCompile Include="Core\Window\Windows\WindowSubSystem.cpp" />
+    <ClCompile Include="Core\PMR_Resource\SpaialResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IMGUI\IMGUI.vcxproj">

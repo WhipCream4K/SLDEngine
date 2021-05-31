@@ -25,7 +25,7 @@ RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(const Ref
 
 	RenderingComponent component{ transform,head,offset,elemSize,elemCnt };
 	auto& emplace{ m_RenderComponents.emplace_back(component) };
-
+	
 	return RefPtr<RenderingComponent>{&emplace, [](RenderingComponent* ptr)
 		{
 			

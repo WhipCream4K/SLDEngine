@@ -57,6 +57,7 @@ namespace SLD
 		
 		// Low-Level window
 		LLWindow m_WindowSubSystem;
+		
 
 		// TODO: Delete Input manager
 		

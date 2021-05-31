@@ -12,19 +12,20 @@ class SFML2DRenderer::ImplSFML2DRenderer
 public:
 
 	ImplSFML2DRenderer();
-	void Render(const std::vector<SLD::RenderingComponent>& renderingComponents);
+	void Render(uint32_t elemCnt,uint8_t* bufferHead, size_t bufferSize);
 	void SetRenderTarget(const SLD::Window& renderWindow);
 	void SetRenderTarget(const RefPtr<SLD::Window>& renderWindow);
 
 private:
-	
+
 	struct DrawComponent
 	{
 		sf::Drawable* drawObj{};
 		sf::RenderStates renderStates{};
 		float depth{};
 	};
-	
+
+	// TODO: Will change this to be independent when I know more about lower level of rendering
 	sf::RenderWindow* m_RenderWindow;
 	std::vector<DrawComponent> m_2DDrawComponent;
 };
@@ -36,8 +37,95 @@ SFML2DRenderer::ImplSFML2DRenderer::ImplSFML2DRenderer()
 {
 }
 
-void SFML2DRenderer::ImplSFML2DRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
+void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize)
 {
+	auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
+
+	if (m_2DDrawComponent.size() < size_t(elemCnt))
+		m_2DDrawComponent.resize(elemCnt);
+
+	uint8_t* head{ bufferHead };
+	uint8_t* end{ bufferHead + bufferSize };
+
+	uint32_t cnt{};
+	while (head != end)
+	{
+		sf::RenderStates renderStates{};
+
+		// register transform
+		SLD::ObservePtr<SLD::TransformComponent>* transform{};
+		std::memcpy(&transform, head, sizeof(void*));
+
+		// move
+		head += sizeof(void*);
+
+		SLD::RenderIdentifier id{ static_cast<SLD::RenderIdentifier>(*head) };
+		head += sizeof(SLD::RenderIdentifier);
+		sf::Drawable* drawObj{};
+		size_t dataSize{};
+
+		switch (SFMLRenderElement(id))
+		{
+		case SFMLRenderElement::RenderShapes: break;
+		case SFMLRenderElement::RenderSprite:
+		{
+			dataSize = sizeof(sf::Sprite);
+			drawObj = reinterpret_cast<sf::Sprite*>(head);
+		}
+		break;
+		case SFMLRenderElement::RenderTexture: break;
+		case SFMLRenderElement::RenderStates: break;
+		default: break;
+		}
+
+		if (transform)
+		{
+			if (drawObj)
+			{
+				
+				auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
+				auto& component{ m_2DDrawComponent[cnt] };
+
+				sf::Vector3f posVec{};
+				sf::Vector2f scaleVec{};
+
+				rtm::vector_store3(objMat.translation, &posVec.x);
+				rtm::vector_store2(objMat.scale, &scaleVec.x);
+
+				posVec.x += renderTargetCenter.x;
+				posVec.y *= -1;
+				posVec.y += renderTargetCenter.y;
+
+				renderStates.transform.translate(posVec.x, posVec.y);
+				renderStates.transform.scale(scaleVec);
+
+				component.drawObj = drawObj;
+				component.renderStates = renderStates;
+				component.depth = posVec.z;
+			}
+		}
+
+		head += dataSize;
+		cnt++;
+	}
+
+	// Sort Layer
+	std::sort(m_2DDrawComponent.begin(), m_2DDrawComponent.end(), [](const DrawComponent& lhs, const DrawComponent& rhs)
+		{
+			return lhs.depth < rhs.depth;
+		});
+
+	// Draw
+	for (const auto& item : m_2DDrawComponent)
+	{
+		if(item.drawObj)
+			m_RenderWindow->draw(*item.drawObj, item.renderStates);
+	}
+
+}
+
+//void SFML2DRenderer::ImplSFML2DRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
+//{
 	//m_RenderWindow.draw();
 	//auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
 
@@ -130,7 +218,7 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(const std::vector<SLD::Rendering
 	//{
 	//	m_RenderWindow->draw(*item.drawObj, item.renderStates);
 	//}
-}
+//}
 
 void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const SLD::Window& renderWindow)
 {
@@ -141,17 +229,17 @@ void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const SLD::Window& rend
 
 void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
 {
-	if(renderWindow)
+	if (renderWindow)
 	{
 		auto subsystem{ renderWindow->GetWindowHandleToType<SFMLWindow>() };
-		if (sf::RenderWindow * sfmlWindow{ &subsystem.GetSFMLWindow() }; sfmlWindow != m_RenderWindow)
+		if (sf::RenderWindow* sfmlWindow{ &subsystem.GetSFMLWindow() }; sfmlWindow != m_RenderWindow)
 			m_RenderWindow = sfmlWindow;
 	}
 }
 
-void SFML2DRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
-{
-	m_pImplRenderWindow->Render(renderingComponents);
+//void SFML2DRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
+//{
+//	m_pImplRenderWindow->Render(renderingComponents);
 	//m_RenderWindow.draw();
 	//auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
 
@@ -246,6 +334,21 @@ void SFML2DRenderer::Render(const std::vector<SLD::RenderingComponent>& renderin
 	//	m_RenderWindow->draw(*item.drawObj, item.renderStates);
 	//}
 
+//}
+
+void SFML2DRenderer::Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize)
+{
+	m_pImplRenderWindow->Render(elemCnt,bufferHead, bufferSize);
+}
+
+void SFML2DRenderer::SetRenderTarget(const SLD::Window& renderWindow)
+{
+	m_pImplRenderWindow->SetRenderTarget(renderWindow);
+}
+
+void SFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
+{
+	m_pImplRenderWindow->SetRenderTarget(renderWindow);
 }
 
 //void SFML2DRenderer::Render(const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents)
