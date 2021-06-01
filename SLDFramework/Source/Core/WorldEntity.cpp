@@ -5,6 +5,7 @@
 SLD::WorldEntity::WorldEntity()
 	: m_TickComponent()
 	//, m_RenderComponents()
+	, m_RenderData(1024)
 	, m_TickTasks()
 	, m_EndTimePoint()
 	, m_CurrentTimePoint()
@@ -13,24 +14,80 @@ SLD::WorldEntity::WorldEntity()
 	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
 }
 
-RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize,
-                                                                       uint32_t elemCnt)
+RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderingComponent(
+	const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt)
 {
-	auto& buffer{ m_RenderingPoolComponent.buffer };
-	auto& head{ m_RenderingPoolComponent.head };
+	constexpr const char* uniqueId{ RenderingComponent::UniqueId };
+	auto it{ m_NonTickComponent.try_emplace(uniqueId,NonTickComponentPool{}) };
+	LoggingResource& logResource{ it.first->second.logger };
 
-	const size_t offset{ buffer.size() };
-	buffer.resize(elemSize);
-	head = buffer.data();
+	// NOTE: I don't know I have to reassign this again so it works
+	logResource = LoggingResource{ &it.first->second.resource };
+	auto& realResource{ it.first->second.resource };
 
-	RenderingComponent component{ transform,head,offset,elemSize,elemCnt };
-	auto& emplace{ m_RenderComponents.emplace_back(component) };
+	void* allocPtr{ logResource.do_allocate(sizeof(RenderingComponent),alignof(RenderingComponent)) };
+
+	// Get Render Buffer
+	void* renderPointer{ m_RenderData.resource.do_allocate(elemSize, alignof(std::max_align_t)) };
+	RefPtr<uint8_t> pointerToRenderBuffer{static_cast<uint8_t*>(renderPointer),[this,elemSize](uint8_t* ptr)
+	{
+		m_RenderData.resource.do_deallocate(ptr,elemSize,alignof(std::max_align_t));
+	}};
+
+	// Construct
+	new (allocPtr) RenderingComponent{ transform,pointerToRenderBuffer,elemSize,elemCnt };
 	
-	return RefPtr<RenderingComponent>{&emplace, [](RenderingComponent* ptr)
-		{
-			
-			ptr = nullptr;
-		}};
+	auto& bufferHead{ realResource.GetBufferHead() };
+	const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
+
+	ObservePtr<RenderingComponent>* ob{ new ObservePtr<RenderingComponent>{bufferHead,offSetFromHead} };
+
+	RefPtr<ObservePtr<RenderingComponent>> out{ ob,[this,&logResource](ObservePtr<RenderingComponent>* ptr)
+	{
+		logResource.do_deallocate(ptr->GetPtr(),sizeof(RenderingComponent),alignof(RenderingComponent));
+		m_RenderData.totalElement--;
+		delete ptr;
+		ptr = nullptr;
+	} };
+	
+	m_RenderData.totalElement++;
+
+	return out;
+}
+
+//RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize,
+//                                                                       uint32_t elemCnt)
+//{
+//	auto& buffer{ m_RenderingPoolComponent.buffer };
+//	auto& head{ m_RenderingPoolComponent.head };
+//
+//	const size_t offset{ buffer.size() };
+//	buffer.resize(elemSize);
+//	head = buffer.data();
+//
+//	RenderingComponent component{ transform,head,offset,elemSize,elemCnt };
+//	auto& emplace{ m_RenderComponents.emplace_back(component) };
+//	
+//	return RefPtr<RenderingComponent>{&emplace, [](RenderingComponent* ptr)
+//		{
+//			
+//			ptr = nullptr;
+//		}};
+//}
+
+uint8_t* SLD::WorldEntity::GetRenderDataBufferStart() const noexcept
+{
+	return m_RenderData.resource.GetHead();
+}
+
+uint32_t SLD::WorldEntity::GetRenderElementCount() const noexcept
+{
+	return m_RenderData.totalElement;
+}
+
+size_t SLD::WorldEntity::GetRenderDataSize() const noexcept
+{
+	return m_RenderData.resource.GetUsedSize();
 }
 
 
@@ -49,15 +106,15 @@ RefPtr<SLD::RenderingComponent> SLD::WorldEntity::AllocRenderComponent(const Ref
 //	return m_RenderComponents.emplace_back(elemSize, elemCnt);
 //}
 //
-const std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderComponents() const
-{
-	return m_RenderComponents;
-}
-
-std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderingComponents()
-{
-	return m_RenderComponents;
-}
+//const std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderComponents() const
+//{
+//	return m_RenderComponents;
+//}
+//
+//std::vector<SLD::RenderingComponent>& SLD::WorldEntity::GetAllRenderingComponents()
+//{
+//	return m_RenderComponents;
+//}
 
 SLD::InputSetting& SLD::WorldEntity::GetWorldInputSetting()
 {

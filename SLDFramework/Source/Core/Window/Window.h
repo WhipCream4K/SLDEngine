@@ -38,7 +38,11 @@ namespace SLD
 		[[nodiscard]] const std::any& GetAnyWindowHandle() const { return m_WindowHandle; }
 
 		template<typename WindowType>
-		[[nodiscard]] constexpr std::add_pointer_t<WindowType> GetWindowSubsystem();
+		[[nodiscard]] constexpr std::add_pointer_t<WindowType> GetWindowSubSystem() noexcept;
+		
+		//template<typename WindowType>
+		//[[nodiscard]] constexpr std::add_pointer_t<const WindowType> GetWindowSubsystem() const noexcept;
+
 
 		void Resize(uint32_t width, uint32_t height);
 
@@ -81,7 +85,7 @@ namespace SLD
 	}
 
 	template <typename WindowType>
-	constexpr std::add_pointer_t<WindowType> Window::GetWindowSubsystem()
+	constexpr std::add_pointer_t<WindowType> Window::GetWindowSubSystem() noexcept
 	{
 		return std::get_if<WindowType>(&m_WindowSubSystem);
 	}

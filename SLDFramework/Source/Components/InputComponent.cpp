@@ -1,6 +1,7 @@
 #include "InputComponent.h"
 
 #include "../Core/WorldEntity.h"
+//#include "../GameObject/GameObject.h"
 
 //SLD::InputActionKeyBinding::InputActionKeyBinding(std::pmr::memory_resource* callbackResource)
 //	: m_Callbacks(callbackResource)

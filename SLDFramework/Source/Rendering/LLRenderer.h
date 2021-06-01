@@ -12,9 +12,9 @@ namespace SLD
 #ifdef HAS_DX12
 		DX12Renderer,
 #endif
-#ifdef HAS_SFML
+//#ifdef HAS_SFML
 		SFML2DRenderer
-#endif
+//#endif
 	>;
 
 }

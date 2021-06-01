@@ -2,7 +2,7 @@
 #include "../../Miscellaneous/DX12Resource.h"
 
 
-SLD::Window::Window(uint32_t width, uint32_t height, LLWindow&& subSystemWindow, LLInputs&& subSystemInput,
+SLD::Window::Window(uint32_t width, uint32_t height, LLWindow&& subSystemWindow, [[maybe_unused]] LLInputs&& subSystemInput,
 	const CurrentWindow& windowHandle, const std::string& vpName)
 	: m_WindowSubSystem(std::move(subSystemWindow))
 	, m_WindowEvents()

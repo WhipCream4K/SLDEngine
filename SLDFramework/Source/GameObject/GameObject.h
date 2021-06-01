@@ -3,25 +3,18 @@
 #define SLDFRAMEWORK_GAMEOBJECT_H
 
 #include "../Core/Base.h"
-#include "../Components/NonTickComponent.h"
-#include "../Components/TransformComponent.h"
+//#include "../Components/NonTickComponent.h"
+//#include "../Components/TickComponent.h"
+//#include "../Components/InputComponent.h"
+//#include "../Components/TransformComponent.h"
 #include "../Core/WorldEntity.h"
 
 namespace SLD
 {
+	class RenderingComponent;
+	class BaseComponent;
 	class TransformComponent;
-
-	//struct ComponentPointerWrapper
-	//{
-	//	ComponentPointerWrapper(ObservePtr ptr)
-	//		: resourcePointer(ptr)
-	//	{
-	//	}
-	//	
-	//	ObservePtr resourcePointer;
-	//	RefPtr<BaseComponent> component;
-	//};
-	
+	class WorldEntity;
 	class GameObject final : public std::enable_shared_from_this<GameObject>
 	{
 	public:
@@ -43,7 +36,7 @@ namespace SLD
 			typename ...Args>
 			[[nodiscard]] WeakPtr<ObservePtr<ComponentType>> CreateComponent(Args&&... args);
 
-		RefPtr<RenderingComponent> CreateRenderingComponent(size_t elemSize, uint32_t elemCnt);
+		RefPtr<ObservePtr<RenderingComponent>> CreateRenderingComponent(size_t elemSize, uint32_t elemCnt);
 
 		RefWrap<WorldEntity> GetWorld();
 
@@ -85,7 +78,7 @@ namespace SLD
 		
 		else if constexpr (std::is_base_of_v<NonTickComponent,ComponentType>)
 			component = m_World.get().AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...);
-
+		
 		if(component)
 			m_ComponentTable.emplace_back(reinterpret_cast<RefPtr<ObservePtr<BaseComponent>>&>(component));
 		

@@ -16,11 +16,13 @@ class SFML2DRenderer final
 public:
 
 	class ImplSFML2DRenderer;
+	SFML2DRenderer();
+	~SFML2DRenderer();
 	void Render(const std::vector<SLD::RenderingComponent>& renderingComponents);
 	void Render(const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents);
 	void Render(uint32_t elemCnt,uint8_t* bufferHead, size_t bufferSize);
 
-	void SetRenderTarget(const SLD::Window& renderWindow);
+	void SetRenderTarget(SLD::Window& renderWindow);
 	void SetRenderTarget(const RefPtr<SLD::Window>& renderWindow);
 
 private:

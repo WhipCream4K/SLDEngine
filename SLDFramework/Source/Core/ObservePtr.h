@@ -52,6 +52,9 @@ namespace SLD
 
 	private:
 
+		// NOTE: I could have use list to store a list of pointers and observe pointer would be useless
+		// however the list::erase() time complexity is O(n)
+		// creating dangling pointer and have smart pointer wraps around observe pointer is better imo.
 		uint8_t* const& m_BufferStart;
 		size_t m_Offset;
 	};
@@ -118,7 +121,6 @@ namespace SLD
 	template <typename T>
 	ObservePtr<T>::~ObservePtr()
 	{
-		m_BufferStart = nullptr;
 	}
 }
 

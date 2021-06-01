@@ -1,4 +1,6 @@
 #include "GameObject.h"
+#include "../Components/TransformComponent.h"
+#include "../Components/RenderingComponent.h"
 
 SLD::GameObject::GameObject(WorldEntity& world)
 	: m_World(world)
@@ -16,9 +18,15 @@ const RefPtr<SLD::ObservePtr<SLD::TransformComponent>>& SLD::GameObject::GetTran
 //	return m_ComponentTable;
 //}
 
-RefPtr<SLD::RenderingComponent> SLD::GameObject::CreateRenderingComponent(size_t elemSize, uint32_t elemCnt)
+//RefPtr<SLD::RenderingComponent> SLD::GameObject::CreateRenderingComponent(size_t elemSize, uint32_t elemCnt)
+//{
+//	return m_World.get().AllocNonTickComponent<RenderingComponent>();
+//}
+
+RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::GameObject::CreateRenderingComponent(size_t elemSize,
+	uint32_t elemCnt)
 {
-	return m_World.get().AllocRenderComponent(m_Transform,elemSize,elemCnt);
+	return m_World.get().AllocRenderingComponent(m_Transform, elemSize + sizeof(RenderIdentifier) * elemCnt, elemCnt);
 }
 
 RefWrap<SLD::WorldEntity> SLD::GameObject::GetWorld()

@@ -7,9 +7,8 @@
 #include "PMR_Resource/PoolResource.h"
 #include "../Inputs/InputSetting.h"
 #include "../Components/TickComponent.h"
-//#include "ComponentToResourceWrapper.h"
 #include "../Core/PersistentThreadWorker.h"
-#include "PMR_Resource/SpaialResource.h"
+#include "PMR_Resource/UnSynchronizedSpatialResource.h"
 
 namespace SLD
 {
@@ -24,24 +23,28 @@ namespace SLD
 
 		WorldEntity();
 
-		//RefPtr<RenderingComponent> AllocRenderComponent(size_t elemSize, uint32_t elemCnt);
-		//RenderingComponent& AllocRefRenderComponent(size_t elemSize, uint32_t elemCnt);
-
 		// Won't return anything because vector loses reference when moved
-		RefPtr<RenderingComponent> AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt);
+		//RefPtr<RenderingComponent> AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt);
 
-		// TODO: Can't find a smart pointer that takes no ownership
-		// until I can find one I will return raw pointers :(
+		RefPtr<ObservePtr<RenderingComponent>> AllocRenderingComponent(
+			const RefPtr<ObservePtr<TransformComponent>>& transform,
+			size_t elemSize,
+			uint32_t elemCnt);
+
+		uint8_t* GetRenderDataBufferStart() const noexcept;
+		uint32_t GetRenderElementCount() const noexcept;
+		size_t GetRenderDataSize() const noexcept;
+		
 		template<typename ComponentType,
 			typename = EnableIsBasedOf<TickComponent, ComponentType >,
 			typename ...Args>
 			RefPtr<ObservePtr<ComponentType>> AllocTickComponent(Args&&... args);
-
+		
 		template<typename ComponentType,
 			typename = EnableIsBasedOf<NonTickComponent, ComponentType>,
 			typename ...Args>
 			RefPtr<ObservePtr<ComponentType>> AllocNonTickComponent(Args&&... args);
-
+		
 		template<typename ComponentType,
 			typename = EnableIsBasedOf<TickComponent, ComponentType>>
 			void DeAllocTickComponent(const RefPtr<ComponentType>& ptr);
@@ -93,19 +96,19 @@ namespace SLD
 		// Packed pool of tick components
 		std::unordered_map<std::string, TickComponentPool> m_TickComponent;
 
-		// Uncouple from the base component above
-		struct RenderingDataPool
+		struct RenderData
 		{
-			// TODO: Maybe use pmr resource
-			std::vector<uint8_t> buffer{};
-			uint8_t* head{ buffer.data() };
+			RenderData(size_t startSize)
+				: resource(startSize)
+				, totalElement()
+			{
+			}
+
+			UnSynchronizedSpatialResource resource;
+			uint32_t totalElement;
 		};
 
-		RenderingDataPool m_RenderingPoolComponent;
-		
-		//std::vector<RenderingComponent> m_RenderComponents;
-		//std::vector<RefPtr<RenderingComponent>> m_RenderingComponents;
-		std::list<RenderingComponent> m_RenderComponents;
+		RenderData m_RenderData;
 
 		// Async Tick Task
 		struct TickTask
@@ -161,7 +164,7 @@ namespace SLD
 
 		return out;
 	}
-
+	
 	template <typename ComponentType, typename, typename ... Args>
 	RefPtr<ObservePtr<ComponentType>> WorldEntity::AllocNonTickComponent(Args&&... args)
 	{

@@ -36,23 +36,11 @@
 //}
 
 SLD::RenderingComponent::RenderingComponent(const RefPtr<ObservePtr<TransformComponent>>& transform,
-	std::add_pointer_t<uint8_t> const& head, size_t offset, size_t elemSize, uint32_t elemCnt)
+	const RefPtr<uint8_t>& pointerToBuffer, size_t elemSize, uint32_t elemCnt)
 	: m_Transform(transform)
-	, m_pBufferHead(head)
+	, m_PointToBuffer(pointerToBuffer)
 	, m_MaxSize(elemSize)
-	, m_FromBufferHeadOffset(offset)
-	, m_CurrentDataOffset()
-	, m_ElementCnt(elemCnt)
-{
-}
-
-SLD::RenderingComponent::RenderingComponent(const RefPtr<ObservePtr<TransformComponent>>& transform,
-	std::add_pointer_t<void> const& head, size_t offset, size_t elemSize, uint32_t elemCnt)
-	: m_Transform(transform)
-	, m_pBufferHead((uint8_t* const&)head)
-	, m_MaxSize(elemSize)
-	, m_FromBufferHeadOffset(offset)
-	, m_CurrentDataOffset()
+	, m_UsedData()
 	, m_ElementCnt(elemCnt)
 {
 }
@@ -67,17 +55,7 @@ size_t SLD::RenderingComponent::GetMaxDataSize() const
 	return m_MaxSize;
 }
 
-uint8_t* SLD::RenderingComponent::GetRenderData() noexcept
-{
-	return m_pBufferHead + m_FromBufferHeadOffset;
-}
-
 uint32_t SLD::RenderingComponent::GetElementCnt() const
 {
 	return m_ElementCnt;
-}
-
-const uint8_t* SLD::RenderingComponent::GetRenderData() const noexcept
-{
-	return m_pBufferHead + m_FromBufferHeadOffset;
 }

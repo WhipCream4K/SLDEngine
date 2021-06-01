@@ -13,7 +13,7 @@ public:
 
 	ImplSFML2DRenderer();
 	void Render(uint32_t elemCnt,uint8_t* bufferHead, size_t bufferSize);
-	void SetRenderTarget(const SLD::Window& renderWindow);
+	void SetRenderTarget(SLD::Window& renderWindow);
 	void SetRenderTarget(const RefPtr<SLD::Window>& renderWindow);
 
 private:
@@ -220,20 +220,24 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 	//}
 //}
 
-void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const SLD::Window& renderWindow)
+void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(SLD::Window& renderWindow)
 {
-	auto subsystem{ renderWindow.GetWindowHandleToType<SFMLWindow>() };
-	if (sf::RenderWindow* sfmlWindow{ &subsystem.GetSFMLWindow() }; sfmlWindow != m_RenderWindow)
-		m_RenderWindow = sfmlWindow;
+	auto winHandle{ renderWindow.GetWindowHandleToType<sf::WindowHandle>() };
+	if(m_RenderWindow->getSystemHandle() != winHandle)
+	{
+		m_RenderWindow = &renderWindow.GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
+	}
 }
 
 void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
 {
 	if (renderWindow)
 	{
-		auto subsystem{ renderWindow->GetWindowHandleToType<SFMLWindow>() };
-		if (sf::RenderWindow* sfmlWindow{ &subsystem.GetSFMLWindow() }; sfmlWindow != m_RenderWindow)
-			m_RenderWindow = sfmlWindow;
+		auto winHandle{ renderWindow->GetWindowHandleToType<sf::WindowHandle>() };
+		if (m_RenderWindow->getSystemHandle() != winHandle)
+		{
+			m_RenderWindow = &renderWindow->GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
+		}
 	}
 }
 
@@ -336,12 +340,16 @@ void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Windo
 
 //}
 
+SFML2DRenderer::SFML2DRenderer() = default;
+
+SFML2DRenderer::~SFML2DRenderer() = default;
+
 void SFML2DRenderer::Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize)
 {
 	m_pImplRenderWindow->Render(elemCnt,bufferHead, bufferSize);
 }
 
-void SFML2DRenderer::SetRenderTarget(const SLD::Window& renderWindow)
+void SFML2DRenderer::SetRenderTarget(SLD::Window& renderWindow)
 {
 	m_pImplRenderWindow->SetRenderTarget(renderWindow);
 }

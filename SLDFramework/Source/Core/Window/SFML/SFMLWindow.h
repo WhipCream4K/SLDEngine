@@ -14,10 +14,10 @@ class SFMLWindow
 {
 public:
 	
-	class ImpleSFMLWindow;
+	class ImplSFMLWindow;
 	
 	SFMLWindow(const std::any& windowHandle,uint32_t width,uint32_t height);
-
+	~SFMLWindow();
 	SFMLWindow(const SFMLWindow&) = delete;
 	SFMLWindow& operator=(const SFMLWindow&) = delete;
 	SFMLWindow(SFMLWindow&& other) noexcept;
@@ -31,7 +31,7 @@ public:
 
 private:
 
-	OwnedPtr<ImpleSFMLWindow> m_pMainWindow{};
+	OwnedPtr<ImplSFMLWindow> m_pMainWindow{};
 };
 
 

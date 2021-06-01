@@ -7,6 +7,7 @@
 #include "../Core/Event.h"
 #include "../Inputs/InputSetting.h"
 #include "NonTickComponent.h"
+#include "../Core/WorldEntity.h"
 #include "../GameObject/GameObject.h"
 
 

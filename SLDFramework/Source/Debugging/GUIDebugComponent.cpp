@@ -89,7 +89,7 @@ void SLD::GUIDebugComponent::NewImmediateFrame(float dt)
 	io.DeltaTime = dt;
 
 	// Update user events
-	const auto inputsFromViewPort = currWindow->GetInputManager().GetEventQueueHandle();
+	const auto inputsFromViewPort = currWindow->GetInputData();
 
 	for (uint8_t i = 0; i < inputsFromViewPort.eventCntThisFrame; ++i)
 	{
@@ -132,12 +132,12 @@ void SLD::GUIDebugComponent::NewImmediateFrame(float dt)
 	ImGui::NewFrame();
 }
 
-SLD::RenderingComponent SLD::GUIDebugComponent::GetImmedateRenderComponent() const
-{
-	ImGui::Render();
-	RenderingComponent out{ 10,10 };
-	return out;
-}
+//SLD::RenderingComponent SLD::GUIDebugComponent::GetImmedateRenderComponent() const
+//{
+//	ImGui::Render();
+//	//RenderingComponent out{ 10,10 };
+//	return out;
+//}
 
 void SLD::GUIDebugComponent::SetUpImGuiKeyMap(ImGuiIO& io)
 {

@@ -29,7 +29,7 @@ namespace SLD
 		// Dangerous; no runtime null checking here, be sure to attach the viewport before call this function
 		void NewImmediateFrame(float dt);
 
-		[[nodiscard]] RenderingComponent GetImmedateRenderComponent() const;
+		//[[nodiscard]] RenderingComponent GetImmedateRenderComponent() const;
 
 	private:
 

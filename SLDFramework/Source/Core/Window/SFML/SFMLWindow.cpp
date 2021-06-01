@@ -1,12 +1,12 @@
 #include "SFMLWindow.h"
 #include "../../Miscellaneous/SFMLPrerequisite.h"
 
-class SFMLWindow::ImpleSFMLWindow
+class SFMLWindow::ImplSFMLWindow
 {
 public:
 
-	ImpleSFMLWindow(sf::WindowHandle winHandle);
-	~ImpleSFMLWindow();
+	ImplSFMLWindow(sf::WindowHandle winHandle);
+	~ImplSFMLWindow();
 
 	void Resize(uint32_t width, uint32_t height);
 	void ClearColor(const float(&clearColor)[4]);
@@ -19,33 +19,33 @@ private:
 	sf::RenderWindow m_MainWindow{};
 };
 
-SFMLWindow::ImpleSFMLWindow::ImpleSFMLWindow(sf::WindowHandle winHandle)
+SFMLWindow::ImplSFMLWindow::ImplSFMLWindow(sf::WindowHandle winHandle)
 	: m_MainWindow(winHandle)
-{
+{	
 }
 
-SFMLWindow::ImpleSFMLWindow::~ImpleSFMLWindow()
+SFMLWindow::ImplSFMLWindow::~ImplSFMLWindow()
 {
 	m_MainWindow.close();
 }
 
-void SFMLWindow::ImpleSFMLWindow::Resize(uint32_t width, uint32_t height)
+void SFMLWindow::ImplSFMLWindow::Resize(uint32_t width, uint32_t height)
 {
 	m_MainWindow.setSize(sf::Vector2u{ width,height });
 }
 
-void SFMLWindow::ImpleSFMLWindow::ClearColor(const float(&clearColor)[4])
+void SFMLWindow::ImplSFMLWindow::ClearColor(const float(&clearColor)[4])
 {
 	m_MainWindow.clear(Float4ToSfColor(clearColor));
 }
 
-void SFMLWindow::ImpleSFMLWindow::Present(bool shouldVSync)
+void SFMLWindow::ImplSFMLWindow::Present(bool shouldVSync)
 {
 	m_MainWindow.setVerticalSyncEnabled(shouldVSync);
 	m_MainWindow.display();
 }
 
-SLD::InputParams::ReadOut SFMLWindow::ImpleSFMLWindow::ReadUserInputs()
+SLD::InputParams::ReadOut SFMLWindow::ImplSFMLWindow::ReadUserInputs()
 {
 	SLD::InputParams::ReadOut out{};
 
@@ -133,7 +133,7 @@ SLD::InputParams::ReadOut SFMLWindow::ImpleSFMLWindow::ReadUserInputs()
 	return out;
 }
 
-sf::RenderWindow& SFMLWindow::ImpleSFMLWindow::GetWindow()
+sf::RenderWindow& SFMLWindow::ImplSFMLWindow::GetWindow()
 {
 	return m_MainWindow;
 }
@@ -142,9 +142,11 @@ SFMLWindow::SFMLWindow(
 	const std::any& windowHandle,
 	[[maybe_unused]] uint32_t width,
 	[[maybe_unused]] uint32_t height)
-	: m_pMainWindow(std::make_unique<ImpleSFMLWindow>(std::any_cast<sf::WindowHandle>(windowHandle)))
+	: m_pMainWindow(std::make_unique<ImplSFMLWindow>(std::any_cast<sf::WindowHandle>(windowHandle)))
 {
 }
+
+SFMLWindow::~SFMLWindow() = default;
 
 SFMLWindow::SFMLWindow(SFMLWindow&& other) noexcept
 	: m_pMainWindow(std::move(other.m_pMainWindow))
