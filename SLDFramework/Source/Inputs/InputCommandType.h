@@ -14,6 +14,7 @@ namespace SLD
 	struct ActionCommand
 	{
 		RefPtr<EventHandler> callback{};
+		//WeakPtr<EventHandler> callback{};
 		InputEvent iEvent{ InputEvent::IE_None };
 		WeakPtr<GameObject> referencePointer{};
 	};
@@ -21,6 +22,7 @@ namespace SLD
 	struct AxisCommand
 	{
 		RefPtr<VirMemDelegate<AxisCallbackType>> callback{};
+		//WeakPtr<VirMemDelegate<AxisCallbackType>> callback{};
 		WeakPtr<GameObject> referencePointer{};
 	};
 	

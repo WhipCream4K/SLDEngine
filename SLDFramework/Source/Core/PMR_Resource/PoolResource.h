@@ -90,7 +90,8 @@ namespace SLD
 		// TODO: Maybe fragment
 		_Align;
 		m_EmptyAddressSpace.emplace(static_cast<uint8_t*>(_Ptr));
-		std::memset(_Ptr, 0, _Bytes);
+		_Bytes;
+		//std::memset(_Ptr, 0, _Bytes);
 	}
 
 	template <size_t Size>

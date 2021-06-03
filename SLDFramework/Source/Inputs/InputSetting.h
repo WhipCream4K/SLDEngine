@@ -127,6 +127,8 @@ namespace SLD
 			);
 
 		void RemoveCommands(WeakPtr<GameObject> reference);
+
+		~InputSetting();
 	
 	private:
 
@@ -251,6 +253,7 @@ namespace SLD
 		RefPtr<CallbackType> smartEv{ ev,[&logResource](CallbackType* ptr)
 		{
 			logResource.do_deallocate(ptr,sizeof(EventType),alignof(EventType));
+			// pass this the pointer already been deleted
 			ptr = nullptr;
 		} };
 

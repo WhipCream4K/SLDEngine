@@ -2,6 +2,7 @@
 
 #include "QBertParams.h"
 #include "GameObject/GameObject.h"
+#include "Components/TransformComponent.h"
 
 Level::Level(SLDWorldEntity& world)
 {
@@ -13,21 +14,25 @@ void Level::SetTexture(sf::Texture& texture)
 {
 	for (auto& platform : m_Platforms)
 	{
-		platform.sprite->setTexture(texture);
+		platform.sprite->GetPtr()->setTexture(texture);
+		//(*platform.sprite)->setTexture(texture);
 	}
 }
 
 void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint8_t id)
 {
-	m_Platforms[id].sprite->setTextureRect(textureRect);
+	m_Platforms[id].sprite->GetPtr()->setTextureRect(textureRect);
+	//(*m_Platforms[id].sprite)->setTextureRect(textureRect);
 }
 
 void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 {
 	for (auto& platfornm : m_Platforms)
 	{
-		platfornm.sprite->setTextureRect(textureRect);
-		platfornm.sprite->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
+		platfornm.sprite->GetPtr()->setTextureRect(textureRect);
+		platfornm.sprite->GetPtr()->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
+		//(*platfornm.sprite)->setTextureRect(textureRect);
+		//(*platfornm.sprite)->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
 	}
 }
 
@@ -43,6 +48,13 @@ void Level::ConstructPlatform()
 	const float platformOffSet{ 1.5f * platformHeight * 0.5f };
 
 	float startPlatformHeight{ (platformHeight * 3.0f) - platformHeight };
+
+	//float debugY{float(PlatformDimension[1])};
+	//float debugPlatformOffset{ 1.5f * debugY * 0.5f };
+	//float debugX{ float(PlatformDimension[0]) };
+	//debugPlatformOffset;
+	//debugX;
+	//startPlatformHeight;
 
 	//	//							0
 	//	//						1		2
@@ -72,16 +84,14 @@ void Level::ConstructPlatform()
 
 void Level::InitializeGameObjects(SLDWorldEntity& worldEntt)
 {
-	const size_t renderSize{
-		sizeof(void*) + sizeof(sf::Sprite)
-	};
-	const size_t renderElemCnt{ 2 };
+	const size_t renderSize{sizeof(sf::Sprite)};
+	const uint32_t renderElemCnt{ 1 };
 
 	for (auto& item : m_Platforms)
 	{
 		item.gameObject = worldEntt.CreateGameObject();
-		RefPtr<SLD::RenderingComponent> render{ item.gameObject->CreateRenderingComponent(renderSize,renderElemCnt) };
-		render->PushElement(SLD::RenderIdentifier(SFMLRenderElement::WorldMatrix), item.gameObject->GetTransform().get());
-		item.sprite = render->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
+		auto renderComponent{ item.gameObject->CreateRenderingComponent(renderSize,renderElemCnt) };
+		//item.sprite = render->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
+		item.sprite = renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
 	}
 }

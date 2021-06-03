@@ -3,7 +3,6 @@
 #define SLDFRAMEWORK_SPATIALRESOURCE_H
 
 #include "../Base.h"
-#include <forward_list>
 
 namespace SLD
 {
@@ -16,9 +15,6 @@ namespace SLD
 		void* do_allocate(size_t _Bytes, size_t _Align) override;
 		void do_deallocate(void* _Ptr, size_t _Bytes, size_t _Align) override;
 		bool do_is_equal(const memory_resource& _That) const noexcept override;
-		
-		//template<typename T, typename ...Args>
-		//RefPtr<ObservePtr<T>> DoAllocate(Args&&... args);
 
 		uint8_t* const & GetHead() const noexcept;
 		size_t GetUsedSize() const noexcept;
@@ -26,11 +22,10 @@ namespace SLD
 	private:
 
 		void* Alloc(size_t bytes, size_t alignment);
-		
-		//template<typename T,typename ...Args>
-		//RefPtr<ObservePtr<T>> Alloc(Args&&... args);
+	
 		
 		void IncreaseBuffer(size_t newSize);
+		void MoveObserver(uint8_t* oldHeadPointer);
 	
 		uint8_t* m_pHead;
 		uint8_t* m_pCurrent;

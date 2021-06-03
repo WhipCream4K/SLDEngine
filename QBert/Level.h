@@ -25,9 +25,12 @@ private:
 	struct Platform
 	{
 		RefPtr<SLD::GameObject> gameObject{};
-		RefPtr<sf::Sprite> sprite{};
+		RefPtr<SLD::ObservePtr<sf::Sprite>> sprite{};
+		//RefPtr<sf::Sprite*> sprite{};
 	};
 	
 	std::array<Platform, PlatformCnt> m_Platforms;
-};
 
+	// Row and Column
+	//std::map<uint32_t,Platform>
+};

@@ -29,6 +29,16 @@ namespace SLD
 			return m_BufferStart;
 		}
 
+		uint8_t* const& GetHead() const noexcept
+		{
+			return m_BufferStart;
+		}
+
+		size_t GetOffset() const noexcept
+		{
+			return m_Offset;
+		}
+
 		//template<typename T>
 		[[nodiscard]] T* GetPtr() const noexcept
 		{
@@ -121,6 +131,8 @@ namespace SLD
 	template <typename T>
 	ObservePtr<T>::~ObservePtr()
 	{
+		if constexpr (!std::is_null_pointer_v<T>)
+			GetPtr()->~T();
 	}
 }
 

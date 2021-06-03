@@ -1,5 +1,7 @@
 #include "RenderingComponent.h"
 
+#include "TransformComponent.h"
+
 
 //SLD::RenderingComponent::RenderingComponent(size_t elemSize, uint32_t elemCnt)
 //	: m_PackageData()
@@ -35,14 +37,36 @@
 //{
 //}
 
+//SLD::RenderingComponent::RenderingComponent(const RefPtr<ObservePtr<TransformComponent>>& transform,
+//	const RefPtr<uint8_t*>& pointerToBuffer, const ObservePtr<std::nullptr_t>& bufferObserver, size_t elemSize,
+//	uint32_t elemCnt)
+//	: m_Transform(transform)
+//	, m_PointToBuffer(pointerToBuffer)
+//	, m_BufferObserver(bufferObserver)
+//	, m_MaxSize(elemSize)
+//	, m_UsedData()
+//	, m_ElementCnt(elemCnt)
+//{
+//	ObservePtr<TransformComponent>* correct{ transform.get() };
+//	std::memcpy(m_PointToBuffer.get(), &correct, sizeof(void*));
+//	m_UsedData += sizeof(void*);
+//}
+
 SLD::RenderingComponent::RenderingComponent(const RefPtr<ObservePtr<TransformComponent>>& transform,
-	const RefPtr<uint8_t>& pointerToBuffer, size_t elemSize, uint32_t elemCnt)
+	const RefPtr<uint8_t>& pointerToBuffer, const ObservePtr<std::nullptr_t>& bufferObserver, size_t elemSize,
+	uint32_t elemCnt)
 	: m_Transform(transform)
 	, m_PointToBuffer(pointerToBuffer)
+	, m_BufferObserver(bufferObserver)
 	, m_MaxSize(elemSize)
 	, m_UsedData()
 	, m_ElementCnt(elemCnt)
 {
+	ObservePtr<TransformComponent>* correct{ transform.get() };
+	uint8_t* temp{};
+	std::memcpy(&temp, m_PointToBuffer.get(), sizeof(void*));
+	std::memcpy(temp, &correct, sizeof(void*));
+	m_UsedData += sizeof(void*);
 }
 
 WeakPtr<SLD::ObservePtr<SLD::TransformComponent>> SLD::RenderingComponent::GetTransform() const

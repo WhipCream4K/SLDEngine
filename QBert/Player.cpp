@@ -3,6 +3,7 @@
 #include <SLDFramework.h>
 
 #include "GameObject/GameObject.h"
+#include "Components/TransformComponent.h"
 #include "Rendering/RenderParams.h"
 #include "Components/InputComponent.h"
 
@@ -21,34 +22,34 @@ Player::Player(SLD::WorldEntity& world)
 	const auto transform{ m_TransformComponent.lock() };
 
 	// Setup Render Component
-	size_t renderData{ sizeof(void*) + sizeof(sf::Sprite) };
-	m_RenderingComponent = m_GameObject->CreateRenderingComponent(renderData, 2);
-
-	// Push transform to Renderer
-	m_RenderingComponent->PushElement(SLD::RenderIdentifier(SFMLRenderElement::WorldMatrix), transform.get());
+	const size_t renderData{ sizeof(sf::Sprite) };
+	const uint32_t renderElemCnt{ 1 };
+	m_RenderingComponent = m_GameObject->CreateRenderingComponent(renderData, renderElemCnt);
 
 	// Sprite Creation
-	m_CharacterSprite = m_RenderingComponent->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
+	m_CharacterSprite = m_RenderingComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
 
-	transform->GetPtr()->Translate(0.0f, 0.0f, float(QBert::Layer::Player));
+	transform->GetPtr()->Translate(-20.0f, 0.0f, float(QBert::Layer::Player));
 
 	m_InputComponent = m_GameObject->CreateComponent<SLD::InputComponent>();
 
 	auto inputTest{ m_GameObject->GetComponent<SLD::InputComponent>() };
-
-	//m_InputComponent.lock()->GetPtr()->BindAction("Horizontal", SLD::InputEvent::IE_Released, &Player::SetSpriteTexture, this);
 }
 
 void Player::SetSpriteTexture(const sf::Texture& texture) const
 {
-	m_CharacterSprite->setTexture(texture, true);
+	m_CharacterSprite->GetPtr()->setTexture(texture, true);
+	//auto ref{ *m_CharacterSprite };
+	//ref->setTexture(texture, true);
 
 	// Set to correct sprite rect
 	const sf::IntRect spriteRect{
 		0,0,16,16
 	};
-	m_CharacterSprite->setTextureRect(spriteRect);
-	m_CharacterSprite->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
+	m_CharacterSprite->GetPtr()->setTextureRect(spriteRect);
+	m_CharacterSprite->GetPtr()->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
+	//ref->setTextureRect(spriteRect);
+	//ref->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
 }
 
 void Player::SetUpPlayerInput()
@@ -63,8 +64,6 @@ void Player::SetUpPlayerInput()
 void Player::MoveDiagonal()
 {
 	m_IsMoving = true;
-
-	
 }
 
 void Player::MoveHorizontal(float value)
@@ -80,13 +79,13 @@ void Player::MoveHorizontal(float value)
 
 void Player::Update(float deltaTime)
 {
-	
+	deltaTime;
 }
 
 
 void Player::LerpTo(const rtm::float3f& to)
 {
-
+	to;
 }
 
 std::shared_ptr<SLD::GameObject> Player::GetGameObject()

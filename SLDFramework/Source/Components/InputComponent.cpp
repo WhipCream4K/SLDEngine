@@ -117,5 +117,14 @@ SLD::InputComponent::InputComponent(const RefPtr<GameObject>& gameObject)
 SLD::InputComponent::~InputComponent()
 {
 	if (auto parent{ m_Parent.lock() }; parent)
+	{
 		parent->GetWorld().get().GetWorldInputSetting().RemoveCommands(m_Parent);
+		std::cout << "Yp" << std::endl;
+	}
 }
+
+//SLD::InputComponent::~InputComponent()
+//{
+//	if (auto parent{ m_Parent.lock() }; parent)
+//		parent->GetWorld().get().GetWorldInputSetting().RemoveCommands(m_Parent);
+//}

@@ -27,15 +27,29 @@ RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderin
 
 	void* allocPtr{ logResource.do_allocate(sizeof(RenderingComponent),alignof(RenderingComponent)) };
 
-	// Get Render Buffer
-	void* renderPointer{ m_RenderData.resource.do_allocate(elemSize, alignof(std::max_align_t)) };
-	RefPtr<uint8_t> pointerToRenderBuffer{static_cast<uint8_t*>(renderPointer),[this,elemSize](uint8_t* ptr)
+	// Handle Render Buffer
+	RefPtr<uint8_t> pointerToBuffer{};
 	{
-		m_RenderData.resource.do_deallocate(ptr,elemSize,alignof(std::max_align_t));
-	}};
+		void* renderPointer{ m_RenderData.resource.do_allocate(elemSize, alignof(std::max_align_t)) };
+		uint8_t* castPointer{ static_cast<uint8_t*>(renderPointer) };
+		pointerToBuffer = RefPtr<uint8_t>{ castPointer, [this, elemSize](uint8_t* ptr)
+		{
+			uint8_t* temp{};
+			std::memcpy(&temp, ptr, sizeof(void*));
+			m_RenderData.resource.do_deallocate(temp, elemSize, alignof(std::max_align_t));
+		} };
 
-	// Construct
-	new (allocPtr) RenderingComponent{ transform,pointerToRenderBuffer,elemSize,elemCnt };
+
+		uint8_t* temp{};
+		std::memcpy(&temp, castPointer, sizeof(void*));
+		const size_t offset{ size_t(temp - m_RenderData.resource.GetHead()) };
+		const ObservePtr<std::nullptr_t> bufferObserver{ m_RenderData.resource.GetHead(),offset };
+		
+		// Construct
+		new (allocPtr) RenderingComponent{ transform,pointerToBuffer,bufferObserver,elemSize,elemCnt };
+	}
+	
+
 	
 	auto& bufferHead{ realResource.GetBufferHead() };
 	const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
@@ -44,6 +58,7 @@ RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderin
 
 	RefPtr<ObservePtr<RenderingComponent>> out{ ob,[this,&logResource](ObservePtr<RenderingComponent>* ptr)
 	{
+		//ptr->GetPtr()->~RenderingComponent();
 		logResource.do_deallocate(ptr->GetPtr(),sizeof(RenderingComponent),alignof(RenderingComponent));
 		m_RenderData.totalElement--;
 		delete ptr;

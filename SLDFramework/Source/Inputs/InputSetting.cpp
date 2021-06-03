@@ -189,3 +189,18 @@ void SLD::InputSetting::RemoveCommands(WeakPtr<GameObject> reference)
 			}));
 	}
 }
+
+SLD::InputSetting::~InputSetting()
+{
+	for (auto& keyMap : m_ActionKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+		commandTable.clear();
+	}
+
+	for (auto& keyMap : m_AxisKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+		commandTable.clear();
+	}
+}

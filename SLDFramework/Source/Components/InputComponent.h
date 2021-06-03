@@ -143,7 +143,9 @@ namespace SLD
 		// InputComponent is the only component that hardly tied to the owner (GameObject)
 		// Because in order to destroy commands create by this InputComponent
 		// We need some sort of reference point to delete from the table
+		// TODO: Make input component owned the commands
 		WeakPtr<GameObject> m_Parent;
+		//std::vector<R>
 	};
 
 	template <typename FuncPtr, typename, typename ObjectType, typename ... Args>

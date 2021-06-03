@@ -45,15 +45,21 @@ void SLD::UnSynchronizedSpatialResource::do_deallocate(void* _Ptr, size_t _Bytes
 		
 		if (*it == _Ptr)
 		{
-			const auto nextIt{ std::next(it, 1) };
-
-			if(nextIt != m_Observer.end())
+			if(const auto nextIt{ std::next(it, 1) };
+				nextIt != m_Observer.end())
 			{
 				diffSizeToNextPointer = size_t(abs(castPtr - (*nextIt)));
 				isFound = true;
 			}
+			else
+			{
+				// Handle the last iterator case
+				diffSizeToNextPointer = size_t(abs(castPtr - m_pCurrent));
+				m_Observer.erase(it);
+				break;
+			}
 			
-			it = m_Observer.erase(it);	
+			it = m_Observer.erase(it);
 		}
 	}
 
@@ -79,16 +85,30 @@ size_t SLD::UnSynchronizedSpatialResource::GetUsedSize() const noexcept
 
 void* SLD::UnSynchronizedSpatialResource::Alloc(size_t bytes, [[maybe_unused]] size_t alignment)
 {
+	//TODO: Man this is really dangerous people would think that i given out buffer pointer
+	// but actually no I gave out the pointer to pointer of buffer
 	auto& outPtr{ m_Observer.emplace_back(m_pCurrent) };
+	m_Buffer.resize(m_Buffer.size() + bytes);
 	m_pCurrent += bytes;
-	return outPtr;
+	return &outPtr;
 }
 
 void SLD::UnSynchronizedSpatialResource::IncreaseBuffer(size_t newSize)
 {
 	const size_t oldSize{ m_Buffer.size() };
 	const size_t allocSize{ (newSize + 7) & (-8) };
+	uint8_t* oldHeadPtr{ m_pHead };
 	m_Buffer.reserve(allocSize * 8); // always increase in multiple of 8
 	m_pHead = m_Buffer.data();
 	m_pCurrent = m_pHead + oldSize;
+	MoveObserver(oldHeadPtr);
+}
+
+void SLD::UnSynchronizedSpatialResource::MoveObserver(uint8_t* oldHeadPointer)
+{
+	for (auto& pointer : m_Observer)
+	{
+		const size_t diffFromHead{ size_t(abs(oldHeadPointer - pointer)) };
+		pointer = (m_pHead + diffFromHead);
+	}
 }

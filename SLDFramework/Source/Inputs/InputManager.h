@@ -8,7 +8,7 @@
 #include "LLInputs.h"
 
 // SFML external dependencies
-#include <SFML/Window.hpp>
+//#include <SFML/Window.hpp>
 
 #include <optional>
 #include <variant>

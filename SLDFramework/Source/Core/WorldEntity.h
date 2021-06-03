@@ -2,18 +2,16 @@
 #define SLDFRAMEWORK_WORLDENTITY_H
 
 #include "Base.h"
-#include "ObservePtr.h"
 #include "PMR_Resource/LoggingResource.h"
 #include "PMR_Resource/PoolResource.h"
 #include "../Inputs/InputSetting.h"
 #include "../Components/TickComponent.h"
-#include "../Core/PersistentThreadWorker.h"
+#include "PersistentThreadWorker.h"
 #include "PMR_Resource/UnSynchronizedSpatialResource.h"
 
 namespace SLD
 {
 	class RenderingComponent;
-	//class TickComponent;
 	class NonTickComponent;
 	class TransformComponent;
 	class GameObject;
@@ -96,6 +94,7 @@ namespace SLD
 		// Packed pool of tick components
 		std::unordered_map<std::string, TickComponentPool> m_TickComponent;
 
+		// TODO: This is really exposes maybe encapsulate later
 		struct RenderData
 		{
 			RenderData(size_t startSize)
@@ -138,13 +137,15 @@ namespace SLD
 		// This only works if we map of different types of components
 		constexpr const char* uniqueId{ ComponentType::UniqueId };
 
-		auto it{ m_TickComponent.try_emplace(uniqueId, TickComponentPool{}) };
+		auto it = m_TickComponent.find(uniqueId);
+		if (it == m_TickComponent.end())
+			it = m_TickComponent.try_emplace(uniqueId, TickComponentPool{}).first;
 
-		LoggingResource& logResource{ it.first->second.logger };
-		auto& realResource{ it.first->second.resource };
+		LoggingResource& logResource{ it->second.logger };
+		auto& realResource{ it->second.resource };
 
 		// NOTE: I don't know I have to reassign this again to make it works
-		logResource = LoggingResource{ &it.first->second.resource };
+		logResource = LoggingResource{ &it->second.resource };
 
 		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
 
@@ -169,12 +170,15 @@ namespace SLD
 	RefPtr<ObservePtr<ComponentType>> WorldEntity::AllocNonTickComponent(Args&&... args)
 	{
 		constexpr const char* uniqueId{ ComponentType::UniqueId };
-		auto it{ m_NonTickComponent.try_emplace(uniqueId,NonTickComponentPool{}) };
-		LoggingResource& logResource{ it.first->second.logger };
+
+		auto it{ m_NonTickComponent.find(uniqueId) };
+		if(it == m_NonTickComponent.end())
+			it = m_NonTickComponent.try_emplace(uniqueId,NonTickComponentPool{}).first;
+		LoggingResource& logResource{ it->second.logger };
 
 		// NOTE: I don't know I have to reassign this again so it works
-		logResource = LoggingResource{ &it.first->second.resource };
-		auto& realResource{ it.first->second.resource };
+		logResource = LoggingResource{ &it->second.resource };
+		auto& realResource{ it->second.resource };
 
 		//void* allocPtr{ logResource.do_allocate(sizeof(InputComponent),alignof(InputComponent)) };
 

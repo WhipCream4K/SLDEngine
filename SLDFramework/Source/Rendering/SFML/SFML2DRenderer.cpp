@@ -32,7 +32,7 @@ private:
 
 
 SFML2DRenderer::ImplSFML2DRenderer::ImplSFML2DRenderer()
-	: m_RenderWindow()
+	: m_RenderWindow(nullptr)
 	, m_2DDrawComponent()
 {
 }
@@ -46,10 +46,11 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 
 	uint8_t* head{ bufferHead };
 	uint8_t* end{ bufferHead + bufferSize };
-
 	uint32_t cnt{};
 	while (head != end)
 	{
+		//if (test == end)
+		//	break;
 		sf::RenderStates renderStates{};
 
 		// register transform
@@ -60,7 +61,9 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 		head += sizeof(void*);
 
 		SLD::RenderIdentifier id{ static_cast<SLD::RenderIdentifier>(*head) };
+		
 		head += sizeof(SLD::RenderIdentifier);
+
 		sf::Drawable* drawObj{};
 		size_t dataSize{};
 
@@ -78,10 +81,11 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 		default: break;
 		}
 
+		// removed since we won't know in runtime if this pointer actually a pointer
 		if (transform)
 		{
-			if (drawObj)
-			{
+			//if (drawObj)
+			//{
 				
 				auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
 				auto& component{ m_2DDrawComponent[cnt] };
@@ -102,7 +106,7 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 				component.drawObj = drawObj;
 				component.renderStates = renderStates;
 				component.depth = posVec.z;
-			}
+			//}
 		}
 
 		head += dataSize;
@@ -118,8 +122,9 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 	// Draw
 	for (const auto& item : m_2DDrawComponent)
 	{
-		if(item.drawObj)
-			m_RenderWindow->draw(*item.drawObj, item.renderStates);
+		// removed since we won't know in runtime if this pointer actually a pointer
+		//if(item.drawObj)
+		m_RenderWindow->draw(*item.drawObj, item.renderStates);
 	}
 
 }
@@ -234,7 +239,8 @@ void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Windo
 	if (renderWindow)
 	{
 		auto winHandle{ renderWindow->GetWindowHandleToType<sf::WindowHandle>() };
-		if (m_RenderWindow->getSystemHandle() != winHandle)
+		if (!m_RenderWindow ||
+			m_RenderWindow->getSystemHandle() != winHandle)
 		{
 			m_RenderWindow = &renderWindow->GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
 		}
@@ -340,7 +346,10 @@ void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Windo
 
 //}
 
-SFML2DRenderer::SFML2DRenderer() = default;
+SFML2DRenderer::SFML2DRenderer()
+	: m_pImplRenderWindow(std::make_unique<ImplSFML2DRenderer>())
+{
+}
 
 SFML2DRenderer::~SFML2DRenderer() = default;
 

@@ -21,8 +21,8 @@ private:
 	SLDFramework m_Framework;
 
 	// Game Data
-	Player m_Player;
-	Level m_Level;
+	RefPtr<Player> m_Player;
+	RefPtr<Level> m_Level;
 
 	// Texture Resource
 	sf::Texture m_QBertSprite;
