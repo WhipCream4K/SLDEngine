@@ -83,5 +83,5 @@ SLD::GameObject& SLD::GameObject::operator=(GameObject&& other) noexcept
 
 SLD::GameObject::~GameObject()
 {
-	m_Transform.reset();
+	//m_Transform.reset();
 }

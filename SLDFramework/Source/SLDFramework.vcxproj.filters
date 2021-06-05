@@ -297,7 +297,10 @@
     <ClInclude Include="Core\PMR_Resource\UnSynchronizedSpatialResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JSON\JSONParser.h">
+    <ClInclude Include="JSON\nlohmann\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\SoundManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -392,7 +395,10 @@
     <ClCompile Include="Core\PMR_Resource\UnSynchronizedSpatialResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JSON\JSONParser.cpp">
+    <ClCompile Include="Sound\SoundManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Singleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

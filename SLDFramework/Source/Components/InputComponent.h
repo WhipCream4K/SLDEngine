@@ -145,7 +145,12 @@ namespace SLD
 		// We need some sort of reference point to delete from the table
 		// TODO: Make input component owned the commands
 		WeakPtr<GameObject> m_Parent;
-		//std::vector<R>
+
+		using CompActionCommand = RefPtr<EventHandler>;
+		using CompAxisCommand = RefPtr<VirMemDelegate<AxisCallbackType>>;
+		
+		//std::vector<CompActionCommand> m_ActionCommand;
+		//std::vector<CompAxisCommand> m_AxisCommand;
 	};
 
 	template <typename FuncPtr, typename, typename ObjectType, typename ... Args>

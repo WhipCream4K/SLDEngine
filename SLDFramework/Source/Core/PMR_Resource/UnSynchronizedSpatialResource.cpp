@@ -30,7 +30,9 @@ void SLD::UnSynchronizedSpatialResource::do_deallocate(void* _Ptr, size_t _Bytes
 	const size_t moveSize{ size_t(abs(nextHeadPointer - m_pCurrent)) };
 
 	// Move all the bytes in the buffer up
-	std::memcpy(nextHeadPointer, castPtr, moveSize);
+	// TODO: Fix caused exception with the last element
+	if(m_Observer.size() != 1)
+		std::memcpy(nextHeadPointer, castPtr, moveSize);
 
 	bool isFound{};
 	size_t diffSizeToNextPointer{};

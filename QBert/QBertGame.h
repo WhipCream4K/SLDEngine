@@ -24,6 +24,8 @@ private:
 	RefPtr<Player> m_Player;
 	RefPtr<Level> m_Level;
 
+	rtm::float3f m_Player1DefaultSpawnPoint;
+	
 	// Texture Resource
 	sf::Texture m_QBertSprite;
 };

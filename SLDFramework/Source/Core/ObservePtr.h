@@ -131,8 +131,8 @@ namespace SLD
 	template <typename T>
 	ObservePtr<T>::~ObservePtr()
 	{
-		if constexpr (!std::is_null_pointer_v<T>)
-			GetPtr()->~T();
+		//if constexpr (!std::is_null_pointer_v<T>)
+		//	GetPtr()->~T();
 	}
 }
 

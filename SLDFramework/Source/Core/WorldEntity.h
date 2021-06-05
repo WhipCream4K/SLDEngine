@@ -20,6 +20,7 @@ namespace SLD
 	public:
 
 		WorldEntity();
+		~WorldEntity();
 
 		// Won't return anything because vector loses reference when moved
 		//RefPtr<RenderingComponent> AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt);
@@ -156,7 +157,10 @@ namespace SLD
 
 		RefPtr<ObservePtr<ComponentType>> out{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead},[&logResource](ObservePtr<ComponentType>* ptr)
 		{
-			logResource.do_deallocate(ptr->GetPtrPointTo(),sizeof(ComponentType),alignof(ComponentType));
+			uint8_t* temp{ptr->GetPtrPointTo()};
+			if (ptr->GetPtr())
+				ptr->GetPtr()->~ComponentType();
+			logResource.do_deallocate(temp,sizeof(ComponentType),alignof(ComponentType));
 			delete ptr;
 			ptr = nullptr;
 		} };
@@ -208,7 +212,10 @@ namespace SLD
 
 		RefPtr<ObservePtr<ComponentType>> out{ ob,[&logResource](ObservePtr<ComponentType>* ptr)
 		{
-			logResource.do_deallocate(ptr->GetPtr(),sizeof(ComponentType),alignof(ComponentType));
+			uint8_t* temp{ptr->GetPtrPointTo()};
+			if (ptr->GetPtr())
+				ptr->GetPtr()->~ComponentType();
+			logResource.do_deallocate(temp,sizeof(ComponentType),alignof(ComponentType));
 			delete ptr;
 			ptr = nullptr;
 		} };

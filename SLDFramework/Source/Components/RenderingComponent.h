@@ -143,6 +143,8 @@ namespace SLD
 			out = RefPtr<ObservePtr<DataType>>{ new ObservePtr<DataType>{m_BufferObserver.GetHead(),m_BufferObserver.GetOffset() + m_UsedData},
 			[](ObservePtr<DataType>* ptr)
 			{
+				if (ptr->GetPtr())
+					ptr->GetPtr()->~DataType();
 				delete ptr;
 				ptr = nullptr;
 			}};

@@ -21,12 +21,6 @@
 #include "ObservePtr.h"
 //#include "../Miscellaneous/RealTimeMath.h"
 
-template<typename SingletonType>
-SingletonType Instance()
-{
-	return SingletonType::Instance();
-}
-
 //void* operator new(size_t size);
 //void operator delete(void* p, size_t size);
 

@@ -14,6 +14,11 @@ SLD::WorldEntity::WorldEntity()
 	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
 }
 
+SLD::WorldEntity::~WorldEntity()
+{
+	
+}
+
 RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderingComponent(
 	const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt)
 {
@@ -59,7 +64,11 @@ RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderin
 	RefPtr<ObservePtr<RenderingComponent>> out{ ob,[this,&logResource](ObservePtr<RenderingComponent>* ptr)
 	{
 		//ptr->GetPtr()->~RenderingComponent();
-		logResource.do_deallocate(ptr->GetPtr(),sizeof(RenderingComponent),alignof(RenderingComponent));
+		uint8_t* temp{ptr->GetPtrPointTo()};
+		if (ptr->GetPtr())
+			ptr->GetPtr()->~RenderingComponent();
+		//delete ptr;
+		logResource.do_deallocate(temp,sizeof(RenderingComponent),alignof(RenderingComponent));
 		m_RenderData.totalElement--;
 		delete ptr;
 		ptr = nullptr;

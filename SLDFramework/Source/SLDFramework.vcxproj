@@ -123,7 +123,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -131,8 +131,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;$(SolutionDir)ExtDependencies\fmod\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -147,7 +147,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -157,8 +157,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;$(SolutionDir)ExtDependencies\fmod\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -171,7 +171,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -179,8 +179,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;$(SolutionDir)ExtDependencies\fmod\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -195,7 +195,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\JSON\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -205,8 +205,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;$(SolutionDir)ExtDependencies\fmod\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -214,7 +214,7 @@
     <ClInclude Include="Core\Window\MainSubSystem.h" />
     <ClInclude Include="Debugging\GUIDebugComponent.h" />
     <ClInclude Include="GameObject\GameObject.h" />
-    <ClInclude Include="JSON\JSONParser.h" />
+    <ClInclude Include="JSON\nlohmann\json.hpp" />
     <ClInclude Include="Math\RealTimeMath.h" />
     <ClInclude Include="Math\rtm\constants.h" />
     <ClInclude Include="Math\rtm\impl\compiler_utils.h" />
@@ -305,13 +305,14 @@
     <ClInclude Include="Components\TransformComponent.h" />
     <ClInclude Include="Core\PersistentThreadWorker.h" />
     <ClInclude Include="Core\PMR_Resource\UnSynchronizedSpatialResource.h" />
+    <ClInclude Include="Sound\SoundManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Components\BaseComponent.cpp" />
     <ClCompile Include="Core\Base.cpp" />
+    <ClCompile Include="Core\Singleton.cpp" />
     <ClCompile Include="Debugging\GUIDebugComponent.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
-    <ClCompile Include="JSON\JSONParser.cpp" />
     <ClCompile Include="Miscellaneous\DX12Resource.cpp" />
     <ClCompile Include="Core\PMR_Resource\PoolResource.cpp" />
     <ClCompile Include="Core\ObservePtr.cpp" />
@@ -338,6 +339,7 @@
     <ClCompile Include="Components\TransformComponent.cpp" />
     <ClCompile Include="Core\PersistentThreadWorker.cpp" />
     <ClCompile Include="Core\PMR_Resource\UnSynchronizedSpatialResource.cpp" />
+    <ClCompile Include="Sound\SoundManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IMGUI\IMGUI.vcxproj">

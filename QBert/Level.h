@@ -6,11 +6,32 @@ class Level
 {
 public:
 
+	struct Node
+	{
+		uint32_t row{};
+		uint32_t col{};
+	};
+	
+	struct Platform
+	{
+		RefPtr<SLD::GameObject> gameObject{};
+		RefPtr<SLD::ObservePtr<sf::Sprite>> sprite{};
+		std::vector<Node> edges{};
+		uint32_t stepCount{};
+		//RefPtr<sf::Sprite*> sprite{};
+	};
+
+	using HexGrid = std::map<uint32_t, std::vector<Platform>>;
+
+public:
+
 	Level(SLDWorldEntity& world);
 
 	void SetTexture(sf::Texture& texture);
-	void ChangePlatformTextureRect(const sf::IntRect& textureRect,uint8_t id);
+	void ChangePlatformTextureRect(const sf::IntRect& textureRect,uint32_t row,uint32_t col);
 	void ChangeAllPlatformTextureRect(const sf::IntRect& textureRect);
+	void SetStepNeeded(uint32_t count);
+	const HexGrid& GetGrid() const noexcept;
 
 private:
 
@@ -19,18 +40,11 @@ private:
 	static constexpr uint8_t PlatformMaxRow{ 7 };
 	static constexpr uint8_t PlatformMaxCol{ 7 };
 
-	void InitializeGameObjects(SLDWorldEntity& worldEntt);
-	void ConstructPlatform();
+	void ConstructPlatform(SLDWorldEntity& worldEntt);
 
-	struct Platform
-	{
-		RefPtr<SLD::GameObject> gameObject{};
-		RefPtr<SLD::ObservePtr<sf::Sprite>> sprite{};
-		//RefPtr<sf::Sprite*> sprite{};
-	};
-	
-	std::array<Platform, PlatformCnt> m_Platforms;
-
+	//std::array<Platform, PlatformCnt> m_Platforms;
 	// Row and Column
-	//std::map<uint32_t,Platform>
+	HexGrid m_HexPlatform;
+	std::string m_MapLayOutFile;
+	uint32_t m_StepNeeded;
 };
