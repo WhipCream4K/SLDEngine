@@ -4,6 +4,7 @@
 #define SLDFRAMEWORK_DELEGATE_H
 
 #include "CustomTypes.h"
+#include <stdexcept>
 
 namespace SLD
 {

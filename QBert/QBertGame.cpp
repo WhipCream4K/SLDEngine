@@ -33,8 +33,8 @@ void QBertGame::Start()
 	if (success)
 	{
 		// Create Sprite
-		const int totalSpriteForNow{ 3 };
-		SetUpSprite(totalSpriteForNow, m_QBertSprite, QBert::Level1::RectPlatFormStart);
+		//const int totalSpriteForNow{ 3 };
+		//SetUpSprite(totalSpriteForNow, m_QBertSprite, QBert::Level1::SpriteStart);
 
 		m_Level = std::make_shared<Level>(m_Framework.GetDefaultWorldEntity());
 		m_Player = std::make_shared<Player>(m_Framework.GetDefaultWorldEntity(),m_Level);
@@ -45,14 +45,21 @@ void QBertGame::Start()
 		m_Player->SetPos(m_Player1DefaultSpawnPoint);
 
 		// Map generation
-		m_Level->ChangeAllPlatformSprite(m_MainSprites[0]);
-		Player::OnPlayerFinishedJump.AddDynamic(&Level::OnPlayerJump, m_Level);
+		m_Level->SetTexture(m_QBertSprite);
+
+		m_Level->SetSpriteTextureRectFromId(0, QBert::Level1::SpriteStart);
+		m_Level->SetSpriteTextureRectFromId(1, QBert::Level1::SpriteEnd);
+		m_Level->SetSpriteTextureRectFromId(2, QBert::Level1::SpriteSpare);
+
+		m_Level->ChangeAllPlatformSprite(0);
+
+		Player::OnPlayerFinishedJump.AddDynamic(&Level::OnPlayerFinishedJump, m_Level);
+		Player::OnPlayerDied.AddDynamic(&Level::OnPlayerDied, m_Level);
 		
 		// HUD generation
 	}
 
 	// Binding
-
 	InputSetting& gameInput{ m_Framework.GetDefaultWorldEntity().GetWorldInputSetting() };
 
 	gameInput.AddAxisMapping("Horizontal", {
@@ -92,19 +99,20 @@ void QBertGame::Run()
 
 		// World Updates
 		m_Player->Update(deltaTime);
+		m_Level->Update(deltaTime);
 
 		// Async update and render
 		m_Framework.Step();
 	}
 }
 
-void QBertGame::SetUpSprite(int count,const sf::Texture& texture, const sf::IntRect& textureRect)
-{
-	for (int i = 0; i < count; ++i)
-	{
-		auto ref{ m_MainSprites.emplace_back(std::make_shared<sf::Sprite>()) };
-		ref->setTexture(texture);
-		ref->setTextureRect(textureRect);
-		ref->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
-	}
-}
+//void QBertGame::SetUpSprite(int count,const sf::Texture& texture, const sf::IntRect& textureRect)
+//{
+//	for (int i = 0; i < count; ++i)
+//	{
+//		auto ref{ m_MainSprites.emplace_back(std::make_shared<sf::Sprite>()) };
+//		ref->setTexture(texture);
+//		ref->setTextureRect(textureRect);
+//		ref->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
+//	}
+//}

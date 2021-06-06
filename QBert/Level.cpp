@@ -7,25 +7,72 @@
 //#include "Sound/SoundManager.h"
 #include <fstream>
 
+Level::FLevelRestart Level::OnLevelRestart{};
+const int Level::MaxSpriteCnt{ 3 };
+
 Level::Level(SLDWorldEntity& world)
 	: m_MapLayOutFile("./Resources/Map/LevelLayout.json")
+	, m_CurrentState(LevelState::Level1)
 {
 	//InitializeGameObjects(world);
 	ConstructPlatform(world);
+	const int spriteCntForNow{ 3 };
+	SetUpSprites(spriteCntForNow);
+	//SetupThreadWorker();
 }
 
-void Level::SetTexture(sf::Texture& texture)
+void Level::Update(float deltaTime)
 {
-	texture;
-	for (auto& platform : m_HexPlatform)
+	if(m_WinFlag)
 	{
-		for (auto& obj : platform.second)
+		// Display Flashing Sprite
+		m_FlashTimeCount += deltaTime;
+		if(m_FlashTimeCount >= m_FlashTime)
 		{
-			obj;
-			//obj.sprite->GetPtr()->setTexture(texture);
-		//platform.sprite->GetPtr()->setTexture(texture);
+			// Stop and Broadcast that level should restart
+			m_WinFlag = false;
+			m_FlashTimeCount = 0;
+			return;
 		}
-		//(*platform.sprite)->setTexture(texture);
+
+		if(m_FlashTimeCount >= m_SpriteFlashInterval)
+		{
+			m_SpriteFlashCount = (m_SpriteFlashCount + 1) % MaxSpriteCnt;
+		}
+
+		ChangeAllPlatformSprite(m_SpriteFlashCount);
+		
+	}
+	deltaTime;
+}
+
+void Level::SetTexture(const sf::Texture& texture)
+{
+	for (auto& sprite : m_SwapSprites)
+	{
+		sprite->setTexture(texture);
+	}
+}
+
+void Level::SetSpriteTextureRectFromId(int id, const sf::IntRect& textureRect)
+{
+	if (id >= 0 && id < int(m_SwapSprites.size()))
+	{
+		auto& ref{ m_SwapSprites[id] };
+		ref->setTextureRect(textureRect);
+		ref->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
+	}
+}
+
+void Level::ChangeAllPlatformSprite(int id)
+{
+	const auto* target{ m_SwapSprites[id].get() };
+	for (auto& row : m_HexPlatform)
+	{
+		for (auto& platform : row.second)
+		{
+			CopyTextureRegion(target, platform.spriteHandle);
+		}
 	}
 }
 
@@ -44,10 +91,10 @@ void Level::ChangeAllPlatformSprite(const RefPtr<sf::Sprite>& sprite)
 
 void Level::ChangePlatformSprite(const RefPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col)
 {
-	sprite;
-	row;
-	col;
-	//m_HexPlatform.at(row)[col].showSprite
+	const auto* target{ sprite.get() };
+	auto handle{ m_HexPlatform.at(row)[col].spriteHandle };
+
+	CopyTextureRegion(target, handle);
 }
 
 void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint32_t row, uint32_t col)
@@ -83,15 +130,92 @@ void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 	}
 }
 
-void Level::SetStepNeeded(uint32_t count)
+void Level::OnPlayerFinishedJump(const Node& to)
 {
-	m_StepNeeded = count;
+	HandlePlatformSpriteSwitch(to, m_CurrentState);
 }
 
-void Level::OnPlayerJump(const Node& to)
+void Level::OnPlayerDied(int currentLives)
 {
-	to;
-	std::cout << "yay" << std::endl;
+	if(currentLives < int(QBert::PlayerMaxLives))
+	{
+		// TODO: Restart Level
+	}
+}
+
+bool Level::CheckWinCondition(int winSpriteId) const
+{
+	bool win{ true };
+	for (const auto& row : m_HexPlatform)
+	{
+		for (const auto& platForm : row.second)
+		{
+			if (platForm.currentSpriteId != winSpriteId)
+			{
+				win = false;
+				break;
+			}
+		}
+	}
+
+	return win;
+}
+
+void Level::SetUpSprites(int amountToCreate)
+{
+	for (int i = 0; i < amountToCreate; ++i)
+	{
+		auto ref{ m_SwapSprites.emplace_back(std::make_shared<sf::Sprite>()) };
+	}
+}
+
+void Level::SetupThreadWorker()
+{
+	//m_CheckWinConditionThread.Start();
+	//m_CheckWinConditionThread.AssignTask([this]()
+	//	{
+	//		if (!m_WinFlag)
+	//		{
+	//			m_WinFlag = CheckWinCondition(m_WinSpriteId);
+	//			
+	//		}
+	//	});
+}
+
+void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
+{
+	auto& platform = m_HexPlatform.at(node.row)[node.col];
+
+	// There are only 3 sprites in use
+	// 0 is default
+	// 1 is usually what changed to
+	// 2 for now is to signal winning
+
+	const int winSpriteId{ 1 };
+	switch (state)
+	{
+	case LevelState::Level1:
+	{
+		// Step only once then lock the sprite changes
+		platform.stepCount = 1;
+			
+		if (platform.currentSpriteId != winSpriteId)
+		{
+			ChangePlatformSprite(m_SwapSprites[winSpriteId], node.row, node.col);
+			platform.currentSpriteId = winSpriteId;
+		}
+	}
+	break;
+	case LevelState::Level2:
+		{
+			
+		}
+		break;
+	case LevelState::Level3: break;
+	default:;
+	}
+
+	m_WinFlag = CheckWinCondition(winSpriteId);
 }
 
 const Level::HexGrid& Level::GetGrid() const noexcept
@@ -119,34 +243,31 @@ void Level::ConstructPlatform(SLDWorldEntity& world)
 	json jsonObj{};
 	mapLayOutFile >> jsonObj;
 
-	const size_t renderSize{ sizeof(sf::Sprite) };
-	const uint32_t renderElemCnt{ 1 };
+	//const size_t renderSize{ sizeof(sf::Sprite) };
+	//const uint32_t renderElemCnt{ 1 };
 
 	uint32_t col{};
 	for (auto it = jsonObj.begin(); it != jsonObj.end(); ++it)
 	{
 		std::vector<Platform> platforms{};
 		for (size_t i = 0; i < it.value().size(); ++i)
-		{			
+		{
 			const auto gameObject{ world.CreateGameObject() };
-			//const auto renderComponent{ gameObject->CreateRenderingComponent(renderSize,renderElemCnt) };
-			//world.GetRenderBuffer().PushRenderElement()
-			//const auto sfSprite{ renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite)) };
 			std::vector<Node> connectedGrid{};
 
 			auto temp{ gameObject->GetTransform() };
 			auto handle = world.GetRenderBuffer().AllocRenderElement<sf::Sprite>(temp, SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
-			
+
 			auto& link = it.value()[i]["link"];
 			for (auto& item : link.items())
 			{
-				const uint32_t cRow{ uint32_t(item.value()["row"])};
+				const uint32_t cRow{ uint32_t(item.value()["row"]) };
 				const uint32_t cCol{ uint32_t{item.value()["col"]} };
 				Node node{ cRow,cCol };
 				connectedGrid.push_back(node);
 			}
 
-			platforms.emplace_back(Platform{ gameObject,handle,std::move(connectedGrid),0 });
+			platforms.emplace_back(Platform{ gameObject,handle,std::move(connectedGrid),0,0 });
 
 			float posX{ (it.value()[i])["x"] };
 			float posY{ (it.value()[i])["y"] };
@@ -155,7 +276,6 @@ void Level::ConstructPlatform(SLDWorldEntity& world)
 			transform->Translate(posX * scaleX, posY * scaleY, float(QBert::Layer::Map));
 			transform->SetScale(scaleX, scaleY, 1.0f);
 		}
-
 
 
 		m_HexPlatform.try_emplace(col, platforms);

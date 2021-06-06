@@ -10,6 +10,8 @@ namespace QBert
 	static constexpr float LevelPixelX{ 32.0f };
 	static constexpr float LevelPixelY{ 32.0f };
 
+	static constexpr uint32_t PlayerMaxLives{ 5u };
+	
 	struct Sound
 	{
 		static constexpr const char* Jump{ "./Resources/Sounds/Jump.wav" };
@@ -19,8 +21,14 @@ namespace QBert
 	
 	struct Level1
 	{
-		inline static const sf::IntRect RectPlatFormStart{0,224,32,32};
-		inline static const sf::IntRect RectPlatFormEnd{0,192,32,32};
+		inline static const sf::IntRect SpriteStart{0,224,32,32};
+		inline static const sf::IntRect SpriteEnd{0,192,32,32};
+		inline static const sf::IntRect SpriteSpare{ 0,160,32,32 };
+	};
+
+	struct Level2
+	{
+		
 	};
 
 	enum class Layer

@@ -18,7 +18,7 @@ public:
 
 private:
 
-	void SetUpSprite(int count,const sf::Texture& texture,const sf::IntRect& textureRect);
+	//void SetUpSprite(int count,const sf::Texture& texture,const sf::IntRect& textureRect);
 	
 	SLDFramework m_Framework;
 
@@ -30,6 +30,6 @@ private:
 	
 	// Texture Resource
 	sf::Texture m_QBertSprite;
-	std::vector<RefPtr<sf::Sprite>> m_MainSprites;
+	//std::vector<RefPtr<sf::Sprite>> m_MainSprites;
 };
 

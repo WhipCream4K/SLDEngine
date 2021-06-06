@@ -8,7 +8,8 @@
 
 namespace SLD
 {
-	template<typename T,std::enable_if_t<std::is_integral_v<T>>>
+	template<typename T,
+	typename = std::enable_if_t<std::is_integral_v<T>>>
 	constexpr const T& clamp(const T& val,const T& lo, const T& hi)
 	{
 		if (val > hi)

@@ -26,9 +26,11 @@ public:
 	static const rtm::float3f SpawnPoint;
 
 	using FPlayerFinishedJump = SLD::DynamicMulticastDelegate<void(const Level::Node&)>;
+	using FPlayerDied = SLD::DynamicMulticastDelegate<void(int)>;
 
 	static FPlayerFinishedJump OnPlayerFinishedJump;
-	
+	static FPlayerDied OnPlayerDied;
+
 	enum class MoveDirection
 	{
 		None,
@@ -36,6 +38,13 @@ public:
 		DownLeft,
 		UpRight,
 		UpLeft
+	};
+
+	enum class State
+	{
+		None,
+		Moving,
+		Fall
 	};
 
 	Player(SLD::WorldEntity& world);
@@ -51,14 +60,15 @@ public:
 	void MoveDownLeft();
 	void MoveHorizontal(float value);
 	void Update(float deltaTime);
-	void LerpTo(const rtm::float3f& to);
+	void LerpTo(const rtm::float3f& to, float deltaTime);
+	rtm::vector4f LerpTo(const rtm::vector4f& to, float deltaTime);
 	std::shared_ptr<SLD::GameObject> GetGameObject();
 	void SetCurrentNode(uint32_t row, uint32_t col);
 
 private:
 
-	rtm::float3f CalculatePath(MoveDirection dir,Level::Node& outNode);
-	
+	rtm::float3f CalculatePath(MoveDirection dir, Level::Node& outNode);
+
 	SLD::WorldEntity* m_World;
 	std::weak_ptr<Level> m_GameLevel;
 	//std::shared_ptr<SLD::ObservePtr<sf::Sprite>> m_CharacterSprite;
@@ -73,7 +83,10 @@ private:
 	MoveDirection m_MoveDirection;
 	rtm::float3f m_CalculatedLocation;
 	float m_MoveSpeed{};
-	bool m_IsMoving{};
-	bool m_IsDead{};
+	float m_ReSpawnTimeCount{};
+	float m_ReSpawnTime{ 3.0f };
+	int m_CurrentLives{ 3 };
+	//uint32_t m_MaxAmountOfLives{ 5 };
+	State m_State{ State::None };
 };
 
