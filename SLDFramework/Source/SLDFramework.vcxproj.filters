@@ -78,7 +78,7 @@
     <ClInclude Include="Components\TickComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\VirMemDelegate.h">
+    <ClInclude Include="Core\DynamicDelegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\PMR_Resource\LoggingResource.h">
@@ -306,6 +306,9 @@
     <ClInclude Include="Rendering\RenderBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\DynamicMulticastDelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -405,6 +408,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\RenderBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DynamicMulticastDelegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

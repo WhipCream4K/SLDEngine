@@ -83,7 +83,7 @@ namespace SLD
 
 	//private:
 
-	//	std::pmr::vector<RefPtr<VirMemDelegate<binding_type>>> m_Callbacks;
+	//	std::pmr::vector<RefPtr<DynamicDelegate<binding_type>>> m_Callbacks;
 	//	AxisHandle m_Handle;
 	//};
 
@@ -147,7 +147,7 @@ namespace SLD
 		WeakPtr<GameObject> m_Parent;
 
 		using CompActionCommand = RefPtr<EventHandler>;
-		using CompAxisCommand = RefPtr<VirMemDelegate<AxisCallbackType>>;
+		using CompAxisCommand = RefPtr<DynamicDelegate<AxisCallbackType>>;
 		
 		//std::vector<CompActionCommand> m_ActionCommand;
 		//std::vector<CompAxisCommand> m_AxisCommand;
@@ -244,7 +244,7 @@ namespace SLD
 	//	FuncPtr fnPtr,
 	//	const RefPtr<ObjectType>& instance) noexcept(false) -> void
 	//{
-	//	RefPtr<VirMemDelegate<AxisHandle::Signature>> axAction{ std::make_shared<CAction<AxisHandle::Signature,ObjectType>>(fnPtr,instance) };
+	//	RefPtr<DynamicDelegate<AxisHandle::Signature>> axAction{ std::make_shared<CAction<AxisHandle::Signature,ObjectType>>(fnPtr,instance) };
 	//	m_Callbacks.emplace_back(axAction);
 	//}
 

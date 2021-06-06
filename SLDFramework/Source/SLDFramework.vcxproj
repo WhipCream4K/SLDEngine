@@ -261,13 +261,14 @@
     <ClInclude Include="Miscellaneous\SFMLPrerequisite.h" />
     <ClInclude Include="Core\PMR_Resource\PoolResource.h" />
     <ClInclude Include="Core\ObservePtr.h" />
+    <ClInclude Include="Core\DynamicMulticastDelegate.h" />
     <ClInclude Include="Rendering\RenderBuffer.h" />
     <ClInclude Include="Rendering\DX12\DX12CommandQueue.h" />
     <ClInclude Include="Rendering\DX12\DX12Renderer.h" />
     <ClInclude Include="Helpers\utils.h" />
     <ClInclude Include="Inputs\InputParams.h" />
     <ClInclude Include="Inputs\InputSetting.h" />
-    <ClInclude Include="Core\VirMemDelegate.h" />
+    <ClInclude Include="Core\DynamicDelegate.h" />
     <ClInclude Include="Core\Base.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Singleton.h" />
@@ -317,6 +318,7 @@
     <ClCompile Include="Miscellaneous\DX12Resource.cpp" />
     <ClCompile Include="Core\PMR_Resource\PoolResource.cpp" />
     <ClCompile Include="Core\ObservePtr.cpp" />
+    <ClCompile Include="Core\DynamicMulticastDelegate.cpp" />
     <ClCompile Include="Rendering\RenderBuffer.cpp" />
     <ClCompile Include="Rendering\DX12\DX12CommandQueue.cpp" />
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp" />

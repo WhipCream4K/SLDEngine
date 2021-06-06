@@ -329,7 +329,7 @@ TEST_CASE("Custom Static Array Test")
 }
 
 
-#include "Core/VirMemDelegate.h"
+#include "Core/DynamicDelegate.h"
 
 inline void Update(float some)
 {

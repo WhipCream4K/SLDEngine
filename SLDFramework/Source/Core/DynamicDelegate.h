@@ -6,10 +6,10 @@
 
 namespace SLD
 {
+
+	//TODO: Name this DynamicDelegate
 	template<typename FnType>
 	struct IAction{};
-
-	// TODO: probably also specialize const function
 
 	template<typename Ret,typename ...Args>
 	struct IAction<Ret(Args...)>
@@ -111,7 +111,7 @@ namespace SLD
 	};
 	
 	template<typename Fntype>
-	using VirMemDelegate = IAction<Fntype>;
+	using DynamicDelegate = IAction<Fntype>;
 
 	//template<typename FnType, class Object = Empty>
 	//struct CallAction {};
@@ -119,12 +119,12 @@ namespace SLD
 	//template<typename Ret, class Object, typename ...Args>
 	//struct CallAction<Ret(Args...), Object>
 	//{
-	//	static [[maybe_unused]] Ret Invoke(const RefPtr<VirMemDelegate>& instance,Args... args)
+	//	static [[maybe_unused]] Ret Invoke(const RefPtr<DynamicDelegate>& instance,Args... args)
 	//	{
 	//		return std::static_pointer_cast<CAction<Ret(Args...), Object>>(instance)->Invoke(std::forward<Args>(args)...);
 	//	}
 
-	//	static [[maybe_unused]] Ret Invoke(const VirMemDelegate& ref,Args... args)
+	//	static [[maybe_unused]] Ret Invoke(const DynamicDelegate& ref,Args... args)
 	//	{
 	//		return static_cast<CAction<Ret(Args...), Object>>(ref).Invoke(std::forward<Args>(args...));
 	//	}

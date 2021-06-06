@@ -67,16 +67,17 @@ void SLD::RenderBuffer::EraseWatcherThenShift(uint8_t* where, size_t dataSize)
 {
 	m_RenderElemCnt--;
 
-	size_t totalMoveSize{ dataSize + sizeof(RenderIdentifier) + sizeof(void*) };
+	const size_t totalMoveSize{ dataSize + sizeof(RenderIdentifier) + sizeof(void*) };
 
 	bool isFound{};
 	bool isLast{};
-	for (auto it = m_REWatcher.begin(); it != m_REWatcher.end(); ++it)
+	for (auto it = m_REWatcher.begin(); it != m_REWatcher.end();)
 	{
 		if (isFound)
 		{
 			auto& temp = *it;
-			temp -= dataSize;
+			temp -= totalMoveSize;
+			++it;
 			continue;
 		}
 
@@ -84,12 +85,17 @@ void SLD::RenderBuffer::EraseWatcherThenShift(uint8_t* where, size_t dataSize)
 		{
 			isFound = true;
 			it = m_REWatcher.erase(it);
+			
 			if (it == m_REWatcher.end())
 			{
 				isLast = true;
 				break;
 			}
+
+			continue;
 		}
+
+		++it;
 	}
 
 	if (!isLast)

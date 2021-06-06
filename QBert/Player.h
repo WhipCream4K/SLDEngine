@@ -6,6 +6,7 @@
 #include "Level.h"
 #include "Core/ObservePtr.h"
 #include "Math/rtm/vector4f.h"
+#include "Core/DynamicMulticastDelegate.h"
 
 class Level;
 
@@ -23,6 +24,10 @@ class Player
 public:
 
 	static const rtm::float3f SpawnPoint;
+
+	using FPlayerFinishedJump = SLD::DynamicMulticastDelegate<void(const Level::Node&)>;
+
+	static FPlayerFinishedJump OnPlayerFinishedJump;
 	
 	enum class MoveDirection
 	{

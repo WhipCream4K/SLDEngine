@@ -3,7 +3,7 @@
 
 #include "InputManager.h"
 #include "../Core/Event.h"
-#include "../Core/VirMemDelegate.h"
+#include "../Core/DynamicDelegate.h"
 
 namespace SLD
 {
@@ -21,12 +21,12 @@ namespace SLD
 
 	struct AxisCommand
 	{
-		RefPtr<VirMemDelegate<AxisCallbackType>> callback{};
-		//WeakPtr<VirMemDelegate<AxisCallbackType>> callback{};
+		RefPtr<DynamicDelegate<AxisCallbackType>> callback{};
+		//WeakPtr<DynamicDelegate<AxisCallbackType>> callback{};
 		WeakPtr<GameObject> referencePointer{};
 	};
 	
-	using AxisCommandType = RefPtr<VirMemDelegate<AxisCallbackType>>;
+	using AxisCommandType = RefPtr<DynamicDelegate<AxisCallbackType>>;
 }
 
 #endif

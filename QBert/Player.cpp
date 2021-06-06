@@ -10,6 +10,7 @@
 
 #include "QBertParams.h"
 
+Player::FPlayerFinishedJump Player::OnPlayerFinishedJump{};
 
 Player::Player(SLD::WorldEntity& world)
 {
@@ -116,7 +117,6 @@ void Player::MoveUpRight()
 		m_MoveDirection = MoveDirection::UpRight;
 		m_CalculatedLocation = CalculatePath(m_MoveDirection, m_CurrentNode);
 		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
-
 	}
 }
 

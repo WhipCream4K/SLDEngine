@@ -21,13 +21,8 @@ public:
 	{
 		RefPtr<SLD::GameObject> gameObject{};
 		RefPtr<SLD::Tracker> spriteHandle{};
-		//RefPtr<SLD::ObservePtr<sf::Sprite>> sprite{};
-		//WeakPtr<SLD::ObservePtr<SLD::RenderComponent>> renderComponent;
-		//WeakPtr<sf::Sprite> showSprite{};
-		//std::vector<>
 		std::vector<Node> edges{};
 		uint32_t stepCount{};
-		//RefPtr<sf::Sprite*> sprite{};
 	};
 
 	using HexGrid = std::map<uint32_t, std::vector<Platform>>;
@@ -44,6 +39,8 @@ public:
 	void SetStepNeeded(uint32_t count);
 	const HexGrid& GetGrid() const noexcept;
 
+	void OnPlayerJump(const Node& to);
+
 private:
 
 	static constexpr uint8_t PlatformCnt{ 28 };
@@ -52,7 +49,7 @@ private:
 	static constexpr uint8_t PlatformMaxCol{ 7 };
 
 	void ConstructPlatform(SLDWorldEntity& worldEntt);
-
+	
 	//std::array<Platform, PlatformCnt> m_Platforms;
 	// Row and Column
 	HexGrid m_HexPlatform;

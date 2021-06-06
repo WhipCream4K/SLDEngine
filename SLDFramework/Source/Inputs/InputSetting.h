@@ -180,7 +180,7 @@ namespace SLD
 		float** outHandle)
 	{
 		using EventType = CAction<FuncPtr, Object>;
-		using CallbackType = VirMemDelegate<AxisCallbackType>;
+		using CallbackType = DynamicDelegate<AxisCallbackType>;
 
 		auto& axisMap{ m_AxisKeyMappings.at(groupName) };
 
@@ -237,7 +237,7 @@ namespace SLD
 		FuncPtr fnPtr, Object* objRef, float** outHandle)
 	{
 		using EventType = CAction<FuncPtr, Object>;
-		using CallbackType = VirMemDelegate<AxisCallbackType>;
+		using CallbackType = DynamicDelegate<AxisCallbackType>;
 
 		auto& axisMap{ m_AxisKeyMappings.at(axisGroupName) };
 

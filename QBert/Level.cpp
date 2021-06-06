@@ -4,6 +4,7 @@
 #include "GameObject/GameObject.h"
 #include "Components/TransformComponent.h"
 #include "JSON/nlohmann/json.hpp"
+//#include "Sound/SoundManager.h"
 #include <fstream>
 
 Level::Level(SLDWorldEntity& world)
@@ -85,6 +86,12 @@ void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 void Level::SetStepNeeded(uint32_t count)
 {
 	m_StepNeeded = count;
+}
+
+void Level::OnPlayerJump(const Node& to)
+{
+	to;
+	std::cout << "yay" << std::endl;
 }
 
 const Level::HexGrid& Level::GetGrid() const noexcept

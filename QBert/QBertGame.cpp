@@ -46,8 +46,8 @@ void QBertGame::Start()
 
 		// Map generation
 		m_Level->ChangeAllPlatformSprite(m_MainSprites[0]);
-		//m_Level->ChangeAllPlatformTextureRect(QBert::Level1::RectPlatFormStart);
-
+		Player::OnPlayerFinishedJump.AddDynamic(&Level::OnPlayerJump, m_Level);
+		
 		// HUD generation
 	}
 
