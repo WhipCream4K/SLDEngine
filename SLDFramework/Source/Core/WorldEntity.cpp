@@ -10,13 +10,19 @@ SLD::WorldEntity::WorldEntity()
 	, m_EndTimePoint()
 	, m_CurrentTimePoint()
 	, m_DeltaTime()
+	, m_RenderBuffer(1024)
 {
 	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
 }
 
 SLD::WorldEntity::~WorldEntity()
 {
-	
+
+}
+
+SLD::RenderBuffer& SLD::WorldEntity::GetRenderBuffer()
+{
+	return m_RenderBuffer;
 }
 
 RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderingComponent(
@@ -49,13 +55,13 @@ RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderin
 		std::memcpy(&temp, castPointer, sizeof(void*));
 		const size_t offset{ size_t(temp - m_RenderData.resource.GetHead()) };
 		const ObservePtr<std::nullptr_t> bufferObserver{ m_RenderData.resource.GetHead(),offset };
-		
+
 		// Construct
 		new (allocPtr) RenderingComponent{ transform,pointerToBuffer,bufferObserver,elemSize,elemCnt };
 	}
-	
 
-	
+
+
 	auto& bufferHead{ realResource.GetBufferHead() };
 	const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
 
@@ -63,17 +69,17 @@ RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::WorldEntity::AllocRenderin
 
 	RefPtr<ObservePtr<RenderingComponent>> out{ ob,[this,&logResource](ObservePtr<RenderingComponent>* ptr)
 	{
-		//ptr->GetPtr()->~RenderingComponent();
-		uint8_t* temp{ptr->GetPtrPointTo()};
-		if (ptr->GetPtr())
-			ptr->GetPtr()->~RenderingComponent();
-		//delete ptr;
-		logResource.do_deallocate(temp,sizeof(RenderingComponent),alignof(RenderingComponent));
-		m_RenderData.totalElement--;
-		delete ptr;
-		ptr = nullptr;
-	} };
-	
+			//ptr->GetPtr()->~RenderingComponent();
+			uint8_t* temp{ptr->GetPtrPointTo()};
+			if (ptr->GetPtr())
+				ptr->GetPtr()->~RenderingComponent();
+			//delete ptr;
+			logResource.do_deallocate(temp,sizeof(RenderingComponent),alignof(RenderingComponent));
+			m_RenderData.totalElement--;
+			delete ptr;
+			ptr = nullptr;
+		} };
+
 	m_RenderData.totalElement++;
 
 	return out;

@@ -27,22 +27,26 @@ void QBertGame::Start()
 {
 	using namespace SLD;
 
-	m_Level = std::make_shared<Level>(m_Framework.GetDefaultWorldEntity());
-	m_Player = std::make_shared<Player>(m_Framework.GetDefaultWorldEntity(),m_Level);
-
 	// Game Sprite Sheet
 	const bool success{ m_QBertSprite.loadFromFile("./Resources/SpriteSheet/QBert_Sprites.png") };
 
 	if (success)
 	{
+		// Create Sprite
+		const int totalSpriteForNow{ 3 };
+		SetUpSprite(totalSpriteForNow, m_QBertSprite, QBert::Level1::RectPlatFormStart);
+
+		m_Level = std::make_shared<Level>(m_Framework.GetDefaultWorldEntity());
+		m_Player = std::make_shared<Player>(m_Framework.GetDefaultWorldEntity(),m_Level);
+		
 		// Player
 		m_Player->SetSpriteTexture(m_QBertSprite);
 		m_Player->SetCurrentNode(0, 0);
 		m_Player->SetPos(m_Player1DefaultSpawnPoint);
 
 		// Map generation
-		m_Level->SetTexture(m_QBertSprite);
-		m_Level->ChangeAllPlatformTextureRect(QBert::Level1::RectPlatFormStart);
+		m_Level->ChangeAllPlatformSprite(m_MainSprites[0]);
+		//m_Level->ChangeAllPlatformTextureRect(QBert::Level1::RectPlatFormStart);
 
 		// HUD generation
 	}
@@ -91,5 +95,16 @@ void QBertGame::Run()
 
 		// Async update and render
 		m_Framework.Step();
+	}
+}
+
+void QBertGame::SetUpSprite(int count,const sf::Texture& texture, const sf::IntRect& textureRect)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		auto ref{ m_MainSprites.emplace_back(std::make_shared<sf::Sprite>()) };
+		ref->setTexture(texture);
+		ref->setTextureRect(textureRect);
+		ref->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
 	}
 }

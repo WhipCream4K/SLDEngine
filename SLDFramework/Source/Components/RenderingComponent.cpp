@@ -69,6 +69,12 @@ SLD::RenderingComponent::RenderingComponent(const RefPtr<ObservePtr<TransformCom
 	m_UsedData += sizeof(void*);
 }
 
+SLD::RenderingComponent::RenderingComponent(size_t elemSize, uint32_t elemCnt)
+	: m_ElementCnt(elemCnt)
+{
+	m_PackageData.reserve(elemSize);
+}
+
 WeakPtr<SLD::ObservePtr<SLD::TransformComponent>> SLD::RenderingComponent::GetTransform() const
 {
 	return m_Transform;

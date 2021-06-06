@@ -2,6 +2,11 @@
 
 #include <SLDFramework.h>
 
+namespace SLD
+{
+	class RenderComponent;
+}
+
 class Level
 {
 public:
@@ -15,7 +20,11 @@ public:
 	struct Platform
 	{
 		RefPtr<SLD::GameObject> gameObject{};
-		RefPtr<SLD::ObservePtr<sf::Sprite>> sprite{};
+		RefPtr<SLD::Tracker> spriteHandle{};
+		//RefPtr<SLD::ObservePtr<sf::Sprite>> sprite{};
+		//WeakPtr<SLD::ObservePtr<SLD::RenderComponent>> renderComponent;
+		//WeakPtr<sf::Sprite> showSprite{};
+		//std::vector<>
 		std::vector<Node> edges{};
 		uint32_t stepCount{};
 		//RefPtr<sf::Sprite*> sprite{};
@@ -28,6 +37,8 @@ public:
 	Level(SLDWorldEntity& world);
 
 	void SetTexture(sf::Texture& texture);
+	void ChangeAllPlatformSprite(const RefPtr<sf::Sprite>& sprite);
+	void ChangePlatformSprite(const RefPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col);
 	void ChangePlatformTextureRect(const sf::IntRect& textureRect,uint32_t row,uint32_t col);
 	void ChangeAllPlatformTextureRect(const sf::IntRect& textureRect);
 	void SetStepNeeded(uint32_t count);

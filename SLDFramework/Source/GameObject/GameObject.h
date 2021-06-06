@@ -36,7 +36,7 @@ namespace SLD
 			typename ...Args>
 			[[nodiscard]] WeakPtr<ObservePtr<ComponentType>> CreateComponent(Args&&... args);
 
-		RefPtr<ObservePtr<RenderingComponent>> CreateRenderingComponent(size_t elemSize, uint32_t elemCnt);
+		WeakPtr<ObservePtr<RenderingComponent>> CreateRenderingComponent(size_t elemSize, uint32_t elemCnt);
 
 		RefWrap<WorldEntity> GetWorld();
 
@@ -80,7 +80,11 @@ namespace SLD
 			component = m_World.get().AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...);
 		
 		if(component)
-			m_ComponentTable.emplace_back(reinterpret_cast<RefPtr<ObservePtr<BaseComponent>>&>(component));
+		{
+			auto base{ reinterpret_cast<RefPtr<ObservePtr<BaseComponent>>&>(component) };
+			base->GetPtr()->SetParent(shared_from_this());
+			m_ComponentTable.emplace_back(base);
+		}
 		
 		return component;
 	}

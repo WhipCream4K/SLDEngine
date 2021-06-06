@@ -8,6 +8,7 @@
 #include "../Components/TickComponent.h"
 #include "PersistentThreadWorker.h"
 #include "PMR_Resource/UnSynchronizedSpatialResource.h"
+#include "../Rendering/RenderBuffer.h"
 
 namespace SLD
 {
@@ -25,6 +26,8 @@ namespace SLD
 		// Won't return anything because vector loses reference when moved
 		//RefPtr<RenderingComponent> AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt);
 
+		RenderBuffer& GetRenderBuffer();
+		
 		RefPtr<ObservePtr<RenderingComponent>> AllocRenderingComponent(
 			const RefPtr<ObservePtr<TransformComponent>>& transform,
 			size_t elemSize,
@@ -110,6 +113,8 @@ namespace SLD
 
 		RenderData m_RenderData;
 
+		RenderBuffer m_RenderBuffer;
+
 		// Async Tick Task
 		struct TickTask
 		{
@@ -123,6 +128,10 @@ namespace SLD
 			typename = EnableIsBasedOf<TickComponent, SubTickComponent>>
 			void InitializeAsyncTickTask(const ObservePtr<SubTickComponent>& pointerToObj);
 
+		template<typename SubTickComponent,
+			typename = EnableIsBasedOf<TickComponent, SubTickComponent>>
+			void InitializeAsyncTickTask(const RefPtr<ObservePtr<SubTickComponent>>& component);
+		
 		PersistentThreadWorker& EmplaceNewWorker(const std::string& id);
 
 		// Game Related
@@ -165,7 +174,7 @@ namespace SLD
 			ptr = nullptr;
 		} };
 
-		InitializeAsyncTickTask(*out.get());
+		InitializeAsyncTickTask(out);
 
 		return out;
 	}
@@ -263,6 +272,29 @@ namespace SLD
 		thread.AssignTask([&pointerToObj, this]()
 			{
 				pointerToObj.GetPtr()->AsyncUpdate(this->GetDeltaTime());
+			});
+	}
+
+	template <typename SubTickComponent, typename>
+	void WorldEntity::InitializeAsyncTickTask(const RefPtr<ObservePtr<SubTickComponent>>& component)
+	{
+		// Check if this component's worker is already initialize
+		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
+			{
+				return std::strcmp(item.id.c_str(), SubTickComponent::UniqueId) == 0;
+			});
+
+		const bool found{ fIt != m_TickTasks.end() };
+		PersistentThreadWorker& thread{ found ? fIt->worker : EmplaceNewWorker(SubTickComponent::UniqueId) };
+		WeakPtr<ObservePtr<SubTickComponent>> weak{ component };
+		thread.AssignTask([weak, this]()
+			{
+				if(auto real = weak.lock();
+					real)
+				{
+					real->GetPtr()->AsyncUpdate(this->GetDeltaTime());
+				}
+				//pointerToObj.GetPtr()->AsyncUpdate(this->GetDeltaTime());
 			});
 	}
 }

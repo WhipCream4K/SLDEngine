@@ -13,10 +13,8 @@
 
 Player::Player(SLD::WorldEntity& world)
 {
-	m_MoveDirection = MoveDirection::None;
-	m_World = &world;
-
 	m_GameObject = world.CreateGameObject();
+	m_MoveSpeed = 10.0f;
 
 	m_TransformComponent = m_GameObject->GetTransform();
 	m_TransformComponent.lock()->GetPtr()->SetScale(2.5f, 2.5f, 1.0f);
@@ -25,10 +23,16 @@ Player::Player(SLD::WorldEntity& world)
 	// Setup Render Component
 	const size_t renderData{ sizeof(sf::Sprite) };
 	const uint32_t renderElemCnt{ 1 };
-	auto renderComponent = m_GameObject->CreateRenderingComponent(renderData, renderElemCnt);
+	//auto renderComponent = m_GameObject->CreateRenderingComponent(renderData, renderElemCnt);
+
+	m_CharacterSprite = std::make_shared<sf::Sprite>();
+
+	//renderComponent.lock()->GetPtr()->PushToRenderBuffer(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite), m_CharacterSprite.get());
 
 	// Sprite Creation
-	m_CharacterSprite = renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
+	//m_CharacterSprite = renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
+
+	m_CharacterSpriteHandle = world.GetRenderBuffer().PushRenderElement(transform, SLD::RenderIdentifier(SFMLRenderElement::RenderSprite), m_CharacterSprite.get());
 
 	transform->GetPtr()->Translate(-20.0f, 0.0f, float(QBert::Layer::Player));
 
@@ -49,11 +53,17 @@ Player::Player(SLD::WorldEntity& world, const std::shared_ptr<Level>& gameLevel)
 	// Setup Render Component
 	const size_t renderData{ sizeof(sf::Sprite) };
 	const uint32_t renderElemCnt{ 1 };
-	auto renderComponent = m_GameObject->CreateRenderingComponent(renderData, renderElemCnt);
+	//auto renderComponent = m_GameObject->CreateRenderingComponent(renderData, renderElemCnt);
 
+	m_CharacterSprite = std::make_shared<sf::Sprite>();
+
+	//renderComponent.lock()->GetPtr()->PushToRenderBuffer(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite), m_CharacterSprite.get());
+	
 	// Sprite Creation
-	m_CharacterSprite = renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
+	//m_CharacterSprite = renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
 
+	m_CharacterSpriteHandle = world.GetRenderBuffer().PushRenderElement(transform, SLD::RenderIdentifier(SFMLRenderElement::RenderSprite), m_CharacterSprite.get());
+	
 	transform->GetPtr()->Translate(-20.0f, 0.0f, float(QBert::Layer::Player));
 
 	m_InputComponent = m_GameObject->CreateComponent<SLD::InputComponent>();
@@ -61,18 +71,22 @@ Player::Player(SLD::WorldEntity& world, const std::shared_ptr<Level>& gameLevel)
 
 void Player::SetSpriteTexture(const sf::Texture& texture) const
 {
-	m_CharacterSprite->GetPtr()->setTexture(texture, true);
-	//auto ref{ *m_CharacterSprite };
-	//ref->setTexture(texture, true);
+	//m_CharacterSprite->GetPtr()->setTexture(texture, true);
+	auto ref{ m_CharacterSprite };
+	ref->setTexture(texture, true);
 
 	// Set to correct sprite rect
 	const sf::IntRect spriteRect{
 		0,0,16,16
 	};
-	m_CharacterSprite->GetPtr()->setTextureRect(spriteRect);
-	m_CharacterSprite->GetPtr()->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
-	//ref->setTextureRect(spriteRect);
-	//ref->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
+	//m_CharacterSprite->GetPtr()->setTextureRect(spriteRect);
+	//m_CharacterSprite->GetPtr()->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
+	ref->setTextureRect(spriteRect);
+	ref->setOrigin(16.0f * 0.5f, 16.0f * 0.5f);
+
+	CopyTextureRegion(m_CharacterSprite.get(), m_CharacterSpriteHandle);
+	//const auto temp{ m_CharacterSpriteHandle.get() };
+	//std::copy_n((uint8_t*)m_CharacterSprite.get(), sizeof(sf::Sprite), *temp);
 }
 
 void Player::SetUpPlayerInput()
@@ -101,6 +115,8 @@ void Player::MoveUpRight()
 		m_IsMoving = true;
 		m_MoveDirection = MoveDirection::UpRight;
 		m_CalculatedLocation = CalculatePath(m_MoveDirection, m_CurrentNode);
+		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
+
 	}
 }
 
@@ -111,6 +127,7 @@ void Player::MoveUpLeft()
 		m_IsMoving = true;
 		m_MoveDirection = MoveDirection::UpLeft;
 		m_CalculatedLocation = CalculatePath(m_MoveDirection, m_CurrentNode);
+		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
 	}
 }
 
@@ -133,6 +150,8 @@ void Player::MoveDownLeft()
 		m_IsMoving = true;
 		m_MoveDirection = MoveDirection::DownLeft;
 		m_CalculatedLocation = CalculatePath(m_MoveDirection,m_CurrentNode);
+		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
+
 	}
 }
 

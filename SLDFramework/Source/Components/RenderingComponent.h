@@ -3,10 +3,9 @@
 #define SLDFRAMEWORK_RENDERING_COMPONENT_H
 
 #include "../Core/Base.h"
-//#include "../Rendering/RenderTarget.h"
 
-//#include "BaseComponent.h"
 #include "NonTickComponent.h"
+#include "../GameObject/GameObject.h"
 #include "../Rendering/RenderParams.h"
 
 namespace SLD
@@ -41,6 +40,11 @@ namespace SLD
 			uint32_t elemCnt
 		);
 
+		RenderingComponent(
+			size_t elemSize,
+			uint32_t elemCnt
+		);
+
 		template<typename DataType>
 		RefPtr<DataType> AllocData(RenderIdentifier identifier);
 
@@ -52,7 +56,11 @@ namespace SLD
 
 		// can throw exceptions from access violation BE CAREFUL
 		template<typename DataType>
-		void PushElement(RenderIdentifier identifier, DataType data);
+		void PushElement(RenderIdentifier identifier, DataType pointerToData);
+
+		template<typename DataType,
+		typename = EnableIf<std::is_pointer_v<DataType>>>
+		void PushToRenderBuffer(RenderIdentifier id, DataType pointerToDataType);
 
 		[[nodiscard]] WeakPtr<ObservePtr<TransformComponent>> GetTransform() const;
 
@@ -62,23 +70,20 @@ namespace SLD
 
 	private:
 
-		//std::vector<uint8_t> m_PackageData{};
-		//ObservePtr<>
-		//ObservePtr<>
-		//RenderTarget m_RenderTarget;
-
+		std::vector<uint8_t> m_PackageData{};
 		WeakPtr<ObservePtr<TransformComponent>> m_Transform;
 		//RefPtr<uint8_t*> m_PointToBuffer;
 		RefPtr<uint8_t> m_PointToBuffer;
 		
 		// TODO: Temporary fix for resizable resources
+		RefPtr<ObservePtr<std::nullptr_t>> m_LinkToBuffer;
 		ObservePtr<std::nullptr_t> m_BufferObserver;
 
 		//uint8_t* m_Header;
 		size_t m_MaxSize;
 		size_t m_UsedData;
 		uint32_t m_ElementCnt;
-		uint32_t m_Test{};
+		//uint32_t m_Test{};
 	};
 
 	template <typename DataType>
@@ -125,7 +130,6 @@ namespace SLD
 		constexpr size_t renderIdSize{ sizeof(RenderIdentifier) };
 		if (m_UsedData + sizeof(DataType) + renderIdSize <= m_MaxSize)
 		{
-			m_Test++;
 			//uint8_t* bufferStart{ (*m_PointToBuffer) };
 			uint8_t* temp{ m_PointToBuffer.get() };
 			uint8_t* bufferStart{};
@@ -265,6 +269,32 @@ namespace SLD
 		//m_pCurrentDataPtr += sizeof(RenderIdentifier);
 		//std::memcpy(m_pCurrentDataPtr, &data, sizeof(DataType));
 		//m_pCurrentDataPtr += sizeof(DataType);
+	}
+
+	template <typename DataType, typename>
+	void RenderingComponent::PushToRenderBuffer(RenderIdentifier id, DataType pointerToDataType)
+	{
+		if (auto parent{ GetParent().lock() };
+			parent)
+		{
+			constexpr size_t bufferSize{ sizeof(void*) + sizeof(RenderIdentifier) + sizeof(DataType) };
+
+			size_t pos{};
+			std::array<uint8_t, bufferSize> tempBuffer{};
+
+			ObservePtr<TransformComponent>* temp{ parent->GetTransform().get() };
+
+			std::memcpy(tempBuffer.data(), &temp, sizeof(void*));
+			pos += sizeof(void*);
+
+			std::memcpy(tempBuffer.data() + pos, &id, sizeof(RenderIdentifier));
+			pos += sizeof(RenderIdentifier);
+
+			std::copy(pointerToDataType, pointerToDataType + sizeof(DataType), tempBuffer.data() + pos);
+
+			parent->GetWorld().get().GetRenderBuffer().PushRenderElement(tempBuffer.data(), bufferSize);
+
+		}
 	}
 
 	//template <size_t PackageSize, size_t ElemCnt>

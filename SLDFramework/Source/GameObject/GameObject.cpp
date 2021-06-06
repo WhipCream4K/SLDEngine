@@ -24,17 +24,22 @@ const RefPtr<SLD::ObservePtr<SLD::TransformComponent>>& SLD::GameObject::GetTran
 //	return m_World.get().AllocNonTickComponent<RenderingComponent>();
 //}
 
-RefPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::GameObject::CreateRenderingComponent(size_t elemSize,
+//WeakPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::GameObject::CreateRenderingComponent(size_t elemSize,
+//	uint32_t elemCnt)
+//{
+//	//auto component = m_World.get().AllocRenderingComponent(m_Transform,
+//	//	// size of User Element + size of Identifier + size of Transform pointer
+//	//	elemSize + sizeof(RenderIdentifier) * elemCnt + sizeof(void*),
+//	//	elemCnt);
+//
+//	//m_ComponentTable.emplace_back(reinterpret_cast<RefPtr<ObservePtr<BaseComponent>>&>(component));
+//	return CreateComponent<RenderingComponent>(elemSize, elemCnt);
+//}
+
+WeakPtr<SLD::ObservePtr<SLD::RenderingComponent>> SLD::GameObject::CreateRenderingComponent(size_t elemSize,
 	uint32_t elemCnt)
 {
-	auto component = m_World.get().AllocRenderingComponent(m_Transform,
-		// size of User Element + size of Identifier + size of Transform pointer
-		elemSize + sizeof(RenderIdentifier) * elemCnt + sizeof(void*),
-		elemCnt);
-
-	m_ComponentTable.emplace_back(reinterpret_cast<RefPtr<ObservePtr<BaseComponent>>&>(component));
-
-	return component;
+	return CreateComponent<RenderingComponent>(elemSize,elemCnt);
 }
 
 RefWrap<SLD::WorldEntity> SLD::GameObject::GetWorld()

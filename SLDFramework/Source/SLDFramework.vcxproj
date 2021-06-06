@@ -261,6 +261,7 @@
     <ClInclude Include="Miscellaneous\SFMLPrerequisite.h" />
     <ClInclude Include="Core\PMR_Resource\PoolResource.h" />
     <ClInclude Include="Core\ObservePtr.h" />
+    <ClInclude Include="Rendering\RenderBuffer.h" />
     <ClInclude Include="Rendering\DX12\DX12CommandQueue.h" />
     <ClInclude Include="Rendering\DX12\DX12Renderer.h" />
     <ClInclude Include="Helpers\utils.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="Miscellaneous\DX12Resource.cpp" />
     <ClCompile Include="Core\PMR_Resource\PoolResource.cpp" />
     <ClCompile Include="Core\ObservePtr.cpp" />
+    <ClCompile Include="Rendering\RenderBuffer.cpp" />
     <ClCompile Include="Rendering\DX12\DX12CommandQueue.cpp" />
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp" />
     <ClCompile Include="Helpers\utils.cpp" />

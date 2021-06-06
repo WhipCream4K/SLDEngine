@@ -243,10 +243,11 @@ void SLD::Core::Step()
 	m_MainViewPort->ClearBackBuffer();
 
 	//auto& allRenderComponent{ m_WorldEntity.GetAllRenderComponents() };
+	auto& renderBuffer{ m_WorldEntity.GetRenderBuffer() };
 	m_MainRenderer.Render(
-		m_WorldEntity.GetRenderElementCount(),
-		m_WorldEntity.GetRenderDataBufferStart(),
-		m_WorldEntity.GetRenderDataSize());
+		renderBuffer.GetElementCnt(),
+		renderBuffer.GetBufferStart(),
+		renderBuffer.GetBufferSize());
 
 	m_MainViewPort->Present();
 

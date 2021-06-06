@@ -15,20 +15,46 @@ Level::Level(SLDWorldEntity& world)
 
 void Level::SetTexture(sf::Texture& texture)
 {
+	texture;
 	for (auto& platform : m_HexPlatform)
 	{
 		for (auto& obj : platform.second)
 		{
-			obj.sprite->GetPtr()->setTexture(texture);
-		}
+			obj;
+			//obj.sprite->GetPtr()->setTexture(texture);
 		//platform.sprite->GetPtr()->setTexture(texture);
+		}
 		//(*platform.sprite)->setTexture(texture);
 	}
 }
 
+void Level::ChangeAllPlatformSprite(const RefPtr<sf::Sprite>& sprite)
+{
+	sprite;
+	const auto* target{ sprite.get() };
+	for (auto& row : m_HexPlatform)
+	{
+		for (auto& platform : row.second)
+		{
+			CopyTextureRegion(target, platform.spriteHandle);
+		}
+	}
+}
+
+void Level::ChangePlatformSprite(const RefPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col)
+{
+	sprite;
+	row;
+	col;
+	//m_HexPlatform.at(row)[col].showSprite
+}
+
 void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint32_t row, uint32_t col)
 {
-	m_HexPlatform.at(row)[col].sprite->GetPtr()->setTextureRect(textureRect);
+	textureRect;
+	row;
+	col;
+	//m_HexPlatform.at(row)[col].sprite->GetPtr()->setTextureRect(textureRect);
 }
 
 //void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint8_t id)
@@ -39,13 +65,15 @@ void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint32_t r
 
 void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 {
+	textureRect;
 	for (auto& platform : m_HexPlatform)
 	{
 		for (auto& obj : platform.second)
 		{
-			auto sfSprite{ obj.sprite->GetPtr() };
-			sfSprite->setTextureRect(textureRect);
-			sfSprite->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
+			obj;
+			//auto sfSprite{ obj.sprite->GetPtr() };
+			//sfSprite->setTextureRect(textureRect);
+			//sfSprite->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
 		}
 		//platfornm.sprite->GetPtr()->setTextureRect(textureRect);
 		//platfornm.sprite->GetPtr()->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
@@ -94,11 +122,14 @@ void Level::ConstructPlatform(SLDWorldEntity& world)
 		for (size_t i = 0; i < it.value().size(); ++i)
 		{			
 			const auto gameObject{ world.CreateGameObject() };
-			const auto renderComponent{ gameObject->CreateRenderingComponent(renderSize,renderElemCnt) };
-			const auto sfSprite{ renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite)) };
-			
+			//const auto renderComponent{ gameObject->CreateRenderingComponent(renderSize,renderElemCnt) };
+			//world.GetRenderBuffer().PushRenderElement()
+			//const auto sfSprite{ renderComponent->GetPtr()->AllocAndConstructData<sf::Sprite>(SLD::RenderIdentifier(SFMLRenderElement::RenderSprite)) };
 			std::vector<Node> connectedGrid{};
 
+			auto temp{ gameObject->GetTransform() };
+			auto handle = world.GetRenderBuffer().AllocRenderElement<sf::Sprite>(temp, SLD::RenderIdentifier(SFMLRenderElement::RenderSprite));
+			
 			auto& link = it.value()[i]["link"];
 			for (auto& item : link.items())
 			{
@@ -108,7 +139,7 @@ void Level::ConstructPlatform(SLDWorldEntity& world)
 				connectedGrid.push_back(node);
 			}
 
-			platforms.emplace_back(Platform{ gameObject,sfSprite,std::move(connectedGrid),0 });
+			platforms.emplace_back(Platform{ gameObject,handle,std::move(connectedGrid),0 });
 
 			float posX{ (it.value()[i])["x"] };
 			float posY{ (it.value()[i])["y"] };
