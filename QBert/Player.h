@@ -19,7 +19,7 @@ namespace SLD
 	class TransformComponent;
 }
 
-class Player
+class Player : public std::enable_shared_from_this<Player>
 {
 public:
 
@@ -59,6 +59,7 @@ public:
 	void MoveDownRight();
 	void MoveDownLeft();
 	void MoveHorizontal(float value);
+	void Move(const Level::Node& to);
 	void Update(float deltaTime);
 	void LerpTo(const rtm::float3f& to, float deltaTime);
 	rtm::vector4f LerpTo(const rtm::vector4f& to, float deltaTime);
@@ -66,7 +67,9 @@ public:
 	void SetCurrentNode(uint32_t row, uint32_t col);
 
 	void OnLevelChange(Level::LevelState);
+	void OnLevelRestart(Level::LevelState);
 	void OnGameClear();
+	void SetPlayerState(State state);
 
 private:
 

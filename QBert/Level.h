@@ -3,19 +3,22 @@
 #include <SLDFramework.h>
 #include "Core/DynamicMulticastDelegate.h"
 
+class Player;
+
 namespace SLD
 {
 	class RenderComponent;
 }
 
+class FlyingDisc;
 class Level
 {
 public:
 
 	struct Node
 	{
-		uint32_t row{};
-		uint32_t col{};
+		int row{};
+		int col{};
 	};
 
 	struct Platform
@@ -38,11 +41,11 @@ public:
 		Count
 	};
 
-
 public:
 
 	// Gonna do static const for now
 	static const int MaxSpriteCnt;
+	inline static constexpr rtm::float3f TopOfTheMountain{0.0f,256.0f,1.0f};
 
 	Level(SLDWorldEntity& world);
 
@@ -55,21 +58,26 @@ public:
 	void ChangePlatformSprite(const RefPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col);
 	void ChangePlatformTextureRect(const sf::IntRect& textureRect, uint32_t row, uint32_t col);
 	void ChangeAllPlatformTextureRect(const sf::IntRect& textureRect);
+	rtm::float3f GetHexGridPos(int row, int col);
 	const HexGrid& GetGrid() const noexcept;
 
 	void OnPlayerFinishedJump(const Node& to);
 	void OnPlayerDied(int currentLives);
 	void OnGameWon();
 
+	using FLevelRestart = SLD::DynamicMulticastDelegate<void(LevelState)>;
 	using FLevelChange = SLD::DynamicMulticastDelegate<void(LevelState)>;
 	static FLevelChange OnLevelChange;
+	static FLevelRestart OnLevelRestart;
+	
 	void ChangeLevelSprite(LevelState state);
+	bool IsFlyingDiscExist(const Node& check);
+	void UseFlyingDisc(const RefPtr<Player>& player,int row,int col);
 
 private:
 
 	bool CheckWinCondition(int winSpriteId) const;
 	void SetUpSprites(int amountToCreate);
-	void SetupThreadWorker();
 	void HandlePlatformSpriteSwitch(const Node& node, LevelState state);
 
 	static constexpr uint8_t PlatformCnt{ 28 };
@@ -79,20 +87,18 @@ private:
 
 	void ConstructPlatform(SLDWorldEntity& worldEntt);
 	void ResetAllPlatformToBase();
+	void PreInitializeFlyingDisc(SLDWorldEntity& world,int startAmount);
 
-	//std::array<Platform, PlatformCnt> m_Platforms;
-	// Row and Column
 	HexGrid m_HexPlatform;
 	std::vector<RefPtr<sf::Sprite>> m_SwapSprites;
+	std::vector<RefPtr<FlyingDisc>> m_FlyingDiscs;
 	std::string m_MapLayOutFile;
-	int m_WinSpriteId{};
 	LevelState m_CurrentState;
 	int m_SpriteFlashCount{};
+	int m_AmountOfFlyingDisc{};
 	float m_SpriteFlashTimeCount{};
 	float m_SpriteFlashInterval{ 0.25f };
 	float m_FlashTimeCount{};
 	float m_FlashTime{ 5.0f };
 	bool m_WinFlag{};
-	//SLD::PersistentThreadWorker m_CheckWinConditionThread;
-	//std::atomic_bool m_WinFlag{};
 };

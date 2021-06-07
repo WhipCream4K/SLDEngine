@@ -2,6 +2,7 @@
 
 #include <SLDFramework.h>
 
+#include "FlyingDisc.h"
 #include "QBertGame.h"
 #include "GameObject/GameObject.h"
 #include "Components/TransformComponent.h"
@@ -105,17 +106,6 @@ void Player::MoveUpRight()
 
 void Player::MoveUpLeft()
 {
-	//if(!m_IsDead)
-	//{
-	//	if (!m_IsMoving)
-	//	{
-	//		m_IsMoving = true;
-	//		m_MoveDirection = MoveDirection::UpLeft;
-	//		m_CalculatedLocation = CalculatePath(m_MoveDirection, m_CurrentNode);
-	//		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
-	//	}
-	//}
-
 	if (m_State == State::None)
 	{
 		m_State = State::Moving;
@@ -128,17 +118,6 @@ void Player::MoveUpLeft()
 
 void Player::MoveDownRight()
 {
-	//if (!m_IsDead)
-	//{
-	//	if (!m_IsMoving)
-	//	{
-	//		m_IsMoving = true;
-	//		m_MoveDirection = MoveDirection::DownRight;
-	//		m_CalculatedLocation = CalculatePath(m_MoveDirection, m_CurrentNode);
-
-	//		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
-	//	}
-	//}
 	if (m_State == State::None)
 	{
 		m_State = State::Moving;
@@ -150,17 +129,6 @@ void Player::MoveDownRight()
 
 void Player::MoveDownLeft()
 {
-	//if (!m_IsDead)
-	//{
-	//	if (!m_IsMoving)
-	//	{
-	//		m_IsMoving = true;
-	//		m_MoveDirection = MoveDirection::DownLeft;
-	//		m_CalculatedLocation = CalculatePath(m_MoveDirection, m_CurrentNode);
-	//		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
-	//	}
-	//}
-
 	if (m_State == State::None)
 	{
 		m_State = State::Moving;
@@ -181,6 +149,33 @@ void Player::MoveHorizontal(float value)
 			const float horizon{ pos.x + (speed * value * m_World->GetDeltaTime()) };
 			transform->GetPtr()->Translate(horizon, pos.y, pos.z);
 		}
+	}
+}
+
+void Player::Move(const Level::Node& to)
+{
+	if (m_State == State::None)
+	{
+		m_State = State::Moving;
+		m_CurrentNode = to;
+
+		if (auto level{ m_GameLevel.lock() };
+			level)
+		{
+			auto& grid{ level->GetGrid() };
+			if (to.row < int(grid.size()) &&
+				to.col < int(grid.at(to.row).size()))
+			{
+				auto platformTransform{ grid.at(to.row)[to.col].gameObject->GetTransform()->GetPtr() };
+				m_CalculatedLocation = platformTransform->GetWorldPos();
+				m_CalculatedLocation.z = float(QBert::Layer::Player);
+
+				const float halfStep{ QBert::LevelPixelY / 2.0f };				
+				m_CalculatedLocation.y += halfStep * QBert::GlobalScaleY;
+			}
+		}
+
+		SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Jump, 0.5f);
 	}
 }
 
@@ -218,16 +213,16 @@ void Player::Update(float deltaTime)
 			m_ReSpawnTimeCount -= m_ReSpawnTime;
 
 			// ReSpawn Here
-			if(const auto level{m_GameLevel.lock()};
-				 level)
+			if (const auto level{ m_GameLevel.lock() };
+				level)
 			{
 				auto& hexGrid{ level->GetGrid() };
-				if(m_CurrentNode.row < hexGrid.size())
+				if (m_CurrentNode.row < int(hexGrid.size()))
 				{
-					if(m_CurrentNode.col < hexGrid.at(m_CurrentNode.row).size())
+					if (m_CurrentNode.col < int(hexGrid.at(m_CurrentNode.row).size()))
 					{
 						auto lastPlatformTransform{ hexGrid.at(m_CurrentNode.row)[m_CurrentNode.col].gameObject->GetTransform()->GetPtr() };
-						rtm::float3f resPos{lastPlatformTransform->GetWorldPos()};
+						rtm::float3f resPos{ lastPlatformTransform->GetWorldPos() };
 						resPos.y += QBert::LevelPixelY / 2.0f * QBert::GlobalScaleY;
 						resPos.z = float(QBert::Layer::Player);
 						SetPos(resPos);
@@ -246,7 +241,7 @@ void Player::Update(float deltaTime)
 				m_FlashBlackCount -= m_FlashBlackInterval;
 				const auto switchColor{ m_CharacterSprite->getColor().a == 255 ?
 				sf::Color{0,0,0,0} :
-				sf::Color{255,255,255,255}};
+				sf::Color{255,255,255,255} };
 
 				SetSpriteColor(switchColor);
 			}
@@ -266,6 +261,7 @@ void Player::Update(float deltaTime)
 
 	}
 	break;
+	case State::Lock: break;
 	default: break;
 	}
 }
@@ -332,9 +328,23 @@ void Player::OnLevelChange(Level::LevelState)
 	m_State = State::None;
 }
 
+void Player::OnLevelRestart(Level::LevelState)
+{
+	SetPos(QBertGame::Player1DefaultSpawnPoint);
+	m_CurrentNode.col = 0;
+	m_CurrentNode.row = 0;
+	m_State = State::None;
+	m_CurrentLives = QBert::PlayerMaxLives;
+}
+
 void Player::OnGameClear()
 {
 	m_State = State::Lock;
+}
+
+void Player::SetPlayerState(State state)
+{
+	m_State = state;
 }
 
 rtm::float3f Player::CalculatePath(MoveDirection dir, Level::Node& outNode)
@@ -407,13 +417,24 @@ rtm::float3f Player::CalculatePath(MoveDirection dir, Level::Node& outNode)
 				outNode.row = targetRow;
 				outNode.col = targetCol;
 			}
-			// Dead
+			// Check for disc
 			else
 			{
-				isDead = true;
+				if (level->IsFlyingDiscExist(Level::Node{ targetRow,targetCol }))
+				{	
+					outNode.row = targetRow;
+					outNode.col = targetCol;
+
+					level->UseFlyingDisc(shared_from_this(), targetRow, targetCol);
+					
+				}
+				else
+				{
+					isDead = true;
+				}
 			}
 		}
-		// Dead
+		// Dead No Disc
 		else
 		{
 			isDead = true;

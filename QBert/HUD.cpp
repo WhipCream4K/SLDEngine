@@ -78,6 +78,12 @@ void HUD::ShouldAddScore(int score)
 	m_HUDTexts[int(TextId::Score)].text->setString(std::to_string(m_CurrentScore));
 }
 
+void HUD::OnPlayerDied(int currentLives)
+{
+	if (currentLives >= 0)
+		m_PlayerLivesIndicatorObject[currentLives].first->GetTransform()->GetPtr()->Translate(-1000.0f, 0.0, float(QBert::Layer::HUD));
+}
+
 void HUD::Update(float deltaTime)
 {
 	deltaTime;
@@ -114,6 +120,26 @@ void HUD::PlayNaiveAnimation(float deltaTime)
 
 		CopyTextureRegion(arrowRightElement.sprite.get(), arrowRightElement.spirteHandle);
 
+	}
+}
+
+void HUD::OnLevelRestart(Level::LevelState state)
+{
+	OnLevelChange(state);
+
+	float offSet{ 100.0f };
+
+	m_CurrentScore = 0;
+
+	m_HUDTexts[int(TextId::Score)].text->setString(std::to_string(m_CurrentScore));
+	
+	for (int i = 0; i < QBert::PlayerMaxLives; ++i)
+	{
+		auto transform{ m_PlayerLivesIndicatorObject[i].first->GetTransform() };
+
+		transform->GetPtr()->SetScale(1.5f, 1.5f, 1.0f);
+		transform->GetPtr()->Translate(-300.0f, offSet, float(QBert::Layer::HUD));
+		offSet -= 64.0f;
 	}
 }
 
@@ -206,20 +232,27 @@ void HUD::SetUpSprite(SLDWorldEntity& worldEntity)
 	// Player Lives Indicator
 	m_PlayerLivesIndicatorSprite = std::make_shared<sf::Sprite>();
 
-	const sf::IntRect staticPlayerSprite{ 128,0,16,16 };
+	const sf::IntRect staticPlayerSprite{ 112,0,16,16 };
 	m_PlayerLivesIndicatorSprite->setTextureRect(staticPlayerSprite);
 	m_PlayerLivesIndicatorSprite->setOrigin(float(staticPlayerSprite.width) * 0.5f, float(staticPlayerSprite.height) * 0.5f);
 
+	float offSet{100.0f};
+	
 	for (int i = 0; i < QBert::PlayerMaxLives; ++i)
 	{
 		auto gameObject = worldEntity.CreateGameObject();
 		auto transform{ gameObject->GetTransform() };
 
+		transform->GetPtr()->SetScale(1.5f, 1.5f, 1.0f);
+		transform->GetPtr()->Translate(-300.0f, offSet, float(QBert::Layer::HUD));
+		
 		auto handle{ worldEntity.GetRenderBuffer().PushRenderElement(transform,
 			SLD::RenderIdentifier(SFMLRenderElement::RenderSprite),
 			m_PlayerLivesIndicatorSprite.get()) };
 
 		m_PlayerLivesIndicatorObject.emplace_back(gameObject, handle);
+
+		offSet -= 64.0f;
 	}
 }
 

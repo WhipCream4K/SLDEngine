@@ -50,8 +50,10 @@ public:
 	void ChangePlatFormIndicatorTextureRect(const sf::IntRect& textureRect);
 	void OnLevelChange(Level::LevelState state);
 	void ShouldAddScore(int score);
+	void OnPlayerDied(int currentLives);
 	void Update(float deltaTime);
 	void PlayNaiveAnimation(float deltaTime);
+	void OnLevelRestart(Level::LevelState state);
 
 private:
 

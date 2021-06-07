@@ -12,7 +12,7 @@ SLD::WorldEntity::WorldEntity()
 	, m_CurrentTimePoint()
 	, m_DeltaTime()
 {
-	m_EndTimePoint += std::chrono::minutes(2954);
+	//m_EndTimePoint += std::chrono::minutes(2954);
 	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
 }
 

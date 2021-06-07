@@ -26,7 +26,7 @@ public:
 private:
 
 	RefPtr<FMOD::System> m_FMODSystem{};
-	uint32_t m_ChannelsCnt{ 10 };
+	uint32_t m_ChannelsCnt{ 18 };
 };
 
 SLD::SoundManager::ImplSoundManager::ImplSoundManager()

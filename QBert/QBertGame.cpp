@@ -56,12 +56,16 @@ void QBertGame::Start()
 
 		
 		Player::OnPlayerFinishedJump.AddDynamic(&Level::OnPlayerFinishedJump, m_Level);
+		Player::OnPlayerDied.AddDynamic(&HUD::OnPlayerDied, m_HUD);
 		Player::OnPlayerDied.AddDynamic(&Level::OnPlayerDied, m_Level);
 		Level::OnLevelChange.AddDynamic(&Player::OnLevelChange, m_Player);
 		Level::OnLevelChange.AddDynamic(&HUD::OnLevelChange, m_HUD);
+		Level::OnLevelRestart.AddDynamic(&HUD::OnLevelRestart, m_HUD);
+		Level::OnLevelRestart.AddDynamic(&Player::OnLevelRestart, m_Player);
 		QBertGame::OnAddScore.AddDynamic(&HUD::ShouldAddScore, m_HUD);
 		QBertGame::OnGameWon.AddDynamic(&Level::OnGameWon, m_Level);
 		QBertGame::OnGameWon.AddDynamic(&Player::OnGameClear, m_Player);
+
 		
 		// HUD generation
 		m_HUD->SetTexture(m_QBertSprite);

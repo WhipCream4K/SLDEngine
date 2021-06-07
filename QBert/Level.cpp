@@ -6,19 +6,24 @@
 #include "JSON/nlohmann/json.hpp"
 #include "Sound/SoundManager.h"
 #include "QBertGame.h"
+#include "FlyingDisc.h"
 #include <fstream>
 
+#include "Player.h"
+
 Level::FLevelChange Level::OnLevelChange{};
+Level::FLevelRestart Level::OnLevelRestart{};
 const int Level::MaxSpriteCnt{ 3 };
 
 Level::Level(SLDWorldEntity& world)
 	: m_MapLayOutFile("./Resources/Map/LevelLayout.json")
 	, m_CurrentState(LevelState::Level1)
 {
-	//InitializeGameObjects(world);
 	ConstructPlatform(world);
 	const int spriteCntForNow{ 3 };
 	SetUpSprites(spriteCntForNow);
+	const int reserveFlyingDisc{ 4 };
+	PreInitializeFlyingDisc(world, reserveFlyingDisc);
 }
 
 void Level::Update(float deltaTime)
@@ -39,6 +44,7 @@ void Level::Update(float deltaTime)
 			m_CurrentState = LevelState((uint32_t(m_CurrentState) + 1) % uint32_t(LevelState::Count));
 
 			// Change Level Sprite
+			QBertGame::OnAddScore.BroadCast(QBert::ScoreType::DiscBonus * m_AmountOfFlyingDisc);
 			ChangeLevelSprite(m_CurrentState);
 			OnLevelChange.BroadCast(m_CurrentState);
 			return;
@@ -51,7 +57,11 @@ void Level::Update(float deltaTime)
 			ChangeAllPlatformSprite(m_SpriteFlashCount);
 		}
 	}
-	deltaTime;
+
+	for (auto& disc : m_FlyingDiscs)
+	{
+		disc->Update(deltaTime);
+	}
 }
 
 void Level::SetTexture(const sf::Texture& texture)
@@ -59,6 +69,11 @@ void Level::SetTexture(const sf::Texture& texture)
 	for (auto& sprite : m_SwapSprites)
 	{
 		sprite->setTexture(texture);
+	}
+
+	for (auto& disc : m_FlyingDiscs)
+	{
+		disc->SetTexture(texture);
 	}
 }
 
@@ -118,7 +133,6 @@ void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint32_t r
 	textureRect;
 	row;
 	col;
-	//m_HexPlatform.at(row)[col].sprite->GetPtr()->setTextureRect(textureRect);
 }
 
 void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
@@ -129,20 +143,32 @@ void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 		for (auto& obj : platform.second)
 		{
 			obj;
-			//auto sfSprite{ obj.sprite->GetPtr() };
-			//sfSprite->setTextureRect(textureRect);
-			//sfSprite->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
 		}
-		//platfornm.sprite->GetPtr()->setTextureRect(textureRect);
-		//platfornm.sprite->GetPtr()->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
-		//(*platfornm.sprite)->setTextureRect(textureRect);
-		//(*platfornm.sprite)->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
 	}
+}
+
+rtm::float3f Level::GetHexGridPos(int row, int col)
+{
+	rtm::float3f targetPos{};
+	if (row >= 0 && row < int(m_HexPlatform.size()))
+	{
+		if (col >= 0 && col < int(m_HexPlatform.at(row).size()))
+		{
+			targetPos = m_HexPlatform.at(row)[col].gameObject->GetTransform()->GetPtr()->GetWorldPos();
+		}
+	}
+
+	return targetPos;
 }
 
 void Level::OnPlayerFinishedJump(const Node& to)
 {
-	HandlePlatformSpriteSwitch(to, m_CurrentState);
+	if (to.row >= 0 && to.row < int(m_HexPlatform.size()))
+	{
+		if (to.col >= 0 && to.col < int(m_HexPlatform.at(to.row).size()))
+			HandlePlatformSpriteSwitch(to, m_CurrentState);
+	}
+
 }
 
 void Level::OnPlayerDied(int currentLives)
@@ -150,18 +176,20 @@ void Level::OnPlayerDied(int currentLives)
 	if (currentLives < 0)
 	{
 		// TODO: Restart Level
-		const int baseSpriteId{ 0 };
-		for (auto& row : m_HexPlatform)
-		{
-			for (size_t i = 0; i < row.second.size(); ++i)
-			{
-				if (row.second[i].currentSpriteId != baseSpriteId)
-				{
-					row.second[i].currentSpriteId = baseSpriteId;
-					ChangePlatformSprite(m_SwapSprites[baseSpriteId], row.first, uint32_t(i));
-				}
-			}
-		}
+		m_WinFlag = true;
+		m_CurrentState = LevelState(int(m_CurrentState) - 1);
+		//const int baseSpriteId{ 0 };
+		//for (auto& row : m_HexPlatform)
+		//{
+		//	for (size_t i = 0; i < row.second.size(); ++i)
+		//	{
+		//		if (row.second[i].currentSpriteId != baseSpriteId)
+		//		{
+		//			row.second[i].currentSpriteId = baseSpriteId;
+		//			ChangePlatformSprite(m_SwapSprites[baseSpriteId], row.first, uint32_t(i));
+		//		}
+		//	}
+		//}
 	}
 }
 
@@ -177,27 +205,80 @@ void Level::ChangeLevelSprite(LevelState state)
 	const int spareSpriteId{ 1 };
 	const int endSpriteId{ 2 };
 
+	const float levelStepX{ QBert::LevelPixelX * QBert::GlobalScaleX };
+	const float levelStepY{ QBert::LevelPixelY * QBert::GlobalScaleY };
 	switch (state)
 	{
 	case LevelState::Level1:
 	{
+		m_AmountOfFlyingDisc = 2;
 		m_SwapSprites[startSpriteId]->setTextureRect(QBert::Level1::SpriteStart);
 		m_SwapSprites[endSpriteId]->setTextureRect(QBert::Level1::SpriteEnd);
 		m_SwapSprites[spareSpriteId]->setTextureRect(QBert::Level1::SpriteSpare);
+
+		auto pos{ GetHexGridPos(3,3) };
+		pos.x += levelStepX;
+		m_FlyingDiscs[0]->SetPos(pos, 3, 4);
+
+		pos = GetHexGridPos(3, 0);
+		pos.x -= levelStepX;
+		m_FlyingDiscs[1]->SetPos(pos, 3, -1);
+
 	}
 	break;
 	case LevelState::Level2:
 	{
+		m_AmountOfFlyingDisc = 3;
+
 		m_SwapSprites[startSpriteId]->setTextureRect(QBert::Level2::SpriteStart);
 		m_SwapSprites[endSpriteId]->setTextureRect(QBert::Level2::SpriteEnd);
 		m_SwapSprites[spareSpriteId]->setTextureRect(QBert::Level2::SpriteSpare);
+
+		//NOTE: Reference from youtube
+		auto pos{ GetHexGridPos(0,0) };
+		pos.x += levelStepX;
+		pos.y += levelStepY / 2.0f;
+		m_FlyingDiscs[0]->SetPos(pos, -1, -1);
+
+		pos = GetHexGridPos(2, 0);
+		pos.x -= levelStepX;
+
+		m_FlyingDiscs[1]->SetPos(pos, 2, -1);
+
+		pos = GetHexGridPos(3, 3);
+		pos.x += levelStepX;
+
+		m_FlyingDiscs[2]->SetPos(pos, 3, 4);
 	}
 	break;
 	case LevelState::Level3:
 	{
+		m_AmountOfFlyingDisc = 4;
+
 		m_SwapSprites[startSpriteId]->setTextureRect(QBert::Level3::SpriteStart);
 		m_SwapSprites[endSpriteId]->setTextureRect(QBert::Level3::SpriteEnd);
 		m_SwapSprites[spareSpriteId]->setTextureRect(QBert::Level3::SpriteSpare);
+
+		//NOTE: Reference from youtube
+		auto pos{ GetHexGridPos(1,0) };
+		pos.x -= levelStepX;
+		m_FlyingDiscs[0]->SetPos(pos, 1, 2);
+
+		pos = GetHexGridPos(1, 1);
+		pos.x += levelStepX;
+
+		m_FlyingDiscs[1]->SetPos(pos, 1, -1);
+
+		pos = GetHexGridPos(2, 2);
+		pos.x += levelStepX;
+
+		m_FlyingDiscs[2]->SetPos(pos, 2, 3);
+
+		pos = GetHexGridPos(3, 0);
+		pos.x -= levelStepX;
+
+		m_FlyingDiscs[3]->SetPos(pos, 3, -1);
+
 	}
 	break;
 	default: break;
@@ -205,6 +286,40 @@ void Level::ChangeLevelSprite(LevelState state)
 
 	ResetAllPlatformToBase();
 
+}
+
+bool Level::IsFlyingDiscExist(const Node& check)
+{
+	bool isExist{};
+	for (auto& disc : m_FlyingDiscs)
+	{
+		const auto discNode{ disc->GetNode() };
+		if (check.row == discNode.row &&
+			check.col == discNode.col)
+		{
+			isExist = true;
+			return isExist;
+		}
+	}
+
+	return isExist;
+}
+
+void Level::UseFlyingDisc(const RefPtr<Player>& player, int row, int col)
+{
+	if (player)
+	{
+		for (auto& disc : m_FlyingDiscs)
+		{
+			auto node{ disc->GetNode() };
+			if (node.row == row && node.col == col)
+			{
+				disc->AttachToPlayer(player);
+			}
+		}
+
+		m_AmountOfFlyingDisc--;
+	}
 }
 
 bool Level::CheckWinCondition(int winSpriteId) const
@@ -233,19 +348,6 @@ void Level::SetUpSprites(int amountToCreate)
 	}
 }
 
-void Level::SetupThreadWorker()
-{
-	//m_CheckWinConditionThread.Start();
-	//m_CheckWinConditionThread.AssignTask([this]()
-	//	{
-	//		if (!m_WinFlag)
-	//		{
-	//			m_WinFlag = CheckWinCondition(m_WinSpriteId);
-	//			
-	//		}
-	//	});
-}
-
 void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 {
 	auto& platform = m_HexPlatform.at(node.row)[node.col];
@@ -265,7 +367,7 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 
 		if (platform.currentSpriteId != winSpriteId)
 		{
-			QBertGame::OnAddScore.BroadCast(25);
+			QBertGame::OnAddScore.BroadCast(QBert::ScoreType::ChangeColor);
 			ChangePlatformSprite(m_SwapSprites[winSpriteId], node.row, node.col);
 			platform.currentSpriteId = winSpriteId;
 		}
@@ -276,7 +378,7 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 		// Step two times then lock
 		if (platform.stepCount != 2)
 		{
-			QBertGame::OnAddScore.BroadCast(25);
+			QBertGame::OnAddScore.BroadCast(QBert::ScoreType::ChangeColor);
 			platform.stepCount++;
 			platform.currentSpriteId++;
 			ChangePlatformSprite(m_SwapSprites[platform.currentSpriteId], node.row, node.col);
@@ -285,7 +387,7 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 	break;
 	case LevelState::Level3:
 	{
-		QBertGame::OnAddScore.BroadCast(25);
+		QBertGame::OnAddScore.BroadCast(QBert::ScoreType::ChangeColor);
 		const uint32_t maxStep{ 2 };
 		platform.stepCount = (platform.stepCount + 1) % maxStep;
 		platform.currentSpriteId = (platform.stepCount == 0) ? 0 : 2;
@@ -296,7 +398,9 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 	}
 
 	if (const bool isLevelClear{ CheckWinCondition(winSpriteId) }; isLevelClear)
+	{
 		QBertGame::OnGameWon.BroadCast();
+	}
 }
 
 const Level::HexGrid& Level::GetGrid() const noexcept
@@ -339,8 +443,8 @@ void Level::ConstructPlatform(SLDWorldEntity& world)
 			auto& link = it.value()[i]["link"];
 			for (auto& item : link.items())
 			{
-				const uint32_t cRow{ uint32_t(item.value()["row"]) };
-				const uint32_t cCol{ uint32_t{item.value()["col"]} };
+				const int cRow{ item.value()["row"] };
+				const int cCol{ item.value()["col"] };
 				Node node{ cRow,cCol };
 				connectedGrid.push_back(node);
 			}
@@ -404,5 +508,15 @@ void Level::ResetAllPlatformToBase()
 			row.second[i].stepCount = 0;
 			ChangePlatformSprite(m_SwapSprites[0], row.first, uint32_t(i));
 		}
+	}
+}
+
+void Level::PreInitializeFlyingDisc(SLDWorldEntity& world, int startAmount)
+{
+	for (int i = 0; i < startAmount; ++i)
+	{
+		auto& ref{ m_FlyingDiscs.emplace_back(std::make_shared<FlyingDisc>(world, -1, -1)) };
+		ref->SetLevelState(&m_CurrentState);
+		Player::OnPlayerFinishedJump.AddDynamic(&FlyingDisc::OnPlayerFinishedJump, ref);
 	}
 }
