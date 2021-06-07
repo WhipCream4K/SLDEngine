@@ -9,60 +9,22 @@
 
 namespace SLD
 {
+	
 	class TickComponent : public BaseComponent
 	{
 	public:
-		//using pointer = typename NonTickComponent<T>::pointer;
-		////using OnCreateEvent = void(*)(const std::any&);
-		////using OnUpdateEvent = void(*)(const std::any&, float);
 
-		//template<typename = std::enable_if_t<std::is_member_function_pointer_v<decltype(T::OnUpdate)>,T>>
-		//TickComponent()
-		//{
-		//}
+		enum class Type
+		{
+			TransformComponent,
 
-		//template<typename UserClass>
-		//constexpr auto Bind(const RefPtr<UserClass>& instance) noexcept(false) -> void;
+			Count // Use to keep track of all the tick component
+		};
 
-		//void operator()(float dt) const
-		//{
-		//	m_OnUpdate(m_Instance, dt);
-		//}
+		virtual void AsyncUpdate([[maybe_unused]] float) {}
 
-		// assume this any is pointer
-		//static void DoTick(const std::any& instance,float dt)
-		//{
-		//	std::any_cast<pointer>(instance)->OnUpdate(dt);
-		//}
-
-		//OnCreateEvent m_OnCreate;
-		//OnUpdateEvent m_OnUpdate;
-		//std::any m_Instance;
-
+		virtual ~TickComponent() override = default;
 	};
-
-	//template <typename UserClass>
-	//constexpr auto TickComponent::Bind(
-	//	const RefPtr<UserClass>& instance) noexcept(false) -> void
-	//{
-	//	using value_type = std::remove_all_extents_t<UserClass>;
-	//	using pointer = value_type*;
-	//	
-	//	m_OnUpdate = [](const std::any& objInstance, float dt)
-	//	{
-	//		std::any_cast<pointer>(objInstance)->OnUpdate(dt);
-	//	};
-
-	//	m_OnCreate = [](const std::any& objInstance)
-	//	{
-	//		std::any_cast<pointer>(objInstance)->OnCreate();
-	//	};
-
-	//	static_assert(IsFuncSameType<decltype(&value_type::OnUpdate),void,float>,
-	//		"OnUpdate Function is not the same type as void()(float)");
-
-	//	m_Instance = instance.get();
-	//}
 }
 
 #endif

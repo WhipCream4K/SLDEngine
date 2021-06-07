@@ -2,7 +2,7 @@
 #define SLDFRAMEWORK_LL_RENDERER_H
 
 #include "DX12/DX12Renderer.h"
-#include "SFML/SFMLRenderer.h"
+#include "SFML/SFML2DRenderer.h"
 
 #include <variant>
 
@@ -12,9 +12,9 @@ namespace SLD
 #ifdef HAS_DX12
 		DX12Renderer,
 #endif
-#ifdef HAS_SFML
-		SFMLRenderer
-#endif
+//#ifdef HAS_SFML
+		SFML2DRenderer
+//#endif
 	>;
 
 }

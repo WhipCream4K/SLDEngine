@@ -12,9 +12,7 @@ namespace SLD
 #if defined(WIN32) && defined(HAS_DX12)
 	WindowsWindow,
 #endif
-#ifdef HAS_SFML
 	SFMLWindow
-#endif
 	>;
 }
 

@@ -15,11 +15,14 @@ namespace SLD
 	public:
 
 		void Render(const std::vector<RefPtr<RenderingComponent>>& renderingComponents);
+		void Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize);
 
 		void Render(const std::vector<RenderingComponent>& renderingComponents);
 
+		void Render(std::vector<RenderingComponent>& renderingComponents);
+
 		void SetRenderWindow(const RefPtr<Window>& renderWindow);
-		void SetRenderWindow(const Window& renderWindow);
+		void SetRenderWindow(Window& renderWindow);
 	
 	private:
 

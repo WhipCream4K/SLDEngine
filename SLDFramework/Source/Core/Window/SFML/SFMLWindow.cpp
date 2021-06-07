@@ -1,56 +1,56 @@
 #include "SFMLWindow.h"
+#include "../../Miscellaneous/SFMLPrerequisite.h"
 
-#ifdef HAS_SFML
-
-SFMLWindow::SFMLWindow(const std::any& windowHandle, uint32_t width, uint32_t height)
-	: m_MainWindow()
+class SFMLWindow::ImplSFMLWindow
 {
-	sf::WindowHandle handle = std::any_cast<sf::WindowHandle>(windowHandle);
-	m_MainWindow.create(handle);
-	width;
-	height;
+public:
+
+	ImplSFMLWindow(sf::WindowHandle winHandle);
+	~ImplSFMLWindow();
+
+	void Resize(uint32_t width, uint32_t height);
+	void ClearColor(const float(&clearColor)[4]);
+	void Present(bool shouldVSync);
+	SLD::InputParams::ReadOut ReadUserInputs();
+	sf::RenderWindow& GetWindow();
+
+private:
+
+	sf::RenderWindow m_MainWindow{};
+};
+
+SFMLWindow::ImplSFMLWindow::ImplSFMLWindow(sf::WindowHandle winHandle)
+	: m_MainWindow(winHandle)
+{
 }
 
-SFMLWindow::SFMLWindow(SFMLWindow&& other) noexcept
-	: m_MainWindow()
+SFMLWindow::ImplSFMLWindow::~ImplSFMLWindow()
 {
-	sf::WindowHandle handle{ other.m_MainWindow.getSystemHandle() };
-	other.m_MainWindow.close();
-	m_MainWindow.create(handle);
+	m_MainWindow.close();
 }
 
-SFMLWindow& SFMLWindow::operator=(SFMLWindow&& other) noexcept
+void SFMLWindow::ImplSFMLWindow::Resize(uint32_t width, uint32_t height)
 {
-	if(this != &other)
-	{
-		sf::WindowHandle handle{ other.m_MainWindow.getSystemHandle() };
-		other.m_MainWindow.close();
-		m_MainWindow.create(handle);
-	}
-
-	return *this;
+	m_MainWindow.setSize(sf::Vector2u{ width,height });
 }
 
-sf::RenderWindow& SFMLWindow::GetSubRef()
+void SFMLWindow::ImplSFMLWindow::ClearColor(const float(&clearColor)[4])
 {
-	return m_MainWindow;
+	m_MainWindow.clear(Float4ToSfColor(clearColor));
 }
 
-
-RefPtr<sf::RenderWindow> SFMLWindow::GetSubRefPtr() 
+void SFMLWindow::ImplSFMLWindow::Present(bool shouldVSync)
 {
-	return RefPtr<sf::RenderWindow>{&m_MainWindow, [](sf::RenderWindow*)
-	{
-	}};
+	m_MainWindow.setVerticalSyncEnabled(shouldVSync);
+	m_MainWindow.display();
 }
 
-SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
+SLD::InputParams::ReadOut SFMLWindow::ImplSFMLWindow::ReadUserInputs()
 {
 	SLD::InputParams::ReadOut out{};
 
 	sf::Event ev{};
 	uint8_t cnt{};
-
 
 	while (m_MainWindow.pollEvent(ev))
 	{
@@ -122,9 +122,9 @@ SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
 		default: break;
 		}
 
-		out.buses[cnt++].data = evData;
-		out.buses[cnt++].eventId = uint8_t(ev.type);
-
+		out.buses[cnt].data = evData;
+		out.buses[cnt].eventId = uint8_t(ev.type);
+		cnt++;
 	}
 
 	out.eventCnt = cnt;
@@ -133,36 +133,57 @@ SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
 	return out;
 }
 
+sf::RenderWindow& SFMLWindow::ImplSFMLWindow::GetWindow()
+{
+	return m_MainWindow;
+}
+
+SFMLWindow::SFMLWindow(
+	const std::any& windowHandle,
+	[[maybe_unused]] uint32_t width,
+	[[maybe_unused]] uint32_t height)
+	: m_pMainWindow(std::make_unique<ImplSFMLWindow>(std::any_cast<sf::WindowHandle>(windowHandle)))
+{
+}
+
+SFMLWindow::~SFMLWindow() = default;
+
+SFMLWindow::SFMLWindow(SFMLWindow && other) noexcept
+	: m_pMainWindow(std::move(other.m_pMainWindow))
+{
+}
+
+SFMLWindow& SFMLWindow::operator=(SFMLWindow && other) noexcept
+{
+	if (this != &other)
+	{
+		m_pMainWindow = std::move(other.m_pMainWindow);
+	}
+
+	return *this;
+}
+
+SLD::InputParams::ReadOut SFMLWindow::ReadUserInputs()
+{
+	return m_pMainWindow->ReadUserInputs();
+}
+
+sf::RenderWindow& SFMLWindow::GetSFMLWindow()
+{
+	return m_pMainWindow->GetWindow();
+}
+
 void SFMLWindow::Resize(uint32_t width, uint32_t height)
 {
-	const auto& view{ m_MainWindow.getView() };
-	m_MainWindow.setView({ view.getCenter(),sf::Vector2f{float(width),float(height)} });
+	m_pMainWindow->Resize(std::move(width), std::move(height));
 }
 
 void SFMLWindow::ClearColor(const float(&clearColor)[4])
 {
-	m_MainWindow.clear(Float4ToSfColor(clearColor));
+	m_pMainWindow->ClearColor(clearColor);
 }
 
 void SFMLWindow::Present(bool shouldVSync)
 {
-
-	//if(m_MainWindow.isOpen())
-	//{
-	//	bool some{};
-	//	sf::Event ev{};
-	//	while(m_MainWindow.pollEvent(ev))
-	//	{
-	//		switch (ev.type)
-	//		{
-	//		case sf::Event::Closed:
-	//			some = false;
-	//			break;
-	//		}
-	//	}
-	//}
-	m_MainWindow.setVerticalSyncEnabled(shouldVSync);
-	m_MainWindow.display();
+	m_pMainWindow->Present(shouldVSync);
 }
-
-#endif

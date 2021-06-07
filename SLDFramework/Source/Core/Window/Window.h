@@ -3,7 +3,6 @@
 #define SLDFRAMEWORK_VIEWPORT_H
 
 #include "../../Inputs/InputManager.h"
-#include "../../Rendering/RenderTarget.h"
 
 #include "MainSubSystem.h"
 
@@ -15,7 +14,8 @@ namespace SLD
 	{
 		
 	public:
-		
+
+		class ImplXInput;
 		using CurrentWindow = std::any;
 		
 		Window(
@@ -25,9 +25,9 @@ namespace SLD
 			LLInputs&& subSystemInput,
 			const CurrentWindow& windowHandle,
 			const std::string& vpName);
+		~Window();
 		
-		
-		[[nodiscard]] InputManager& GetInputManager() { return m_InputManager; }
+		//[[nodiscard]] InputManager& GetInputManager() { return m_InputManager; }
 
 		[[nodiscard]] uint32_t GetWidth() const { return m_Width; }
 		[[nodiscard]] uint32_t GetHeight() const { return m_Height; }
@@ -39,7 +39,11 @@ namespace SLD
 		[[nodiscard]] const std::any& GetAnyWindowHandle() const { return m_WindowHandle; }
 
 		template<typename WindowType>
-		[[nodiscard]] constexpr std::add_pointer_t<WindowType> GetWindowSubsystem();
+		[[nodiscard]] constexpr std::add_pointer_t<WindowType> GetWindowSubSystem() noexcept;
+		
+		//template<typename WindowType>
+		//[[nodiscard]] constexpr std::add_pointer_t<const WindowType> GetWindowSubsystem() const noexcept;
+
 
 		void Resize(uint32_t width, uint32_t height);
 
@@ -50,19 +54,22 @@ namespace SLD
 
 		void Present();
 		void ClearBackBuffer();
-		
+
+	
 	private:
 
-		bool QueryWindowEvents();
+		//bool QueryWindowEvents();
 		
 		// Low-Level window
 		LLWindow m_WindowSubSystem;
+		
 
 		// TODO: Delete Input manager
 		
 		std::array<MessageBus, MinimumEventCnt> m_WindowEvents;
+		OwnedPtr<ImplXInput> m_pImplXInput;
 		uint8_t m_EventCntThisFrame;
-		InputManager m_InputManager;
+		//InputManager m_InputManager;
 
 		
 		std::string m_Name;
@@ -80,7 +87,7 @@ namespace SLD
 	}
 
 	template <typename WindowType>
-	constexpr std::add_pointer_t<WindowType> Window::GetWindowSubsystem()
+	constexpr std::add_pointer_t<WindowType> Window::GetWindowSubSystem() noexcept
 	{
 		return std::get_if<WindowType>(&m_WindowSubSystem);
 	}

@@ -1,6 +1,7 @@
 #include "InputComponent.h"
 
 #include "../Core/WorldEntity.h"
+//#include "../GameObject/GameObject.h"
 
 //SLD::InputActionKeyBinding::InputActionKeyBinding(std::pmr::memory_resource* callbackResource)
 //	: m_Callbacks(callbackResource)
@@ -102,8 +103,28 @@
 //	, m_InputSettingRef(const_cast<InputSetting&>(world->GetWorldInputSetting()))
 //{
 //}
-SLD::InputComponent::InputComponent(InputSetting& inputRef)
-	: NonTickComponent()
-	, m_InputSettingRef(inputRef)
+
+SLD::InputComponent::InputComponent(WeakPtr<GameObject> gameObject)
+	: m_Parent(gameObject)
 {
 }
+
+SLD::InputComponent::InputComponent(const RefPtr<GameObject>& gameObject)
+	: m_Parent(gameObject)
+{
+}
+
+SLD::InputComponent::~InputComponent()
+{
+	if (auto parent{ m_Parent.lock() }; parent)
+	{
+		parent->GetWorld().get().GetWorldInputSetting().RemoveCommands(m_Parent);
+		std::cout << "Yp" << std::endl;
+	}
+}
+
+//SLD::InputComponent::~InputComponent()
+//{
+//	if (auto parent{ m_Parent.lock() }; parent)
+//		parent->GetWorld().get().GetWorldInputSetting().RemoveCommands(m_Parent);
+//}

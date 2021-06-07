@@ -3,73 +3,111 @@
 #define SLDFRAMEWORK_GAMEOBJECT_H
 
 #include "../Core/Base.h"
-#include "../Components/TransformComponent.h"
-#include "../Components/NonTickComponent.h"
-#include "../Components/TickComponent.h"
+//#include "../Components/NonTickComponent.h"
+//#include "../Components/TickComponent.h"
+//#include "../Components/InputComponent.h"
+//#include "../Components/TransformComponent.h"
 #include "../Core/WorldEntity.h"
 
 namespace SLD
 {
-	class GameObject final
+	class RenderingComponent;
+	class BaseComponent;
+	class TransformComponent;
+	class WorldEntity;
+	class GameObject final : public std::enable_shared_from_this<GameObject>
 	{
 	public:
 
-		GameObject(const RefPtr<WorldEntity>& world);
+		//GameObject(const RefPtr<WorldEntity>& world);
+		GameObject(WorldEntity& world);
 
-		[[nodiscard]] RefPtr<TransformComponent> GetTransform();
+		//GameObject(const RefPtr<const WorldEntity>& world);
 
-		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<BaseComponent, ComponentType>>>
-			[[nodiscard]] RefPtr<ComponentType> GetComponent();
-
-		[[nodiscard]] const std::vector<RefPtr<BaseComponent>>& GetAllComponents() const;
+		[[nodiscard]] const RefPtr<ObservePtr<TransformComponent>>& GetTransform() const;
 
 		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<BaseComponent, ComponentType>>,
-		typename ...Args>
-			[[nodiscard]] RefPtr<ComponentType> CreateComponent(Args&&... args);
+			typename = EnableIsBasedOf<BaseComponent,ComponentType>>
+			[[nodiscard]] WeakPtr<ObservePtr<ComponentType>> GetComponent();
 
-		RefPtr<RenderingComponent> CreateRenderingComponent(size_t elemSize,uint32_t elemCnt);
+
+		template<typename ComponentType,
+			typename = EnableIsBasedOf<BaseComponent, ComponentType>,
+			typename ...Args>
+			[[nodiscard]] WeakPtr<ObservePtr<ComponentType>> CreateComponent(Args&&... args);
+
+		WeakPtr<ObservePtr<RenderingComponent>> CreateRenderingComponent(size_t elemSize, uint32_t elemCnt);
+
+		RefWrap<WorldEntity> GetWorld();
+
+		GameObject(const GameObject& other);
+		GameObject& operator=(const GameObject& other);
+		GameObject(GameObject&& other) noexcept;
+		GameObject& operator=(GameObject&& other) noexcept;
+		~GameObject();
 
 	private:
 
-		std::vector<RefPtr<BaseComponent>> m_ComponentTable;
-		WeakPtr<WorldEntity> m_World;
-		WeakPtr<TransformComponent> m_Transform;
+		std::vector<RefPtr<ObservePtr<BaseComponent>>> m_ComponentTable;
+		RefWrap<WorldEntity> m_World;
+		RefPtr<ObservePtr<TransformComponent>> m_Transform;
 	};
 
 	template <typename ComponentType, typename>
-	RefPtr<ComponentType> GameObject::GetComponent()
+	WeakPtr<ObservePtr<ComponentType>> GameObject::GetComponent()
 	{
-		for (const auto& component : m_ComponentTable)
+		for (auto& component : m_ComponentTable)
 		{
-			const auto& out{ std::static_pointer_cast<ComponentType>(component) };
-			if (out)
-				return out;
+			if (dynamic_cast<ComponentType*>(component->GetPtr()))
+				return reinterpret_cast<RefPtr<ObservePtr<ComponentType>>&>(component);
 		}
 
-		return nullptr;
+		return {};
 	}
 
 	template <typename ComponentType, typename, typename ... Args>
-	RefPtr<ComponentType> GameObject::CreateComponent(Args&&... args)
-	{
-		auto world{ m_World.lock() };
+	WeakPtr<ObservePtr<ComponentType>> GameObject::CreateComponent(Args&&... args)
+	{		
+		RefPtr<ObservePtr<ComponentType>> component{};
+
+		if constexpr (std::is_same_v<InputComponent, ComponentType>)
+			component = m_World.get().AllocNonTickComponent<ComponentType>(shared_from_this());
 		
-		if constexpr (std::is_base_of_v<NonTickComponent,ComponentType>)
+		else if constexpr (std::is_base_of_v<TickComponent,ComponentType>)
+			component = m_World.get().AllocTickComponent<ComponentType>(std::forward<Args>(args)...);
+		
+		else if constexpr (std::is_base_of_v<NonTickComponent,ComponentType>)
+			component = m_World.get().AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...);
+		
+		if(component)
 		{
-			RefPtr<ComponentType> component{ world->AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...) };
-			return component;
+			auto base{ reinterpret_cast<RefPtr<ObservePtr<BaseComponent>>&>(component) };
+			base->GetPtr()->SetParent(shared_from_this());
+			m_ComponentTable.emplace_back(base);
 		}
-
-		if constexpr (std::is_base_of_v<TickComponent,ComponentType>)
-		{
-			RefPtr<ComponentType> component{ world->AllocTickComponent<ComponentType>(std::forward<Args>(args)...) };
-			return component;
-		}
-
-		return nullptr;
+		
+		return component;
 	}
+
+	//template <typename ComponentType, typename, typename ... Args>
+	//RefPtr<ComponentType> GameObject::CreateComponent(Args&&... args)
+	//{
+	//	//auto world{ m_World.lock() };
+
+	//	if constexpr (std::is_base_of_v<NonTickComponent, ComponentType>)
+	//	{
+	//		RefPtr<ComponentType> component{ m_World->AllocNonTickComponent<ComponentType>(std::forward<Args>(args)...) };
+	//		return component;
+	//	}
+
+	//	if constexpr (std::is_base_of_v<TickComponent, ComponentType>)
+	//	{
+	//		RefPtr<ComponentType> component{ m_World->AllocTickComponent<ComponentType>(std::forward<Args>(args)...) };
+	//		return component;
+	//	}
+
+	//	return nullptr;
+	//}
 }
 
 #endif

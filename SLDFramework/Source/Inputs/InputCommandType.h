@@ -3,19 +3,30 @@
 
 #include "InputManager.h"
 #include "../Core/Event.h"
-#include "../Core/VirMemDelegate.h"
+#include "../Core/DynamicDelegate.h"
 
 namespace SLD
 {
+	class GameObject;
+	class InputComponent;
 	using AxisCallbackType = void(float);
 	
-	struct ActionCommandType
+	struct ActionCommand
 	{
 		RefPtr<EventHandler> callback{};
+		//WeakPtr<EventHandler> callback{};
 		InputEvent iEvent{ InputEvent::IE_None };
+		WeakPtr<GameObject> referencePointer{};
+	};
+
+	struct AxisCommand
+	{
+		RefPtr<DynamicDelegate<AxisCallbackType>> callback{};
+		//WeakPtr<DynamicDelegate<AxisCallbackType>> callback{};
+		WeakPtr<GameObject> referencePointer{};
 	};
 	
-	using AxisCommandType = RefPtr<VirMemDelegate<AxisCallbackType>>;
+	using AxisCommandType = RefPtr<DynamicDelegate<AxisCallbackType>>;
 }
 
 #endif

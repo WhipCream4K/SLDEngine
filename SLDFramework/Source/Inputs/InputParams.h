@@ -48,7 +48,9 @@ namespace SLD
 			GPK_Right_AxisX = (1 << 10),
 			GPK_Right_AxisY,
 			GPK_Left_AxisX,
-			GPK_Left_AxisY
+			GPK_Left_AxisY,
+
+			GPK_KEY_CHECK = 0b111100111111111
 		};
 
 		enum class WindowEventType
@@ -78,11 +80,7 @@ namespace SLD
 			MouseMoved,             ///< The mouse cursor moved (data in event.mouseMove)
 			MouseEntered,           ///< The mouse cursor entered the area of the window (no data)
 			MouseLeft,              ///< The mouse cursor left the area of the window (no data)
-			JoystickButtonPressed,  ///< A joystick button was pressed (data in event.joystickButton)
-			JoystickButtonReleased, ///< A joystick button was released (data in event.joystickButton)
-			JoystickMoved,          ///< The joystick moved along an axis (data in event.joystickMove)
-			JoystickConnected,      ///< A joystick was connected (data in event.joystickConnect)
-			JoystickDisconnected,   ///< A joystick was disconnected (data in event.joystickConnect)
+			XInputState,
 			TouchBegan,             ///< A touch event began (data in event.touch)
 			TouchMoved,             ///< A touch moved (data in event.touch)
 			TouchEnded,             ///< A touch event ended (data in event.touch)
@@ -114,11 +112,24 @@ namespace SLD
 			bool shift;
 		};
 
+		struct JoyStickEvent
+		{
+			uint8_t joyStickId;
+			uint16_t joyStickButton;
+			float rightThumbX;
+			float rightThumbY;
+			float leftThumbX;
+			float leftThumbY;
+			float rightTrigger;
+			float leftTrigger;
+		};
+
 		union EventData
 		{
 			// TODO: Add gamepad event
 			KeyboardEvent keyboard;
 			MouseEvent mouse;
+			JoyStickEvent joyStick{};
 			WindowEvent windowSize;
 		};
 

@@ -78,7 +78,7 @@
     <ClInclude Include="Components\TickComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\VirMemDelegate.h">
+    <ClInclude Include="Core\DynamicDelegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\PMR_Resource\LoggingResource.h">
@@ -108,9 +108,6 @@
     <ClInclude Include="Debugging\TSLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\PMR_Resource\UnsafeSpatialResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Inputs\SFMLInputs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -132,9 +129,6 @@
     <ClInclude Include="Rendering\DX12\DX12CommandQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Window\Windows\WindowsWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Window\MainSubSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -144,7 +138,7 @@
     <ClInclude Include="Rendering\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\SFML\SFMLRenderer.h">
+    <ClInclude Include="Rendering\SFML\SFML2DRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Window\SFML\SFMLWindow.h">
@@ -294,6 +288,27 @@
     <ClInclude Include="Math\RealTimeMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\PersistentThreadWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ObservePtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PMR_Resource\UnSynchronizedSpatialResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON\nlohmann\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\SoundManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DynamicMulticastDelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -338,9 +353,6 @@
     <ClCompile Include="Helpers\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\PMR_Resource\UnsafeSpatialResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Inputs\SFMLInputs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -350,16 +362,13 @@
     <ClCompile Include="Rendering\DX12\DX12CommandQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Window\Windows\WindowsWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Miscellaneous\DX12Resource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\SFML\SFMLRenderer.cpp">
+    <ClCompile Include="Rendering\SFML\SFML2DRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\Window\SFML\SFMLWindow.cpp">
@@ -381,6 +390,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PersistentThreadWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ObservePtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PMR_Resource\UnSynchronizedSpatialResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound\SoundManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Singleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DynamicMulticastDelegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

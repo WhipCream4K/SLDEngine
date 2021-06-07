@@ -234,15 +234,20 @@ bool SLD::Core::TranslateUserInputs()
 void SLD::Core::Step()
 {
 	// *** UPDATE WORLD ***
-
+	m_WorldEntity.WakeAllAsyncUpdates();
 
 	// JOIN THREADS
+	m_WorldEntity.JoinAllAsyncUpdates();
 
 	// *** Render ***
 	m_MainViewPort->ClearBackBuffer();
 
-	auto& allRenderComponent{ m_WorldEntity.GetAllRenderComponents() };
-	m_MainRenderer.Render(allRenderComponent);
+	//auto& allRenderComponent{ m_WorldEntity.GetAllRenderComponents() };
+	auto& renderBuffer{ m_WorldEntity.GetRenderBuffer() };
+	m_MainRenderer.Render(
+		renderBuffer.GetElementCnt(),
+		renderBuffer.GetBufferStart(),
+		renderBuffer.GetBufferSize());
 
 	m_MainViewPort->Present();
 

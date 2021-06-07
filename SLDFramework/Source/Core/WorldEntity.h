@@ -5,52 +5,68 @@
 #include "PMR_Resource/LoggingResource.h"
 #include "PMR_Resource/PoolResource.h"
 #include "../Inputs/InputSetting.h"
-#include "../Components/InputComponent.h"
+#include "../Components/TickComponent.h"
+#include "PersistentThreadWorker.h"
+#include "PMR_Resource/UnSynchronizedSpatialResource.h"
+#include "../Rendering/RenderBuffer.h"
 
 namespace SLD
 {
 	class RenderingComponent;
-	class TickComponent;
 	class NonTickComponent;
+	class TransformComponent;
 	class GameObject;
-	class WorldEntity final : public std::enable_shared_from_this<WorldEntity>
+	class WorldEntity final
 	{
 	public:
 
 		WorldEntity();
+		~WorldEntity();
 
-		RefPtr<RenderingComponent> AllocRenderComponent(size_t elemSize, uint32_t elemCnt);
-		RenderingComponent& AllocRefRenderComponent(size_t elemSize, uint32_t elemCnt);
+		// Won't return anything because vector loses reference when moved
+		//RefPtr<RenderingComponent> AllocRenderComponent(const RefPtr<ObservePtr<TransformComponent>>& transform, size_t elemSize, uint32_t elemCnt);
 
+		RenderBuffer& GetRenderBuffer();
+		
+		RefPtr<ObservePtr<RenderingComponent>> AllocRenderingComponent(
+			const RefPtr<ObservePtr<TransformComponent>>& transform,
+			size_t elemSize,
+			uint32_t elemCnt);
+
+		uint8_t* GetRenderDataBufferStart() const noexcept;
+		uint32_t GetRenderElementCount() const noexcept;
+		size_t GetRenderDataSize() const noexcept;
+		
 		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<TickComponent, ComponentType>>,
+			typename = EnableIsBasedOf<TickComponent, ComponentType >,
 			typename ...Args>
-			RefPtr<ComponentType> AllocTickComponent(Args&&... args);
-
+			RefPtr<ObservePtr<ComponentType>> AllocTickComponent(Args&&... args);
+		
 		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<TickComponent, ComponentType>>,
+			typename = EnableIsBasedOf<NonTickComponent, ComponentType>,
 			typename ...Args>
-			RefPtr<ComponentType> AllocNonTickComponent(Args&&... args);
-
+			RefPtr<ObservePtr<ComponentType>> AllocNonTickComponent(Args&&... args);
+		
 		template<typename ComponentType,
-			typename = std::enable_if_t<std::is_base_of_v<TickComponent, ComponentType>>>
+			typename = EnableIsBasedOf<TickComponent, ComponentType>>
 			void DeAllocTickComponent(const RefPtr<ComponentType>& ptr);
 
 		[[nodiscard]] const std::vector<RenderingComponent>& GetAllRenderComponents() const;
+		[[nodiscard]] std::vector<RenderingComponent>& GetAllRenderingComponents();
 
-		[[nodiscard]] const InputSetting& GetWorldInputSetting() const;
+		[[nodiscard]] InputSetting& GetWorldInputSetting();
 
 		[[nodiscard]] RefPtr<GameObject> CreateGameObject();
 
-		float GetDeltaTime();
-
-		// Inputs
-		//void ParseUserEvent(const MessageBus& bus);
+		[[nodiscard]] float GetDeltaTime() const noexcept;
 
 		// Detach all of the component from this GameObject
 		void Destroy(const RefPtr<GameObject>& object);
 		// Detach all of the component from this GameObject
 		void Destroy(const GameObject& object);
+
+		void WakeAllAsyncUpdates();
+		void JoinAllAsyncUpdates();
 
 		void StartWorldTime();
 		void EndWorldTime();
@@ -59,16 +75,20 @@ namespace SLD
 
 		struct TickComponentPool
 		{
+			TickComponentPool()
+				: resource()
+				, logger(&resource)
+			{
+			}
+
 			PoolResource<64> resource{};
-			LoggingResource logger{ &resource };
-			std::vector<RefPtr<TickComponent>> dataTable{};
+			LoggingResource logger;
 		};
 
 		struct NonTickComponentPool
 		{
 			PoolResource<64> resource{};
 			LoggingResource logger{ &resource };
-			std::vector<RefPtr<NonTickComponent>> dataTable{};
 		};
 
 		InputSetting m_InputSetting;
@@ -78,73 +98,138 @@ namespace SLD
 		// Packed pool of tick components
 		std::unordered_map<std::string, TickComponentPool> m_TickComponent;
 
-		// Uncouple from the base component above
-		std::vector<RenderingComponent> m_RenderComponents;
+		// TODO: This is really exposes maybe encapsulate later
+		struct RenderData
+		{
+			RenderData(size_t startSize)
+				: resource(startSize)
+				, totalElement()
+			{
+			}
 
-		std::chrono::system_clock::time_point m_EndTimePoint;
+			UnSynchronizedSpatialResource resource;
+			uint32_t totalElement;
+		};
+
+		RenderData m_RenderData;
+
+		RenderBuffer m_RenderBuffer;
+
+		// Async Tick Task
+		struct TickTask
+		{
+			std::string id{};
+			PersistentThreadWorker worker{};
+		};
+
+		std::vector<TickTask> m_TickTasks;
+
+		template<typename SubTickComponent,
+			typename = EnableIsBasedOf<TickComponent, SubTickComponent>>
+			void InitializeAsyncTickTask(const ObservePtr<SubTickComponent>& pointerToObj);
+
+		template<typename SubTickComponent,
+			typename = EnableIsBasedOf<TickComponent, SubTickComponent>>
+			void InitializeAsyncTickTask(const RefPtr<ObservePtr<SubTickComponent>>& component);
+		
+		PersistentThreadWorker& EmplaceNewWorker(const std::string& id);
+
+		// Game Related
+		std::chrono::high_resolution_clock::time_point m_EndTimePoint;
+		std::chrono::high_resolution_clock::time_point m_CurrentTimePoint;
 		float m_DeltaTime;
+		bool m_IsFirstFrame{ true };
 	};
 
 	template <typename ComponentType, typename, typename ... Args>
-	RefPtr<ComponentType> WorldEntity::AllocTickComponent(Args&&... args)
+	RefPtr<ObservePtr<ComponentType>> WorldEntity::AllocTickComponent(Args&&... args)
 	{
 		// This only works if we map of different types of components
-		// TODO: implement unique id
-		constexpr std::string uniqueId{};
-		auto it{ m_TickComponent.try_emplace(uniqueId, TickComponentPool{}) };
+		constexpr const char* uniqueId{ ComponentType::UniqueId };
 
-		auto& logResource{ it.first->second.logger };
-		auto& table{ it.first->second.dataTable };
+		auto it = m_TickComponent.find(uniqueId);
+		if (it == m_TickComponent.end())
+			it = m_TickComponent.try_emplace(uniqueId, TickComponentPool{}).first;
+
+		LoggingResource& logResource{ it->second.logger };
+		auto& realResource{ it->second.resource };
+
+		// NOTE: I don't know I have to reassign this again to make it works
+		logResource = LoggingResource{ &it->second.resource };
 
 		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
 
-		ComponentType* initPtr{ new (allocPtr) ComponentType(std::forward<Args>(args)...) };
+		auto& bufferHead{ realResource.GetBufferHead() };
+		const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
 
-		RefPtr<ComponentType> out{ initPtr,[&logResource](ComponentType* ptr)
+		// Construct
+		new (allocPtr) ComponentType(std::forward<Args>(args)...);
+
+		RefPtr<ObservePtr<ComponentType>> out{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead},[&logResource](ObservePtr<ComponentType>* ptr)
 		{
-			logResource.do_deallocate(ptr,sizeof(ComponentType),alignof(ComponentType));
+			uint8_t* temp{ptr->GetPtrPointTo()};
+			if (ptr->GetPtr())
+				ptr->GetPtr()->~ComponentType();
+			logResource.do_deallocate(temp,sizeof(ComponentType),alignof(ComponentType));
+			delete ptr;
 			ptr = nullptr;
 		} };
 
-		table.emplace_back(out);
+		InitializeAsyncTickTask(out);
 
 		return out;
-
 	}
-
+	
 	template <typename ComponentType, typename, typename ... Args>
-	RefPtr<ComponentType> WorldEntity::AllocNonTickComponent(Args&&... args)
+	RefPtr<ObservePtr<ComponentType>> WorldEntity::AllocNonTickComponent(Args&&... args)
 	{
-		constexpr std::string uniqueId{ ComponentType::UniqueId };
-		auto it{ m_NonTickComponent.try_emplace(uniqueId,NonTickComponentPool{}) };
-		auto& logResource{ it.first->second.logger };
-		auto& table{ it.first->second.dataTable };
-		void* allocPtr{ logResource.do_allocate(sizeof(InputComponent),alignof(InputComponent)) };
+		constexpr const char* uniqueId{ ComponentType::UniqueId };
+
+		auto it{ m_NonTickComponent.find(uniqueId) };
+		if(it == m_NonTickComponent.end())
+			it = m_NonTickComponent.try_emplace(uniqueId,NonTickComponentPool{}).first;
+		LoggingResource& logResource{ it->second.logger };
+
+		// NOTE: I don't know I have to reassign this again so it works
+		logResource = LoggingResource{ &it->second.resource };
+		auto& realResource{ it->second.resource };
+
+		//void* allocPtr{ logResource.do_allocate(sizeof(InputComponent),alignof(InputComponent)) };
+
+		void* allocPtr{ logResource.do_allocate(sizeof(ComponentType),alignof(ComponentType)) };
 
 		// special case for InputComponent
-		if constexpr (std::is_same_v<ComponentType, InputComponent>)
+		//if constexpr (std::is_same_v<ComponentType, InputComponent>)
+		//{
+		//	InputComponent* initPtr{ new (allocPtr) InputComponent{m_InputSetting} };
+		//	RefPtr<InputComponent> out{ initPtr,[&logResource](InputComponent* ptr)
+		//	{
+		//		logResource.do_deallocate(ptr,sizeof(InputComponent),alignof(InputComponent));
+		//		ptr = nullptr;
+		//	} };
+
+		//	table.emplace_back(out);
+
+		//	return out;
+		//}
+
+		new (allocPtr) ComponentType{ std::forward<Args>(args)... };
+
+		auto& bufferHead{ realResource.GetBufferHead() };
+		const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
+
+		ObservePtr<ComponentType>* ob{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead} };
+
+		RefPtr<ObservePtr<ComponentType>> out{ ob,[&logResource](ObservePtr<ComponentType>* ptr)
 		{
-			InputComponent* initPtr{ new (allocPtr) InputComponent{m_InputSetting} };
-			RefPtr<InputComponent> out{ initPtr,[&logResource](InputComponent* ptr)
-			{
-				logResource.do_deallocate(ptr,sizeof(InputComponent),alignof(InputComponent));
-				ptr = nullptr;
-			} };
-
-			table.emplace_back(out);
-
-			return out;
-		}
-
-		ComponentType* initPtr{ new (allocPtr) ComponentType(shared_from_this(),std::forward<Args>(args)...) };
-
-		RefPtr<ComponentType> out{ initPtr,[&logResource](ComponentType* ptr)
-		{
-			logResource.do_deallocate(ptr,sizeof(ComponentType),alignof(ComponentType));
+			uint8_t* temp{ptr->GetPtrPointTo()};
+			if (ptr->GetPtr())
+				ptr->GetPtr()->~ComponentType();
+			logResource.do_deallocate(temp,sizeof(ComponentType),alignof(ComponentType));
+			delete ptr;
 			ptr = nullptr;
 		} };
 
-		table.emplace_back(out);
 
 		return out;
 	}
@@ -156,9 +241,48 @@ namespace SLD
 	{
 		constexpr std::string uniqueId{};
 		auto& tickPool{ m_TickComponent.at(uniqueId) };
-		auto& table{ tickPool.dataTable };
 
-		table.erase(std::remove(table.begin(), table.end(), ptr));
+		tickPool;
+	}
+
+	template <typename SubTickComponent, typename>
+	void WorldEntity::InitializeAsyncTickTask(const ObservePtr<SubTickComponent>& pointerToObj)
+	{
+		// Check if this component's worker is already initialize
+		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
+			{
+				return std::strcmp(item.id.c_str(), SubTickComponent::UniqueId) == 0;
+			});
+
+		const bool found{ fIt != m_TickTasks.end() };
+		PersistentThreadWorker& thread{ found ? fIt->worker : EmplaceNewWorker(SubTickComponent::UniqueId) };
+		thread.AssignTask([&pointerToObj, this]()
+			{
+				pointerToObj.GetPtr()->AsyncUpdate(this->GetDeltaTime());
+			});
+	}
+
+	template <typename SubTickComponent, typename>
+	void WorldEntity::InitializeAsyncTickTask(const RefPtr<ObservePtr<SubTickComponent>>& component)
+	{
+		// Check if this component's worker is already initialize
+		auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
+			{
+				return std::strcmp(item.id.c_str(), SubTickComponent::UniqueId) == 0;
+			});
+
+		const bool found{ fIt != m_TickTasks.end() };
+		PersistentThreadWorker& thread{ found ? fIt->worker : EmplaceNewWorker(SubTickComponent::UniqueId) };
+		WeakPtr<ObservePtr<SubTickComponent>> weak{ component };
+		thread.AssignTask([weak, this]()
+			{
+				if(auto real = weak.lock();
+					real)
+				{
+					real->GetPtr()->AsyncUpdate(this->GetDeltaTime());
+				}
+				//pointerToObj.GetPtr()->AsyncUpdate(this->GetDeltaTime());
+			});
 	}
 }
 

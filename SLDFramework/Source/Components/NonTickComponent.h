@@ -10,6 +10,8 @@ namespace SLD
 	class NonTickComponent : public BaseComponent
 	{
 	public:
+
+		~NonTickComponent() override = default;
 		
 		//using value_type = std::remove_all_extents_t<T>;
 		//using pointer = value_type*;
@@ -45,21 +47,6 @@ namespace SLD
 		//std::any m_Instance;
 		//bool m_IsInitialized;
 	};
-
-	//template <typename UserClass>
-	//constexpr auto NonTickComponent::Bind(
-	//	const RefPtr<std::remove_all_extents_t<UserClass>>& instance) noexcept(false) -> void
-	//{
-	//	using value_type = std::remove_all_extents_t<UserClass>;
-	//	using pointer = value_type*;
-	//	
-	//	m_OnCreate = [](const std::any& objInstance)
-	//	{
-	//		std::any_cast<pointer>(objInstance)->OnCreate();
-	//	};
-
-	//	m_Instance = instance.get();
-	//}
 }
 
 #endif

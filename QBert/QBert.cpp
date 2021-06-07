@@ -5,6 +5,9 @@
 #include "QBertGame.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#ifdef _DEBUG
+#include <vld.h>
+#endif
 
 #ifdef min
 #undef min
@@ -52,26 +55,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 
 	game.Start();
 	//game.Run();
-
-	//sf::RenderWindow window{ sf::WindowHandle{windowHandle} };
-	////window.close();
-	//sf::WindowHandle handle{ window.getSystemHandle() };
-	////window.close();
-	//sf::Window input{handle};
-	
-	//while(window.isOpen())
-	//{
-	//	sf::Event ev;
-	//	while(window.pollEvent(ev))
-	//	{
-	//		switch (ev.type)
-	//		{
-	//		case sf::Event::Closed:
-	//			window.close();
-	//			break;
-	//		}
-	//	}
-	//}
 	
 	MSG msg{};
 	while(msg.message != WM_QUIT)
@@ -82,16 +65,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
-		//sf::Event ev;
-		//while(input.pollEvent(ev))
-		//{
-		//	switch (ev.type)
-		//	{
-		//	case sf::Event::Closed:
-		//		quit = true;
-		//		break;
-		//	}
-		//}
 		game.Run();
 	}
 	

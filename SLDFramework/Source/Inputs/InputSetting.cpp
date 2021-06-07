@@ -1,4 +1,5 @@
 #include "InputSetting.h"
+//#include <Windows.h>
 
 const std::vector<SLD::ActionKey>& SLD::InputSetting::GetActionKeyByName(const std::string& groupName) const
 {
@@ -53,9 +54,8 @@ void SLD::InputSetting::AddActionKeyToMapping(
 	{
 		actionKeys.emplace_back(key);
 		if (rebuildKeyPool) // for this one just add it to the Keypool
-		{
 			keyPool.insert(key.key);
-		}
+
 	}
 }
 
@@ -95,6 +95,21 @@ void SLD::InputSetting::AddAxisKeysToMapping(
 	rebuildKeyPool;
 }
 
+void SLD::InputSetting::RemoveActionKeyFromMapping(const std::string& groupName, const ActionKey& key,
+	bool rebuildKeyPool)
+{
+	groupName;
+	key;
+	rebuildKeyPool;
+}
+
+void SLD::InputSetting::RemoveAxisKeyFromMapping(const std::string& groupName, const AxisKey& key, bool rebuildKeyPool)
+{
+	groupName;
+	key;
+	rebuildKeyPool;
+}
+
 void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 {
 	switch (message.eventId)
@@ -124,9 +139,9 @@ void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 	case EventType::KeyPressed:
 	{
 		const Key inKey{ InputDevice::D_Keyboard,uint16_t(message.data.keyboard.key) };
-		const InputEvent ie{ InputEvent::IE_Pressed };
+		//const InputEvent ie{ InputEvent::IE_Pressed };
 		const float axisValue{ 1.0f };
-
+		//OutputDebugString(L"1\n");
 		for (const auto& axisMap : m_AxisKeyMappings)
 		{
 			const auto& keyPool{ axisMap.second.keyPool };
@@ -138,15 +153,104 @@ void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 				const float totalAxisValue{ fIt->second * axisValue };
 				for (const auto& cm : commands)
 				{
-					cm->Invoke(totalAxisValue);
+					cm.callback->Invoke(totalAxisValue);
 				}
 			}
 		}
 
 		break;
 	}
+	case XInputState:
+	{
+		const Key inKey{ InputDevice::D_Gamepad,uint16_t(message.data.joyStick.joyStickButton) };
 
+		// TODO: Fix this limit controller behaviour
+		const InputEvent ie{ InputEvent::IE_Released };
+
+
+		for (const auto& actionMap : m_ActionKeyMappings)
+		{
+			const auto& keyPool{ actionMap.second.keyPool };
+			const auto& commands{ actionMap.second.commandTable };
+
+			if (keyPool.find(inKey) != keyPool.end())
+			{
+				for (const auto& cm : commands)
+				{
+					if (cm.iEvent == ie)
+						cm.callback->Invoke();
+				}
+			}
+		}
+
+		float axisValue{};
+		switch (GamePadKey(message.data.joyStick.joyStickButton))
+		{
+		case GamePadKey::GPK_Left_AxisX: axisValue = message.data.joyStick.leftThumbX; break;
+		case GamePadKey::GPK_Left_AxisY: axisValue = message.data.joyStick.leftThumbY; break;
+		case GamePadKey::GPK_Left_Shoulder:	axisValue = message.data.joyStick.leftTrigger; break;
+		case GamePadKey::GPK_Right_Shoulder:	axisValue = message.data.joyStick.rightTrigger; break;
+		default: axisValue = 1.0f;
+		}
+			
+		for (const auto& axisMap : m_AxisKeyMappings)
+		{
+			const auto& keyPool{ axisMap.second.keyPool };
+			const auto& commands{ axisMap.second.commandTable };
+
+			const auto fIt = keyPool.find(inKey);
+			if (fIt != keyPool.end())
+			{
+				const float totalAxisValue{ fIt->second * axisValue };
+				for (const auto& cm : commands)
+				{
+					cm.callback->Invoke(totalAxisValue);
+				}
+			}
+		}
+
+	}
+	break;
 	default: break;
 	}
 
+}
+
+void SLD::InputSetting::RemoveCommands(WeakPtr<GameObject> reference)
+{
+	// Delete from both command table
+
+	for (auto& keyMap : m_ActionKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+
+		commandTable.erase(std::remove_if(commandTable.begin(), commandTable.end(), [&reference](const ActionCommand& item)
+			{
+				return item.referencePointer.lock() == reference.lock();
+			}), commandTable.end());
+	}
+
+	for (auto& keyMap : m_AxisKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+		commandTable.erase(std::remove_if(commandTable.begin(), commandTable.end(), [&reference](const AxisCommand& item)
+			{
+				return item.referencePointer.lock() == reference.lock();
+			}));
+	}
+}
+
+SLD::InputSetting::~InputSetting()
+{
+	for (auto& keyMap : m_ActionKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+		commandTable.clear();
+	}
+
+	for (auto& keyMap : m_AxisKeyMappings)
+	{
+		auto& commandTable{ keyMap.second.commandTable };
+		commandTable.clear();
+	}
 }

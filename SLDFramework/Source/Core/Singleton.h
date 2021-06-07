@@ -20,13 +20,15 @@ namespace SLD
 
 		using value_type = std::remove_all_extents_t<T>;
 
-		friend RefPtr<T> Instance();
+		template<typename U>
+		friend RefPtr<U> Instance();
 
 		Singleton(const Singleton&) = delete;
 		Singleton& operator=(const Singleton&) = delete;
-	
-	protected:
+		virtual ~Singleton() = default;
 
+	protected:
+		
 		static RefPtr<value_type> GetInstance()
 		{
 			if (!m_Instance)
@@ -35,13 +37,19 @@ namespace SLD
 		}
 		
 		Singleton() = default;
+
+	private:
+		
 		static RefPtr<value_type> m_Instance;
 	};
 
 	template<typename T>
+	std::shared_ptr<typename Singleton<T>::value_type> Singleton<T>::m_Instance{};
+	
+	template<typename T>
 	inline RefPtr<T> Instance()
 	{
-		return T::GetInstance();
+		return Singleton<T>::GetInstance();
 	}
 }
 
