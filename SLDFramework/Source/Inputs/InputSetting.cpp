@@ -160,7 +160,57 @@ void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 
 		break;
 	}
+	case XInputState:
+	{
+		const Key inKey{ InputDevice::D_Gamepad,uint16_t(message.data.joyStick.joyStickButton) };
 
+		// TODO: Fix this limit controller behaviour
+		const InputEvent ie{ InputEvent::IE_Released };
+
+
+		for (const auto& actionMap : m_ActionKeyMappings)
+		{
+			const auto& keyPool{ actionMap.second.keyPool };
+			const auto& commands{ actionMap.second.commandTable };
+
+			if (keyPool.find(inKey) != keyPool.end())
+			{
+				for (const auto& cm : commands)
+				{
+					if (cm.iEvent == ie)
+						cm.callback->Invoke();
+				}
+			}
+		}
+
+		float axisValue{};
+		switch (GamePadKey(message.data.joyStick.joyStickButton))
+		{
+		case GamePadKey::GPK_Left_AxisX: axisValue = message.data.joyStick.leftThumbX; break;
+		case GamePadKey::GPK_Left_AxisY: axisValue = message.data.joyStick.leftThumbY; break;
+		case GamePadKey::GPK_Left_Shoulder:	axisValue = message.data.joyStick.leftTrigger; break;
+		case GamePadKey::GPK_Right_Shoulder:	axisValue = message.data.joyStick.rightTrigger; break;
+		default: axisValue = 1.0f;
+		}
+			
+		for (const auto& axisMap : m_AxisKeyMappings)
+		{
+			const auto& keyPool{ axisMap.second.keyPool };
+			const auto& commands{ axisMap.second.commandTable };
+
+			const auto fIt = keyPool.find(inKey);
+			if (fIt != keyPool.end())
+			{
+				const float totalAxisValue{ fIt->second * axisValue };
+				for (const auto& cm : commands)
+				{
+					cm.callback->Invoke(totalAxisValue);
+				}
+			}
+		}
+
+	}
+	break;
 	default: break;
 	}
 
@@ -169,7 +219,7 @@ void SLD::InputSetting::ParseMessage(const MessageBus& message) const
 void SLD::InputSetting::RemoveCommands(WeakPtr<GameObject> reference)
 {
 	// Delete from both command table
-	
+
 	for (auto& keyMap : m_ActionKeyMappings)
 	{
 		auto& commandTable{ keyMap.second.commandTable };

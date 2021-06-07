@@ -5,6 +5,9 @@
 #include "QBertGame.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#ifdef _DEBUG
+#include <vld.h>
+#endif
 
 #ifdef min
 #undef min

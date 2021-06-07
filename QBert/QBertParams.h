@@ -10,7 +10,7 @@ namespace QBert
 	static constexpr float LevelPixelX{ 32.0f };
 	static constexpr float LevelPixelY{ 32.0f };
 
-	static constexpr uint32_t PlayerMaxLives{ 5u };
+	static constexpr uint32_t PlayerMaxLives{ 3u };
 	
 	struct Sound
 	{
@@ -18,12 +18,17 @@ namespace QBert
 		static constexpr const char* Win{ "./Resources/Sounds/Win.wav" };
 		static constexpr const char* Lose{ "./Resources/Sounds/Lose.wav" };
 	};
+
+	struct HUDElements
+	{
+	};
 	
 	struct Level1
 	{
 		inline static const sf::IntRect SpriteStart{0,224,32,32};
 		inline static const sf::IntRect SpriteEnd{0,192,32,32};
 		inline static const sf::IntRect SpriteSpare{ 0,160,32,32 };
+		inline static const sf::IntRect PlatfromChangeTo{ 64,192,16,16 };
 	};
 
 	struct Level2
@@ -31,18 +36,22 @@ namespace QBert
 		inline static const sf::IntRect SpriteStart{ 80,160,32,32 };
 		inline static const sf::IntRect SpriteSpare{ 80,192,32,32 };
 		inline static const sf::IntRect SpriteEnd{ 80,224,32,32 };
+		inline static const sf::IntRect PlatfromChangeTo{ 144,224,16,16 };
 	};
 
 	struct Level3
 	{
-		inline static const sf::IntRect SpriteStart{ 160,160,32,32 };
-		inline static const sf::IntRect SpriteSpare{ 160,192,32,32 };
-		inline static const sf::IntRect SpriteEnd{ 160,224,32,32 };
+		inline static const sf::IntRect SpriteStart{ 160,192,32,32 };
+		inline static const sf::IntRect SpriteSpare{ 160,224,32,32 };
+		inline static const sf::IntRect SpriteEnd{ 160,160,32,32 };
+		inline static const sf::IntRect PlatfromChangeTo{ 224,160,16,16 };
 	};
 
 	enum class Layer
 	{
+		BackGround,
 		Map,
-		Player
+		Player,
+		HUD
 	};
 }

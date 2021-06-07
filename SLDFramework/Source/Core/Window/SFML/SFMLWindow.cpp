@@ -15,13 +15,13 @@ public:
 	sf::RenderWindow& GetWindow();
 
 private:
-	
+
 	sf::RenderWindow m_MainWindow{};
 };
 
 SFMLWindow::ImplSFMLWindow::ImplSFMLWindow(sf::WindowHandle winHandle)
 	: m_MainWindow(winHandle)
-{	
+{
 }
 
 SFMLWindow::ImplSFMLWindow::~ImplSFMLWindow()
@@ -148,14 +148,14 @@ SFMLWindow::SFMLWindow(
 
 SFMLWindow::~SFMLWindow() = default;
 
-SFMLWindow::SFMLWindow(SFMLWindow&& other) noexcept
+SFMLWindow::SFMLWindow(SFMLWindow && other) noexcept
 	: m_pMainWindow(std::move(other.m_pMainWindow))
 {
 }
 
-SFMLWindow& SFMLWindow::operator=(SFMLWindow&& other) noexcept
+SFMLWindow& SFMLWindow::operator=(SFMLWindow && other) noexcept
 {
-	if(this != &other)
+	if (this != &other)
 	{
 		m_pMainWindow = std::move(other.m_pMainWindow);
 	}

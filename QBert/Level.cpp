@@ -265,6 +265,7 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 
 		if (platform.currentSpriteId != winSpriteId)
 		{
+			QBertGame::OnAddScore.BroadCast(25);
 			ChangePlatformSprite(m_SwapSprites[winSpriteId], node.row, node.col);
 			platform.currentSpriteId = winSpriteId;
 		}
@@ -275,6 +276,7 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 		// Step two times then lock
 		if (platform.stepCount != 2)
 		{
+			QBertGame::OnAddScore.BroadCast(25);
 			platform.stepCount++;
 			platform.currentSpriteId++;
 			ChangePlatformSprite(m_SwapSprites[platform.currentSpriteId], node.row, node.col);
@@ -283,9 +285,10 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 	break;
 	case LevelState::Level3:
 	{
-		const uint32_t maxStep{ 3 };
+		QBertGame::OnAddScore.BroadCast(25);
+		const uint32_t maxStep{ 2 };
 		platform.stepCount = (platform.stepCount + 1) % maxStep;
-		platform.currentSpriteId = (platform.currentSpriteId + 1) % maxStep;
+		platform.currentSpriteId = (platform.stepCount == 0) ? 0 : 2;
 		ChangePlatformSprite(m_SwapSprites[platform.currentSpriteId], node.row, node.col);
 	}
 	break;

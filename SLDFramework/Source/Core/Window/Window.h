@@ -14,7 +14,8 @@ namespace SLD
 	{
 		
 	public:
-		
+
+		class ImplXInput;
 		using CurrentWindow = std::any;
 		
 		Window(
@@ -24,7 +25,7 @@ namespace SLD
 			LLInputs&& subSystemInput,
 			const CurrentWindow& windowHandle,
 			const std::string& vpName);
-		
+		~Window();
 		
 		//[[nodiscard]] InputManager& GetInputManager() { return m_InputManager; }
 
@@ -66,6 +67,7 @@ namespace SLD
 		// TODO: Delete Input manager
 		
 		std::array<MessageBus, MinimumEventCnt> m_WindowEvents;
+		OwnedPtr<ImplXInput> m_pImplXInput;
 		uint8_t m_EventCntThisFrame;
 		//InputManager m_InputManager;
 

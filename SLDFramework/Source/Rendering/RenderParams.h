@@ -29,7 +29,8 @@ enum class SFMLRenderElement
 	RenderShapes,
 	RenderSprite,
 	RenderTexture,
-	RenderStates
+	RenderStates,
+	RenderText
 };
 
 #endif

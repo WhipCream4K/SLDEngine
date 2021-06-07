@@ -12,7 +12,7 @@ class SFML2DRenderer::ImplSFML2DRenderer
 public:
 
 	ImplSFML2DRenderer();
-	void Render(uint32_t elemCnt,uint8_t* bufferHead, size_t bufferSize);
+	void Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize);
 	void SetRenderTarget(SLD::Window& renderWindow);
 	void SetRenderTarget(const RefPtr<SLD::Window>& renderWindow);
 
@@ -52,7 +52,8 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 		//if (test == end)
 		//	break;
 		sf::RenderStates renderStates{};
-
+		sf::Text* textEdgeCases{};
+		
 		// register transform
 		SLD::ObservePtr<SLD::TransformComponent>* transform{};
 		std::memcpy(&transform, head, sizeof(void*));
@@ -61,7 +62,7 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 		head += sizeof(void*);
 
 		SLD::RenderIdentifier id{ static_cast<SLD::RenderIdentifier>(*head) };
-		
+
 		head += sizeof(SLD::RenderIdentifier);
 
 		sf::Drawable* drawObj{};
@@ -78,35 +79,45 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 		break;
 		case SFMLRenderElement::RenderTexture: break;
 		case SFMLRenderElement::RenderStates: break;
+		case SFMLRenderElement::RenderText:
+		{
+			dataSize = sizeof(sf::Text*);
+			std::memcpy(&textEdgeCases, head, sizeof(void*));
+			//drawObj = reinterpret_cast<sf::Text*>(head);
+		}
+		break;
 		default: break;
 		}
 
 		// removed since we won't know in runtime if this pointer actually a pointer
 		if (transform)
 		{
-			//if (drawObj)
-			//{
-				
-				auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
-				auto& component{ m_2DDrawComponent[cnt] };
 
-				sf::Vector3f posVec{};
-				sf::Vector2f scaleVec{};
+			auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
+			auto& component{ m_2DDrawComponent[cnt] };
 
-				rtm::vector_store3(objMat.translation, &posVec.x);
-				rtm::vector_store2(objMat.scale, &scaleVec.x);
+			sf::Vector3f posVec{};
+			sf::Vector2f scaleVec{};
 
-				posVec.x += renderTargetCenter.x;
-				posVec.y *= -1;
-				posVec.y += renderTargetCenter.y;
+			rtm::vector_store3(objMat.translation, &posVec.x);
+			rtm::vector_store2(objMat.scale, &scaleVec.x);
 
-				renderStates.transform.translate(posVec.x, posVec.y);
-				renderStates.transform.scale(scaleVec);
+			posVec.x += renderTargetCenter.x;
+			posVec.y *= -1;
+			posVec.y += renderTargetCenter.y;
 
-				component.drawObj = drawObj;
-				component.renderStates = renderStates;
-				component.depth = posVec.z;
-			//}
+			renderStates.transform.translate(posVec.x, posVec.y);
+			renderStates.transform.scale(scaleVec);
+
+			if(textEdgeCases)
+			{
+				drawObj = textEdgeCases;
+			}
+			
+			component.drawObj = drawObj;
+			component.renderStates = renderStates;
+			component.depth = posVec.z;
+
 		}
 
 		head += dataSize;
@@ -129,106 +140,10 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 
 }
 
-//void SFML2DRenderer::ImplSFML2DRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
-//{
-	//m_RenderWindow.draw();
-	//auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
-
-	//if (m_2DDrawComponent.size() < renderingComponents.size())
-	//	m_2DDrawComponent.resize(renderingComponents.size());
-	//for (size_t i = 0; i < renderingComponents.size(); ++i)
-	//{
-	//	// Read Render Identifier
-	//	const uint8_t* head{ renderingComponents[i].GetRenderData() };
-	//	const uint8_t* end{ head + renderingComponents[i].GetMaxDataSize() };
-	//	const SLD::ObservePtr<SLD::TransformComponent>* transform{};
-	//	const sf::Drawable* sfmlDrawable{};
-	//	sf::RenderStates renderStates{ sf::RenderStates::Default };
-
-	//	while (head != end)
-	//	{
-	//		SLD::RenderIdentifier id{ static_cast<SLD::RenderIdentifier>(*head) };
-	//		size_t dataSize{};
-
-	//		head += sizeof(SLD::RenderIdentifier);
-
-	//		switch (SFMLRenderElement(id))
-	//		{
-	//		case SFMLRenderElement::WorldMatrix:
-	//		{
-	//			dataSize = sizeof(void*);
-	//			std::memcpy(&transform, head, dataSize);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderShapes:
-	//		{
-	//			dataSize = sizeof(sf::CircleShape);
-	//			sfmlDrawable = reinterpret_cast<const sf::CircleShape*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderSprite:
-	//		{
-	//			dataSize = sizeof(sf::Sprite);
-	//			sfmlDrawable = reinterpret_cast<const sf::Sprite*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderStates:
-	//		{
-	//			dataSize = sizeof(sf::RenderStates);
-	//			renderStates = *reinterpret_cast<const sf::RenderStates*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderTexture: break;
-	//		default: break;
-	//		}
-
-	//		if (sfmlDrawable)
-	//		{
-	//			if (transform)
-	//			{
-
-	//				// TODO: Do rotation
-
-	//				sf::Vector3f posVec{};
-	//				sf::Vector2f scaleVec{};
-	//				auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
-	//				rtm::vector_store3(objMat.translation, &posVec.x);
-	//				rtm::vector_store2(objMat.scale, &scaleVec.x);
-
-	//				posVec.x += renderTargetCenter.x;
-	//				posVec.y *= -1.0f;
-	//				posVec.y += renderTargetCenter.y;
-
-	//				renderStates.transform.translate(posVec.x, posVec.y);
-	//				renderStates.transform.scale(scaleVec);
-
-	//				m_SFMLDrawable[i].drawObj = sfmlDrawable;
-	//				m_SFMLDrawable[i].renderStates = renderStates;
-	//				m_SFMLDrawable[i].depth = posVec.z;
-	//			}
-	//		}
-
-	//		head += dataSize;
-	//	}
-	//}
-
-	//// Sort Layer
-	//std::sort(m_SFMLDrawable.begin(), m_SFMLDrawable.end(), [](const DrawComponent& lhs, const DrawComponent& rhs)
-	//	{
-	//		return lhs.depth < rhs.depth;
-	//	});
-
-	//// Draw
-	//for (const auto& item : m_SFMLDrawable)
-	//{
-	//	m_RenderWindow->draw(*item.drawObj, item.renderStates);
-	//}
-//}
-
 void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(SLD::Window& renderWindow)
 {
 	auto winHandle{ renderWindow.GetWindowHandleToType<sf::WindowHandle>() };
-	if(m_RenderWindow->getSystemHandle() != winHandle)
+	if (m_RenderWindow->getSystemHandle() != winHandle)
 	{
 		m_RenderWindow = &renderWindow.GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
 	}
@@ -247,104 +162,6 @@ void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Windo
 	}
 }
 
-//void SFML2DRenderer::Render(const std::vector<SLD::RenderingComponent>& renderingComponents)
-//{
-//	m_pImplRenderWindow->Render(renderingComponents);
-	//m_RenderWindow.draw();
-	//auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
-
-	//if (m_SFMLDrawable.size() < renderingComponents.size())
-	//	m_SFMLDrawable.resize(renderingComponents.size());
-
-	//for (size_t i = 0; i < renderingComponents.size(); ++i)
-	//{
-	//	// Read Render Identifier
-	//	const uint8_t* head{ renderingComponents[i].GetRenderData() };
-	//	const uint8_t* end{ head + renderingComponents[i].GetMaxDataSize() };
-	//	const SLD::ObservePtr<SLD::TransformComponent>* transform{};
-	//	const sf::Drawable* sfmlDrawable{};
-	//	sf::RenderStates renderStates{ sf::RenderStates::Default };
-
-	//	while (head != end)
-	//	{
-	//		SLD::RenderIdentifier id{ static_cast<SLD::RenderIdentifier>(*head) };
-	//		size_t dataSize{};
-
-	//		head += sizeof(SLD::RenderIdentifier);
-
-	//		switch (SFMLRenderElement(id))
-	//		{
-	//		case SFMLRenderElement::WorldMatrix:
-	//		{
-	//			dataSize = sizeof(void*);
-	//			std::memcpy(&transform, head, dataSize);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderShapes:
-	//		{
-	//			dataSize = sizeof(sf::CircleShape);
-	//			sfmlDrawable = reinterpret_cast<const sf::CircleShape*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderSprite:
-	//		{
-	//			dataSize = sizeof(sf::Sprite);
-	//			sfmlDrawable = reinterpret_cast<const sf::Sprite*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderStates:
-	//		{
-	//			dataSize = sizeof(sf::RenderStates);
-	//			renderStates = *reinterpret_cast<const sf::RenderStates*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderTexture: break;
-	//		default: break;
-	//		}
-
-	//		if (sfmlDrawable)
-	//		{
-	//			if (transform)
-	//			{
-
-	//				// TODO: Do rotation
-
-	//				sf::Vector3f posVec{};
-	//				sf::Vector2f scaleVec{};
-	//				auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
-	//				rtm::vector_store3(objMat.translation, &posVec.x);
-	//				rtm::vector_store2(objMat.scale, &scaleVec.x);
-
-	//				posVec.x += renderTargetCenter.x;
-	//				posVec.y *= -1.0f;
-	//				posVec.y += renderTargetCenter.y;
-
-	//				renderStates.transform.translate(posVec.x, posVec.y);
-	//				renderStates.transform.scale(scaleVec);
-
-	//				m_SFMLDrawable[i].drawObj = sfmlDrawable;
-	//				m_SFMLDrawable[i].renderStates = renderStates;
-	//				m_SFMLDrawable[i].depth = posVec.z;
-	//			}
-	//		}
-
-	//		head += dataSize;
-	//	}
-	//}
-
-	//// Sort Layer
-	//std::sort(m_SFMLDrawable.begin(), m_SFMLDrawable.end(), [](const DrawComponent& lhs, const DrawComponent& rhs)
-	//	{
-	//		return lhs.depth < rhs.depth;
-	//	});
-
-	//// Draw
-	//for (const auto& item : m_SFMLDrawable)
-	//{
-	//	m_RenderWindow->draw(*item.drawObj, item.renderStates);
-	//}
-
-//}
 
 SFML2DRenderer::SFML2DRenderer()
 	: m_pImplRenderWindow(std::make_unique<ImplSFML2DRenderer>())
@@ -353,115 +170,17 @@ SFML2DRenderer::SFML2DRenderer()
 
 SFML2DRenderer::~SFML2DRenderer() = default;
 
-void SFML2DRenderer::Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize)
+void SFML2DRenderer::Render(uint32_t elemCnt, uint8_t * bufferHead, size_t bufferSize)
 {
-	m_pImplRenderWindow->Render(elemCnt,bufferHead, bufferSize);
+	m_pImplRenderWindow->Render(elemCnt, bufferHead, bufferSize);
 }
 
-void SFML2DRenderer::SetRenderTarget(SLD::Window& renderWindow)
-{
-	m_pImplRenderWindow->SetRenderTarget(renderWindow);
-}
-
-void SFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
+void SFML2DRenderer::SetRenderTarget(SLD::Window & renderWindow)
 {
 	m_pImplRenderWindow->SetRenderTarget(renderWindow);
 }
 
-//void SFML2DRenderer::Render(const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents)
-//{
-//	renderingComponents;
-//	//renderingComponents;
-//}
-
-//void SFML2DRenderer::Render(std::vector<SLD::RenderingComponent>& renderingComponents)
-//{
-	//auto& renderTargetCenter{ m_RenderWindow->getView().getCenter() };
-
-	//for (auto& element : renderingComponents)
-	//{
-	//	// Read Render Identifier
-	//	uint8_t* head{ element.GetRenderData() };
-	//	uint8_t* end{ head + element.GetMaxDataSize() };
-	//	rtm::qvvf* objectWorldMatrix{};
-
-	//	while (head != end)
-	//	{
-	//		SLD::RenderIdentifier id{ static_cast<SLD::RenderIdentifier>(*head) };
-	//		size_t dataSize{};
-
-	//		head += sizeof(SLD::RenderIdentifier);
-
-	//		sf::Drawable* sfmlDrawable{};
-	//		sf::RenderStates renderStates{ sf::RenderStates::Default };
-	//		//sf::FloatRect bounding{};
-
-	//		switch (SFMLRenderElement(id))
-	//		{
-	//		case SFMLRenderElement::WorldMatrix:
-	//		{
-	//			dataSize = sizeof(rtm::qvvf*);
-	//			std::memcpy(&objectWorldMatrix, head, dataSize);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderShapes:
-	//		{
-	//			dataSize = sizeof(sf::CircleShape);
-	//			sfmlDrawable = reinterpret_cast<sf::CircleShape*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderSprite:
-	//		{
-	//			dataSize = sizeof(sf::Sprite);
-	//			sfmlDrawable = reinterpret_cast<sf::Sprite*>(head);
-	//			break;
-	//		}
-	//		case SFMLRenderElement::RenderTexture: break;
-	//		case SFMLRenderElement::RenderStates: break;
-	//		default: break;
-	//		}
-
-	//		// SFML Drawable
-	//		if (sfmlDrawable)
-	//		{
-	//			if (objectWorldMatrix)
-	//			{
-	//				sf::Vector2f posVec{};
-	//				rtm::vector_store2(objectWorldMatrix->translation, &posVec.x);
-
-	//				posVec.x += renderTargetCenter.x;
-	//				posVec.y += renderTargetCenter.y;
-
-	//				renderStates.transform.translate(posVec);
-	//			}
-
-	//			m_RenderWindow->draw(*sfmlDrawable, renderStates);
-	//		}
-	//		head += dataSize;
-	//	}
-	//}
-//}
-
-//void SFML2DRenderer::SetRenderTarget(const SLD::Window& renderWindow)
-//{
-//	//sf::WindowHandle newWindowHandle{ renderWindow.GetWindowHandleToType<sf::WindowHandle>() };
-//	//if(m_RenderWindow->getSystemHandle() != newWindowHandle)
-//	//{
-//	//	m_RenderWindow.create(newWindowHandle);
-//	//}
-//	renderWindow;
-//}
-//
-//void SFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
-//{
-//	auto windowSubSystem{ renderWindow->GetWindowSubsystem<SFMLWindow>()->GetSubRefPtr() };
-//	if (windowSubSystem != m_RenderWindow)
-//	{
-//		m_RenderWindow = windowSubSystem;
-//	}
-//	//sf::WindowHandle newWindowHandle{ renderWindow->GetWindowHandleToType<sf::WindowHandle>() };
-//	//if (m_RenderWindow->getSystemHandle() != newWindowHandle)
-//	//{
-//	//	//m_RenderWindow-create(newWindowHandle);
-//	//}
-//}
+void SFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>&renderWindow)
+{
+	m_pImplRenderWindow->SetRenderTarget(renderWindow);
+}

@@ -1,10 +1,9 @@
 #include "QBertGame.h"
 #include "QBertParams.h"
 #include "GameObject/GameObject.h"
-//#include <SFML/Window.hpp>
-
-//#include <SFML/Window.hpp>
-//#include <SFML/Graphics.hpp>
+#include "HUD.h"
+#include "Player.h"
+#include "Level.h"
 
 //QBertGame::QBertGame(const std::any& windowHandle)
 //	: m_Framework()
@@ -14,6 +13,8 @@
 //}
 
 QBertGame::FGameWon QBertGame::OnGameWon{};
+QBertGame::FAddScore QBertGame::OnAddScore{};
+
 const rtm::float3f QBertGame::Player1DefaultSpawnPoint{
 	0.0f,
 	(64.0f + QBert::LevelPixelY / 2.0f) * QBert::GlobalScaleY,
@@ -23,10 +24,6 @@ QBertGame::QBertGame(HWND windowHandle)
 	: m_Framework()
 {
 	m_Framework.CreateViewPortFromHWND(windowHandle);
-
-	//Player1DefaultSpawnPoint = rtm::float3f{
-	//	0.0,(64.0f + QBert::LevelPixelY / 2.0f) * QBert::GlobalScaleY,
-	//	float(QBert::Layer::Player) };
 }
 
 void QBertGame::Start()
@@ -34,16 +31,16 @@ void QBertGame::Start()
 	using namespace SLD;
 
 	// Game Sprite Sheet
-	const bool success{ m_QBertSprite.loadFromFile("./Resources/SpriteSheet/QBert_Sprites.png") };
+	bool success{ m_QBertSprite.loadFromFile("./Resources/SpriteSheet/QBert_Sprites.png") };
+	success = m_QBertFont.loadFromFile("./Resources/Fonts/Minecraft.ttf");
 
 	if (success)
 	{
-		// Create Sprite
-		//const int totalSpriteForNow{ 3 };
-		//SetUpSprite(totalSpriteForNow, m_QBertSprite, QBert::Level1::SpriteStart);
-
-		m_Level = std::make_shared<Level>(m_Framework.GetDefaultWorldEntity());
-		m_Player = std::make_shared<Player>(m_Framework.GetDefaultWorldEntity(),m_Level);
+		auto& defaultWorld{ m_Framework.GetDefaultWorldEntity() };
+		
+		m_Level = std::make_shared<Level>(defaultWorld);
+		m_Player = std::make_shared<Player>(defaultWorld,m_Level);
+		m_HUD = std::make_shared<HUD>(defaultWorld);
 		
 		// Player
 		m_Player->SetSpriteTexture(m_QBertSprite);
@@ -55,19 +52,20 @@ void QBertGame::Start()
 
 		m_Level->ChangeLevelSprite(Level::LevelState::Level1);
 		m_Level->SetSpriteOrigin(QBert::Level1::SpriteStart);
-		//m_Level->SetSpriteTextureRectFromId(0, QBert::Level1::SpriteStart);
-		//m_Level->SetSpriteTextureRectFromId(1, QBert::Level1::SpriteEnd);
-		//m_Level->SetSpriteTextureRectFromId(2, QBert::Level1::SpriteSpare);
-
 		m_Level->ChangeAllPlatformSprite(0);
 
+		
 		Player::OnPlayerFinishedJump.AddDynamic(&Level::OnPlayerFinishedJump, m_Level);
 		Player::OnPlayerDied.AddDynamic(&Level::OnPlayerDied, m_Level);
 		Level::OnLevelChange.AddDynamic(&Player::OnLevelChange, m_Player);
+		Level::OnLevelChange.AddDynamic(&HUD::OnLevelChange, m_HUD);
+		QBertGame::OnAddScore.AddDynamic(&HUD::ShouldAddScore, m_HUD);
 		QBertGame::OnGameWon.AddDynamic(&Level::OnGameWon, m_Level);
 		QBertGame::OnGameWon.AddDynamic(&Player::OnGameClear, m_Player);
 		
 		// HUD generation
+		m_HUD->SetTexture(m_QBertSprite);
+		m_HUD->SetFont(m_QBertFont);
 	}
 
 	// Binding
@@ -80,22 +78,26 @@ void QBertGame::Start()
 
 	gameInput.AddActionMapping("MoveUpRight",
 		{
-			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::E}}
+			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::E}},
+			ActionKey{Key{InputDevice::D_Gamepad,uint16_t(GamePadKey::GPK_DPAD_Up)}}
 		});
 
 	gameInput.AddActionMapping("MoveUpLeft",
 		{
-			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::Q}}
+			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::Q}},
+			ActionKey{Key{InputDevice::D_Gamepad,uint16_t(GamePadKey::GPK_DPAD_Left)}}
 		});
 
 	gameInput.AddActionMapping("MoveDownLeft",
 		{
-			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::Z}}
+			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::Z}},
+			ActionKey{Key{InputDevice::D_Gamepad,uint16_t(GamePadKey::GPK_DPAD_Down)}}
 		});
 
 	gameInput.AddActionMapping("MoveDownRight",
 		{
-			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::C}}
+			ActionKey{Key{InputDevice::D_Keyboard,sf::Keyboard::C}},
+			ActionKey{Key{InputDevice::D_Gamepad,uint16_t(GamePadKey::GPK_DPAD_Right)}}
 		});
 
 	m_Player->SetUpPlayerInput();
@@ -108,25 +110,16 @@ void QBertGame::Run()
 	{
 		const float deltaTime{ m_Framework.GetDefaultWorldEntity().GetDeltaTime() };
 
+		// Skip
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F9))
 			OnGameWon.BroadCast();
 		
 		// World Updates
 		m_Player->Update(deltaTime);
 		m_Level->Update(deltaTime);
+		m_HUD->Update(deltaTime);
 
 		// Async update and render
 		m_Framework.Step();
 	}
 }
-
-//void QBertGame::SetUpSprite(int count,const sf::Texture& texture, const sf::IntRect& textureRect)
-//{
-//	for (int i = 0; i < count; ++i)
-//	{
-//		auto ref{ m_MainSprites.emplace_back(std::make_shared<sf::Sprite>()) };
-//		ref->setTexture(texture);
-//		ref->setTextureRect(textureRect);
-//		ref->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
-//	}
-//}

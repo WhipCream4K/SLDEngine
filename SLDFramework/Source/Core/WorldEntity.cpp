@@ -6,12 +6,13 @@ SLD::WorldEntity::WorldEntity()
 	: m_TickComponent()
 	//, m_RenderComponents()
 	, m_RenderData(1024)
+	, m_RenderBuffer(1024)
 	, m_TickTasks()
 	, m_EndTimePoint()
 	, m_CurrentTimePoint()
 	, m_DeltaTime()
-	, m_RenderBuffer(1024)
 {
+	m_EndTimePoint += std::chrono::minutes(2954);
 	m_TickTasks.reserve(size_t(TickComponent::Type::Count));
 }
 
