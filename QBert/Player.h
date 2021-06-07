@@ -23,8 +23,6 @@ class Player
 {
 public:
 
-	static const rtm::float3f SpawnPoint;
-
 	using FPlayerFinishedJump = SLD::DynamicMulticastDelegate<void(const Level::Node&)>;
 	using FPlayerDied = SLD::DynamicMulticastDelegate<void(int)>;
 
@@ -44,7 +42,8 @@ public:
 	{
 		None,
 		Moving,
-		Fall
+		Fall,
+		Lock
 	};
 
 	Player(SLD::WorldEntity& world);
@@ -53,6 +52,7 @@ public:
 	void SetSpriteTexture(const sf::Texture& texture) const;
 	void SetUpPlayerInput();
 
+	void SetSpriteColor(const sf::Color& color);
 	void SetPos(const rtm::float3f& pos) const;
 	void MoveUpRight();
 	void MoveUpLeft();
@@ -64,6 +64,9 @@ public:
 	rtm::vector4f LerpTo(const rtm::vector4f& to, float deltaTime);
 	std::shared_ptr<SLD::GameObject> GetGameObject();
 	void SetCurrentNode(uint32_t row, uint32_t col);
+
+	void OnLevelChange(Level::LevelState);
+	void OnGameClear();
 
 private:
 
@@ -82,11 +85,14 @@ private:
 	Level::Node m_CurrentNode;
 	MoveDirection m_MoveDirection;
 	rtm::float3f m_CalculatedLocation;
+	float m_FlashBlackInterval{ 0.5f };
+	float m_FlashBlackCount{};
 	float m_MoveSpeed{};
 	float m_ReSpawnTimeCount{};
 	float m_ReSpawnTime{ 3.0f };
 	int m_CurrentLives{ 3 };
 	//uint32_t m_MaxAmountOfLives{ 5 };
 	State m_State{ State::None };
+	bool m_FlashFlag{};
 };
 

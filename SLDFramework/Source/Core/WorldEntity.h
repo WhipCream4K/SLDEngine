@@ -162,6 +162,7 @@ namespace SLD
 		auto& bufferHead{ realResource.GetBufferHead() };
 		const size_t offSetFromHead{ size_t(std::abs(bufferHead - (uint8_t*)allocPtr)) };
 
+		// Construct
 		new (allocPtr) ComponentType(std::forward<Args>(args)...);
 
 		RefPtr<ObservePtr<ComponentType>> out{ new ObservePtr<ComponentType>{bufferHead,offSetFromHead},[&logResource](ObservePtr<ComponentType>* ptr)
@@ -243,20 +244,6 @@ namespace SLD
 
 		tickPool;
 	}
-
-	//template <typename SubTickComponent, typename>
-	//void WorldEntity::InitializeAsyncTickTask(SubTickComponent& object)
-	//{
-	//	// Check if this component's worker is already initialize
-	//	auto fIt = std::find_if(m_TickTasks.begin(), m_TickTasks.end(), [](const TickTask& item)
-	//		{
-	//			return std::strcmp(item.id.c_str(), SubTickComponent::UniqueId) == 0;
-	//		});
-
-	//	const bool found{ fIt != m_TickTasks.end() };
-	//	PersistentThreadWorker& thread{ found ? fIt->worker : EmplaceNewWorker(SubTickComponent::UniqueId) };
-	//	thread.AssignTask(&SubTickComponent::AsyncUpdate, object, this->GetDeltaTime());
-	//}
 
 	template <typename SubTickComponent, typename>
 	void WorldEntity::InitializeAsyncTickTask(const ObservePtr<SubTickComponent>& pointerToObj)

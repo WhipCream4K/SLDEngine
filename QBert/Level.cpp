@@ -4,10 +4,11 @@
 #include "GameObject/GameObject.h"
 #include "Components/TransformComponent.h"
 #include "JSON/nlohmann/json.hpp"
-//#include "Sound/SoundManager.h"
+#include "Sound/SoundManager.h"
+#include "QBertGame.h"
 #include <fstream>
 
-Level::FLevelRestart Level::OnLevelRestart{};
+Level::FLevelChange Level::OnLevelChange{};
 const int Level::MaxSpriteCnt{ 3 };
 
 Level::Level(SLDWorldEntity& world)
@@ -18,30 +19,37 @@ Level::Level(SLDWorldEntity& world)
 	ConstructPlatform(world);
 	const int spriteCntForNow{ 3 };
 	SetUpSprites(spriteCntForNow);
-	//SetupThreadWorker();
 }
 
 void Level::Update(float deltaTime)
 {
-	if(m_WinFlag)
+	if (m_WinFlag)
 	{
 		// Display Flashing Sprite
 		m_FlashTimeCount += deltaTime;
-		if(m_FlashTimeCount >= m_FlashTime)
+		m_SpriteFlashTimeCount += deltaTime;
+
+		if (m_FlashTimeCount >= m_FlashTime)
 		{
-			// Stop and Broadcast that level should restart
+			// Stop and Broadcast that level should change
 			m_WinFlag = false;
 			m_FlashTimeCount = 0;
+
+			// NOTE: Look at this level change logic
+			m_CurrentState = LevelState((uint32_t(m_CurrentState) + 1) % uint32_t(LevelState::Count));
+
+			// Change Level Sprite
+			ChangeLevelSprite(m_CurrentState);
+			OnLevelChange.BroadCast(m_CurrentState);
 			return;
 		}
 
-		if(m_FlashTimeCount >= m_SpriteFlashInterval)
+		if (m_SpriteFlashTimeCount >= m_SpriteFlashInterval)
 		{
+			m_SpriteFlashTimeCount -= m_SpriteFlashInterval;
 			m_SpriteFlashCount = (m_SpriteFlashCount + 1) % MaxSpriteCnt;
+			ChangeAllPlatformSprite(m_SpriteFlashCount);
 		}
-
-		ChangeAllPlatformSprite(m_SpriteFlashCount);
-		
 	}
 	deltaTime;
 }
@@ -51,6 +59,14 @@ void Level::SetTexture(const sf::Texture& texture)
 	for (auto& sprite : m_SwapSprites)
 	{
 		sprite->setTexture(texture);
+	}
+}
+
+void Level::SetSpriteOrigin(const sf::IntRect& textureRect)
+{
+	for (auto& sprite : m_SwapSprites)
+	{
+		sprite->setOrigin(float(textureRect.width) * 0.5f, float(textureRect.height) * 0.5f);
 	}
 }
 
@@ -105,12 +121,6 @@ void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint32_t r
 	//m_HexPlatform.at(row)[col].sprite->GetPtr()->setTextureRect(textureRect);
 }
 
-//void Level::ChangePlatformTextureRect(const sf::IntRect& textureRect, uint8_t id)
-//{
-//	m_HexPlatform[id].sprite->GetPtr()->setTextureRect(textureRect);
-//	//(*m_Platforms[id].sprite)->setTextureRect(textureRect);
-//}
-
 void Level::ChangeAllPlatformTextureRect(const sf::IntRect& textureRect)
 {
 	textureRect;
@@ -137,10 +147,64 @@ void Level::OnPlayerFinishedJump(const Node& to)
 
 void Level::OnPlayerDied(int currentLives)
 {
-	if(currentLives < int(QBert::PlayerMaxLives))
+	if (currentLives < 0)
 	{
 		// TODO: Restart Level
+		const int baseSpriteId{ 0 };
+		for (auto& row : m_HexPlatform)
+		{
+			for (size_t i = 0; i < row.second.size(); ++i)
+			{
+				if (row.second[i].currentSpriteId != baseSpriteId)
+				{
+					row.second[i].currentSpriteId = baseSpriteId;
+					ChangePlatformSprite(m_SwapSprites[baseSpriteId], row.first, uint32_t(i));
+				}
+			}
+		}
 	}
+}
+
+void Level::OnGameWon()
+{
+	m_WinFlag = true;
+	SLD::Instance<SLD::SoundManager>()->PlayStream(QBert::Sound::Win, 0.5f);
+}
+
+void Level::ChangeLevelSprite(LevelState state)
+{
+	const int startSpriteId{ 0 };
+	const int spareSpriteId{ 1 };
+	const int endSpriteId{ 2 };
+
+	switch (state)
+	{
+	case LevelState::Level1:
+	{
+		m_SwapSprites[startSpriteId]->setTextureRect(QBert::Level1::SpriteStart);
+		m_SwapSprites[endSpriteId]->setTextureRect(QBert::Level1::SpriteEnd);
+		m_SwapSprites[spareSpriteId]->setTextureRect(QBert::Level1::SpriteSpare);
+	}
+	break;
+	case LevelState::Level2:
+	{
+		m_SwapSprites[startSpriteId]->setTextureRect(QBert::Level2::SpriteStart);
+		m_SwapSprites[endSpriteId]->setTextureRect(QBert::Level2::SpriteEnd);
+		m_SwapSprites[spareSpriteId]->setTextureRect(QBert::Level2::SpriteSpare);
+	}
+	break;
+	case LevelState::Level3:
+	{
+		m_SwapSprites[startSpriteId]->setTextureRect(QBert::Level3::SpriteStart);
+		m_SwapSprites[endSpriteId]->setTextureRect(QBert::Level3::SpriteEnd);
+		m_SwapSprites[spareSpriteId]->setTextureRect(QBert::Level3::SpriteSpare);
+	}
+	break;
+	default: break;
+	}
+
+	ResetAllPlatformToBase();
+
 }
 
 bool Level::CheckWinCondition(int winSpriteId) const
@@ -165,7 +229,7 @@ void Level::SetUpSprites(int amountToCreate)
 {
 	for (int i = 0; i < amountToCreate; ++i)
 	{
-		auto ref{ m_SwapSprites.emplace_back(std::make_shared<sf::Sprite>()) };
+		m_SwapSprites.emplace_back(std::make_shared<sf::Sprite>());
 	}
 }
 
@@ -188,17 +252,17 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 
 	// There are only 3 sprites in use
 	// 0 is default
-	// 1 is usually what changed to
-	// 2 for now is to signal winning
+	// 1 is for level 2 and above
+	// 2 is what changed to
 
-	const int winSpriteId{ 1 };
+	const int winSpriteId{ 2 };
 	switch (state)
 	{
 	case LevelState::Level1:
 	{
 		// Step only once then lock the sprite changes
 		platform.stepCount = 1;
-			
+
 		if (platform.currentSpriteId != winSpriteId)
 		{
 			ChangePlatformSprite(m_SwapSprites[winSpriteId], node.row, node.col);
@@ -207,15 +271,29 @@ void Level::HandlePlatformSpriteSwitch(const Node& node, LevelState state)
 	}
 	break;
 	case LevelState::Level2:
+	{
+		// Step two times then lock
+		if (platform.stepCount != 2)
 		{
-			
+			platform.stepCount++;
+			platform.currentSpriteId++;
+			ChangePlatformSprite(m_SwapSprites[platform.currentSpriteId], node.row, node.col);
 		}
-		break;
-	case LevelState::Level3: break;
-	default:;
+	}
+	break;
+	case LevelState::Level3:
+	{
+		const uint32_t maxStep{ 3 };
+		platform.stepCount = (platform.stepCount + 1) % maxStep;
+		platform.currentSpriteId = (platform.currentSpriteId + 1) % maxStep;
+		ChangePlatformSprite(m_SwapSprites[platform.currentSpriteId], node.row, node.col);
+	}
+	break;
+	default: break;
 	}
 
-	m_WinFlag = CheckWinCondition(winSpriteId);
+	if (const bool isLevelClear{ CheckWinCondition(winSpriteId) }; isLevelClear)
+		QBertGame::OnGameWon.BroadCast();
 }
 
 const Level::HexGrid& Level::GetGrid() const noexcept
@@ -242,9 +320,6 @@ void Level::ConstructPlatform(SLDWorldEntity& world)
 	std::ifstream mapLayOutFile{ m_MapLayOutFile };
 	json jsonObj{};
 	mapLayOutFile >> jsonObj;
-
-	//const size_t renderSize{ sizeof(sf::Sprite) };
-	//const uint32_t renderElemCnt{ 1 };
 
 	uint32_t col{};
 	for (auto it = jsonObj.begin(); it != jsonObj.end(); ++it)
@@ -314,4 +389,17 @@ void Level::ConstructPlatform(SLDWorldEntity& world)
 //	startPlatformHeight -= platformOffSet;
 //}
 #pragma endregion 
+}
+
+void Level::ResetAllPlatformToBase()
+{
+	for (auto& row : m_HexPlatform)
+	{
+		for (size_t i = 0; i < row.second.size(); ++i)
+		{
+			row.second[i].currentSpriteId = 0;
+			row.second[i].stepCount = 0;
+			ChangePlatformSprite(m_SwapSprites[0], row.first, uint32_t(i));
+		}
+	}
 }

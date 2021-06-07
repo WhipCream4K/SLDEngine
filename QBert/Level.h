@@ -33,7 +33,9 @@ public:
 	{
 		Level1,
 		Level2,
-		Level3
+		Level3,
+
+		Count
 	};
 
 
@@ -46,6 +48,7 @@ public:
 
 	void Update(float deltaTime);
 	void SetTexture(const sf::Texture& texture);
+	void SetSpriteOrigin(const sf::IntRect& textureRect);
 	void SetSpriteTextureRectFromId(int id, const sf::IntRect& textureRect);
 	void ChangeAllPlatformSprite(int id);
 	void ChangeAllPlatformSprite(const RefPtr<sf::Sprite>& sprite);
@@ -56,11 +59,11 @@ public:
 
 	void OnPlayerFinishedJump(const Node& to);
 	void OnPlayerDied(int currentLives);
+	void OnGameWon();
 
-
-	using FLevelRestart = SLD::DynamicMulticastDelegate<void()>;
-
-	static FLevelRestart OnLevelRestart;
+	using FLevelChange = SLD::DynamicMulticastDelegate<void(LevelState)>;
+	static FLevelChange OnLevelChange;
+	void ChangeLevelSprite(LevelState state);
 
 private:
 
@@ -75,6 +78,7 @@ private:
 	static constexpr uint8_t PlatformMaxCol{ 7 };
 
 	void ConstructPlatform(SLDWorldEntity& worldEntt);
+	void ResetAllPlatformToBase();
 
 	//std::array<Platform, PlatformCnt> m_Platforms;
 	// Row and Column
@@ -84,7 +88,8 @@ private:
 	int m_WinSpriteId{};
 	LevelState m_CurrentState;
 	int m_SpriteFlashCount{};
-	float m_SpriteFlashInterval{ 1.0f };
+	float m_SpriteFlashTimeCount{};
+	float m_SpriteFlashInterval{ 0.25f };
 	float m_FlashTimeCount{};
 	float m_FlashTime{ 5.0f };
 	bool m_WinFlag{};

@@ -28,7 +28,16 @@ namespace QBert
 
 	struct Level2
 	{
-		
+		inline static const sf::IntRect SpriteStart{ 80,160,32,32 };
+		inline static const sf::IntRect SpriteSpare{ 80,192,32,32 };
+		inline static const sf::IntRect SpriteEnd{ 80,224,32,32 };
+	};
+
+	struct Level3
+	{
+		inline static const sf::IntRect SpriteStart{ 160,160,32,32 };
+		inline static const sf::IntRect SpriteSpare{ 160,192,32,32 };
+		inline static const sf::IntRect SpriteEnd{ 160,224,32,32 };
 	};
 
 	enum class Layer

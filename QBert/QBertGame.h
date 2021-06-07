@@ -15,10 +15,15 @@ public:
 
 	void Start();
 	void Run();
+	using FGameWon = SLD::DynamicMulticastDelegate<void()>;
+	static FGameWon OnGameWon;
+	static const rtm::float3f Player1DefaultSpawnPoint;
 
 private:
 
 	//void SetUpSprite(int count,const sf::Texture& texture,const sf::IntRect& textureRect);
+
+
 	
 	SLDFramework m_Framework;
 
@@ -26,7 +31,6 @@ private:
 	RefPtr<Player> m_Player;
 	RefPtr<Level> m_Level;
 
-	rtm::float3f m_Player1DefaultSpawnPoint;
 	
 	// Texture Resource
 	sf::Texture m_QBertSprite;
