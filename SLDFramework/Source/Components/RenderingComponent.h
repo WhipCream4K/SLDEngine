@@ -18,23 +18,23 @@ namespace SLD
 		static constexpr const char* UniqueId{ "RenderingComponent" };
 
 		//RenderingComponent(
-		//	const RefPtr<ObservePtr<TransformComponent>>& transform,
+		//	const SharedPtr<ObservePtr<TransformComponent>>& transform,
 		//	std::add_pointer_t<uint8_t> const& head,
 		//	size_t offset,
 		//	size_t elemSize,
 		//	uint32_t elemCnt);
 
 		//RenderingComponent(
-		//	const RefPtr<ObservePtr<TransformComponent>>& transform,
-		//	const RefPtr<uint8_t*>& pointerToBuffer,
+		//	const SharedPtr<ObservePtr<TransformComponent>>& transform,
+		//	const SharedPtr<uint8_t*>& pointerToBuffer,
 		//	const ObservePtr<std::nullptr_t>& bufferObserver,
 		//	size_t elemSize,
 		//	uint32_t elemCnt
 		//);
 
 		RenderingComponent(
-			const RefPtr<ObservePtr<TransformComponent>>& transform,
-			const RefPtr<uint8_t>& pointerToBuffer,
+			const SharedPtr<ObservePtr<TransformComponent>>& transform,
+			const SharedPtr<uint8_t>& pointerToBuffer,
 			const ObservePtr<std::nullptr_t>& bufferObserver,
 			size_t elemSize,
 			uint32_t elemCnt
@@ -46,13 +46,13 @@ namespace SLD
 		);
 
 		template<typename DataType>
-		RefPtr<DataType> AllocData(RenderIdentifier identifier);
+		SharedPtr<DataType> AllocData(RenderIdentifier identifier);
 
 		//template<typename DataType, typename ...Args>
-		//RefPtr<DataType> AllocAndConstructData(RenderIdentifier identifier, Args&&... args);
+		//SharedPtr<DataType> AllocAndConstructData(RenderIdentifier identifier, Args&&... args);
 
 		template<typename DataType, typename ...Args>
-		RefPtr<ObservePtr<DataType>> AllocAndConstructData(RenderIdentifier id, Args&&... args);
+		SharedPtr<ObservePtr<DataType>> AllocAndConstructData(RenderIdentifier id, Args&&... args);
 
 		// can throw exceptions from access violation BE CAREFUL
 		template<typename DataType>
@@ -72,11 +72,11 @@ namespace SLD
 
 		std::vector<uint8_t> m_PackageData{};
 		WeakPtr<ObservePtr<TransformComponent>> m_Transform;
-		//RefPtr<uint8_t*> m_PointToBuffer;
-		RefPtr<uint8_t> m_PointToBuffer;
+		//SharedPtr<uint8_t*> m_PointToBuffer;
+		SharedPtr<uint8_t> m_PointToBuffer;
 		
 		// TODO: Temporary fix for resizable resources
-		RefPtr<ObservePtr<std::nullptr_t>> m_LinkToBuffer;
+		SharedPtr<ObservePtr<std::nullptr_t>> m_LinkToBuffer;
 		ObservePtr<std::nullptr_t> m_BufferObserver;
 
 		//uint8_t* m_Header;
@@ -87,9 +87,9 @@ namespace SLD
 	};
 
 	template <typename DataType>
-	RefPtr<DataType> RenderingComponent::AllocData(RenderIdentifier identifier)
+	SharedPtr<DataType> RenderingComponent::AllocData(RenderIdentifier identifier)
 	{
-		RefPtr<DataType> out{};
+		SharedPtr<DataType> out{};
 		if (m_UsedData + sizeof(DataType) <= m_MaxSize)
 		{
 			constexpr size_t renderIdSize{ sizeof(RenderIdentifier) };
@@ -99,7 +99,7 @@ namespace SLD
 			std::memcpy(bufferStart, &identifier, renderIdSize);
 			m_UsedData += renderIdSize;
 
-			out = RefPtr<DataType>{ reinterpret_cast<DataType*>(bufferStart + m_UsedData),[this,offsetFromStart](DataType* ptr)
+			out = SharedPtr<DataType>{ reinterpret_cast<DataType*>(bufferStart + m_UsedData),[this,offsetFromStart](DataType* ptr)
 			{
 				uint8_t* delBuffer{m_PointToBuffer.get() + offsetFromStart};
 				std::memset(delBuffer, 0, sizeof(DataType) + renderIdSize);
@@ -112,7 +112,7 @@ namespace SLD
 		//std::memcpy(m_pCurrentDataPtr, &identifier, sizeof(RenderIdentifier));
 		//m_pCurrentDataPtr += sizeof(RenderIdentifier);
 		//
-		//RefPtr<DataType> out{ reinterpret_cast<DataType*>(m_pCurrentDataPtr),[](DataType* ptr)
+		//SharedPtr<DataType> out{ reinterpret_cast<DataType*>(m_pCurrentDataPtr),[](DataType* ptr)
 		//{
 		//	ptr = nullptr;
 		//} };
@@ -123,9 +123,9 @@ namespace SLD
 	}
 
 	template <typename DataType, typename ... Args>
-	RefPtr<ObservePtr<DataType>> RenderingComponent::AllocAndConstructData(RenderIdentifier id, Args&&... args)
+	SharedPtr<ObservePtr<DataType>> RenderingComponent::AllocAndConstructData(RenderIdentifier id, Args&&... args)
 	{
-		RefPtr<ObservePtr<DataType>> out{};
+		SharedPtr<ObservePtr<DataType>> out{};
 
 		constexpr size_t renderIdSize{ sizeof(RenderIdentifier) };
 		if (m_UsedData + sizeof(DataType) + renderIdSize <= m_MaxSize)
@@ -144,7 +144,7 @@ namespace SLD
 			new (bufferStart + m_UsedData) DataType{ std::forward<Args>(args)... };
 
 			// TODO: Not sure how to handle missing resource, might think about it later
-			out = RefPtr<ObservePtr<DataType>>{ new ObservePtr<DataType>{m_BufferObserver.GetHead(),m_BufferObserver.GetOffset() + m_UsedData},
+			out = SharedPtr<ObservePtr<DataType>>{ new ObservePtr<DataType>{m_BufferObserver.GetHead(),m_BufferObserver.GetOffset() + m_UsedData},
 			[](ObservePtr<DataType>* ptr)
 			{
 				if (ptr->GetPtr())
@@ -173,9 +173,9 @@ namespace SLD
 	}
 
 	//template <typename DataType, typename ... Args>
-	//RefPtr<DataType> RenderingComponent::AllocAndConstructData(RenderIdentifier identifier, Args&&... args)
+	//SharedPtr<DataType> RenderingComponent::AllocAndConstructData(RenderIdentifier identifier, Args&&... args)
 	//{
-	//	RefPtr<DataType> out{};
+	//	SharedPtr<DataType> out{};
 	//	constexpr size_t renderIdSize{ sizeof(RenderIdentifier) };
 	//	if (m_UsedData + sizeof(DataType) + renderIdSize <= m_MaxSize)
 	//	{
@@ -190,7 +190,7 @@ namespace SLD
 	//		DataType* allocPtr{ new (bufferStart + m_UsedData) DataType{std::forward<Args>(args)...} };
 
 	//		// TODO: Not sure how to handle missing resource, might think about it later
-	//		out = RefPtr<DataType>{ allocPtr,[this,offsetFromStart,renderIdSize](DataType*)
+	//		out = SharedPtr<DataType>{ allocPtr,[this,offsetFromStart,renderIdSize](DataType*)
 	//		{
 	//			if(m_PointToBuffer)
 	//			{
@@ -207,7 +207,7 @@ namespace SLD
 	//	//m_pCurrentDataPtr += sizeof(RenderIdentifier);
 
 	//	//DataType* out{ new (m_pCurrentDataPtr) DataType{std::forward<Args>(args)...} };
-	//	//RefPtr<DataType> smrtOut{ out,[](DataType* ptr)
+	//	//SharedPtr<DataType> smrtOut{ out,[](DataType* ptr)
 	//	//{
 	//	//	ptr = nullptr;
 	//	//} };
@@ -220,9 +220,9 @@ namespace SLD
 	//}
 
 	//template <typename DataType, typename ... Args>
-	//RefPtr<ObservePtr<DataType>> RenderingComponent::AllocAndConstructData(RenderIdentifier id, Args&&... args)
+	//SharedPtr<ObservePtr<DataType>> RenderingComponent::AllocAndConstructData(RenderIdentifier id, Args&&... args)
 	//{
-	//	RefPtr<ObservePtr<DataType>> out{};
+	//	SharedPtr<ObservePtr<DataType>> out{};
 	//	constexpr size_t renderIdSize{ sizeof(RenderIdentifier) };
 	//	if (m_UsedData + sizeof(DataType) + renderIdSize <= m_MaxSize)
 	//	{
@@ -236,7 +236,7 @@ namespace SLD
 	//		// Construct
 	//		new (bufferStart + m_UsedData) DataType{ std::forward<Args>(args)... };
 
-	//		out = RefPtr<ObservePtr<DataType>>{ new ObservePtr<DataType>{m_PointToBuffer,m_UsedData},
+	//		out = SharedPtr<ObservePtr<DataType>>{ new ObservePtr<DataType>{m_PointToBuffer,m_UsedData},
 	//			[this,offsetFromStart,renderIdSize](ObservePtr<DataType>* ptr)
 	//		{
 	//			if (m_PointToBuffer)
@@ -274,27 +274,27 @@ namespace SLD
 	template <typename DataType, typename>
 	void RenderingComponent::PushToRenderBuffer(RenderIdentifier id, DataType pointerToDataType)
 	{
-		if (auto parent{ GetParent().lock() };
-			parent)
-		{
-			constexpr size_t bufferSize{ sizeof(void*) + sizeof(RenderIdentifier) + sizeof(DataType) };
+		//if (auto parent{ GetParent().lock() };
+		//	parent)
+		//{
+		//	constexpr size_t bufferSize{ sizeof(void*) + sizeof(RenderIdentifier) + sizeof(DataType) };
 
-			size_t pos{};
-			std::array<uint8_t, bufferSize> tempBuffer{};
+		//	size_t pos{};
+		//	std::array<uint8_t, bufferSize> tempBuffer{};
 
-			ObservePtr<TransformComponent>* temp{ parent->GetTransform().get() };
+		//	ObservePtr<TransformComponent>* temp{ parent->GetTransform().get() };
 
-			std::memcpy(tempBuffer.data(), &temp, sizeof(void*));
-			pos += sizeof(void*);
+		//	std::memcpy(tempBuffer.data(), &temp, sizeof(void*));
+		//	pos += sizeof(void*);
 
-			std::memcpy(tempBuffer.data() + pos, &id, sizeof(RenderIdentifier));
-			pos += sizeof(RenderIdentifier);
+		//	std::memcpy(tempBuffer.data() + pos, &id, sizeof(RenderIdentifier));
+		//	pos += sizeof(RenderIdentifier);
 
-			std::copy(pointerToDataType, pointerToDataType + sizeof(DataType), tempBuffer.data() + pos);
+		//	std::copy(pointerToDataType, pointerToDataType + sizeof(DataType), tempBuffer.data() + pos);
 
-			parent->GetWorld().get().GetRenderBuffer().PushRenderElement(tempBuffer.data(), bufferSize);
+		//	parent->GetWorld().GetRenderBuffer().PushRenderElement(tempBuffer.data(), bufferSize);
 
-		}
+		//}
 	}
 
 	//template <size_t PackageSize, size_t ElemCnt>

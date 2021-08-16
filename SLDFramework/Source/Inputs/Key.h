@@ -12,9 +12,10 @@ namespace SLD
 		D_Gamepad
 	};
 
+	using KeyType = uint16_t;
+
 	struct Key
 	{
-		using KeyType = uint16_t;
 		
 		Key(InputDevice device, KeyType code)
 			: inputDevice(device)

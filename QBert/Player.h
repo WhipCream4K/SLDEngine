@@ -79,7 +79,7 @@ private:
 	std::weak_ptr<Level> m_GameLevel;
 	//std::shared_ptr<SLD::ObservePtr<sf::Sprite>> m_CharacterSprite;
 	std::shared_ptr<sf::Sprite> m_CharacterSprite;
-	RefPtr<SLD::Tracker> m_CharacterSpriteHandle;
+	SharedPtr<SLD::Tracker> m_CharacterSpriteHandle;
 	std::shared_ptr<sf::CircleShape> m_TestCircle;
 	//std::weak_ptr<SLD::ObservePtr<SLD::RenderingComponent>> m_RenderingComponent;
 	std::weak_ptr<SLD::ObservePtr<SLD::TransformComponent>> m_TransformComponent;

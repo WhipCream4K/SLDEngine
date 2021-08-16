@@ -12,7 +12,7 @@ namespace SLD
 	public:
 
 		template<typename T>
-		static RefPtr<std::remove_all_extents_t<T>> NewAligned()
+		static SharedPtr<std::remove_all_extents_t<T>> NewAligned()
 		{
 			using value_type = std::remove_all_extents_t<T>;
 			

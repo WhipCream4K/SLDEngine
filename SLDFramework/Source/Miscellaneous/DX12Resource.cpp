@@ -14,7 +14,7 @@ void DX12Resource::Init(bool shouldUseWARP)
 	EnableDebugLayer();
 }
 
-RefPtr<DX12CommandQueue> DX12Resource::GetCommandQueue(D3D12_COMMAND_LIST_TYPE type) const
+SharedPtr<DX12CommandQueue> DX12Resource::GetCommandQueue(D3D12_COMMAND_LIST_TYPE type) const
 {
 	switch (type)
 	{

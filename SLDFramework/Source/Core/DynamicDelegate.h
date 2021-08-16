@@ -24,14 +24,43 @@ namespace SLD
 		IAction& operator=(const IAction&) = delete;
 		IAction& operator=(IAction&&) = delete;
 	};
-
+	
 	template<typename FnType, class Object = Empty>
 	class CAction {};
 
+	template<typename Ret, typename ...Args>
+	class CAction<Ret(Args...)> : public IAction<Ret(Args...)>
+	{
+		using FnType = Ret(Args...);
+
+	public:
+
+		template<typename FuncPtr>
+		CAction(FuncPtr ptr)
+			: m_Delegate(ptr)
+		{
+		}
+
+		[[maybe_unused]] Ret Invoke(Args... args) const override
+		{
+			return m_Delegate(std::forward<Args>(args)...);
+		}
+
+		~CAction() override = default;
+		CAction(const CAction&) = delete;
+		CAction(CAction&&) = delete;
+		CAction& operator=(const CAction&) = delete;
+		CAction& operator=(CAction&&) = delete;
+
+	private:
+
+		Delegate<FnType> m_Delegate;
+	};
+	
 	template<typename Ret, class Object, typename ...Args>
 	class CAction<Ret(Args...), Object> : public IAction<Ret(Args...)>
 	{
-		using FnTpye = Ret(Args...);
+		using FnType = Ret(Object::*)(Args...);
 
 	public:
 		
@@ -66,7 +95,7 @@ namespace SLD
 
 	private:
 
-		Delegate<FnTpye, Object> m_Delegate;
+		Delegate<FnType> m_Delegate;
 	};
 
 	template<typename Ret, class Object, typename ...Args>
@@ -107,7 +136,7 @@ namespace SLD
 
 	private:
 
-		Delegate<FnTpye, Object> m_Delegate;
+		Delegate<FnTpye> m_Delegate;
 	};
 	
 	template<typename Fntype>
@@ -119,7 +148,7 @@ namespace SLD
 	//template<typename Ret, class Object, typename ...Args>
 	//struct CallAction<Ret(Args...), Object>
 	//{
-	//	static [[maybe_unused]] Ret Invoke(const RefPtr<DynamicDelegate>& instance,Args... args)
+	//	static [[maybe_unused]] Ret Invoke(const SharedPtr<DynamicDelegate>& instance,Args... args)
 	//	{
 	//		return std::static_pointer_cast<CAction<Ret(Args...), Object>>(instance)->Invoke(std::forward<Args>(args)...);
 	//	}

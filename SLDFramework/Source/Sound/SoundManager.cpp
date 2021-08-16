@@ -25,7 +25,7 @@ public:
 
 private:
 
-	RefPtr<FMOD::System> m_FMODSystem{};
+	SharedPtr<FMOD::System> m_FMODSystem{};
 	uint32_t m_ChannelsCnt{ 18 };
 };
 
@@ -42,7 +42,7 @@ SLD::SoundManager::ImplSoundManager::ImplSoundManager()
 	if (result != FMOD_OK)
 		throw std::runtime_error(FMOD_ErrorString(result));
 
-	m_FMODSystem = RefPtr<FMOD::System>{ system,[](FMOD::System* ptr)
+	m_FMODSystem = SharedPtr<FMOD::System>{ system,[](FMOD::System* ptr)
 	{
 		ptr->release();
 		ptr = nullptr;

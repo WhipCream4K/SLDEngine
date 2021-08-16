@@ -29,16 +29,16 @@ public:
 
 	struct SpriteHandle
 	{
-		RefPtr<sf::Sprite> sprite{};
-		RefPtr<SLD::Tracker> spirteHandle{};
-		RefPtr<SLD::GameObject> gameObject{};
+		SharedPtr<sf::Sprite> sprite{};
+		SharedPtr<SLD::Tracker> spirteHandle{};
+		SharedPtr<SLD::GameObject> gameObject{};
 	};
 
 	struct TextHandle
 	{
-		RefPtr<sf::Text> text{};
-		RefPtr<SLD::Tracker> textHandle{};
-		RefPtr<SLD::GameObject> gameObject{};
+		SharedPtr<sf::Text> text{};
+		SharedPtr<SLD::Tracker> textHandle{};
+		SharedPtr<SLD::GameObject> gameObject{};
 	};
 
 public:
@@ -63,28 +63,28 @@ private:
 	std::vector<SpriteHandle> m_HUDSprites;
 	std::vector<TextHandle> m_HUDTexts;
 
-	using PlayerLivesIndicator = std::pair<RefPtr<SLD::GameObject>, RefPtr<SLD::Tracker>>;
+	using PlayerLivesIndicator = std::pair<SharedPtr<SLD::GameObject>, SharedPtr<SLD::Tracker>>;
 
-	RefPtr<sf::Sprite> m_PlayerLivesIndicatorSprite;
+	SharedPtr<sf::Sprite> m_PlayerLivesIndicatorSprite;
 	std::vector<PlayerLivesIndicator> m_PlayerLivesIndicatorObject;
 
-	//RefPtr<sf::RectangleShape>
+	//SharedPtr<sf::RectangleShape>
 	
 	int m_CurrentScore{};
 	float m_AnimTimeCount{};
 	int m_AnimId{};
 	float m_AnimInterval{ 0.1f };
 	//SpriteHandle m_PlayerLivesIndicator;
-	//RefPtr<sf::Sprite> m_Player1Sprite;
-	//RefPtr<sf::Sprite> m_PlayerNumberSprite;
-	//RefPtr<sf::Sprite> m_ChangeToSprite;
-	//RefPtr<sf::Sprite> m_LevelIdSprite;
-	//RefPtr<sf::Sprite> m_ChangeToPlatformSprite;
+	//SharedPtr<sf::Sprite> m_Player1Sprite;
+	//SharedPtr<sf::Sprite> m_PlayerNumberSprite;
+	//SharedPtr<sf::Sprite> m_ChangeToSprite;
+	//SharedPtr<sf::Sprite> m_LevelIdSprite;
+	//SharedPtr<sf::Sprite> m_ChangeToPlatformSprite;
 
-	//RefPtr<SLD::Tracker> m_Player1SpriteHandle;
-	//RefPtr<SLD::Tracker> m_PlayerNumberSpriteHandle;
-	//RefPtr<SLD::Tracker> m_ChangeToSpriteHandle;
-	//RefPtr<SLD::Tracker> m_LevelIdSpriteHandle;
-	//RefPtr<SLD::Tracker> m_ChangeToPlatformSpriteHandle;
+	//SharedPtr<SLD::Tracker> m_Player1SpriteHandle;
+	//SharedPtr<SLD::Tracker> m_PlayerNumberSpriteHandle;
+	//SharedPtr<SLD::Tracker> m_ChangeToSpriteHandle;
+	//SharedPtr<SLD::Tracker> m_LevelIdSpriteHandle;
+	//SharedPtr<SLD::Tracker> m_ChangeToPlatformSpriteHandle;
 };
 

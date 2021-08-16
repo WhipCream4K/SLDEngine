@@ -21,7 +21,7 @@ public:
 
 	void Init(bool shouldUseWARP);
 	const ComPtr<ID3D12Device2>& GetDevice() const { return m_MainDevice; }
-	RefPtr<DX12CommandQueue> GetCommandQueue(D3D12_COMMAND_LIST_TYPE type) const;
+	SharedPtr<DX12CommandQueue> GetCommandQueue(D3D12_COMMAND_LIST_TYPE type) const;
 	void FlushCommands();
 
 private:
@@ -35,9 +35,9 @@ private:
 private:
 
 	ComPtr<ID3D12Device2> m_MainDevice;
-	RefPtr<DX12CommandQueue> m_DirectCommandQueue;
-	RefPtr<DX12CommandQueue> m_CopyCommandQueue;
-	RefPtr<DX12CommandQueue> m_ComputeCommandQueue;
+	SharedPtr<DX12CommandQueue> m_DirectCommandQueue;
+	SharedPtr<DX12CommandQueue> m_CopyCommandQueue;
+	SharedPtr<DX12CommandQueue> m_ComputeCommandQueue;
 };
 
 #endif

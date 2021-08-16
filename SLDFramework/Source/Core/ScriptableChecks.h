@@ -20,10 +20,15 @@ constexpr bool IsOnUpdateImpl<T, Ret(Args...), std::void_t<decltype(std::declval
 };
 
 template<typename FnType>
-struct Function_Traits {};
+struct Function_Traits;
 
-// Function pointer
+template<typename T>
+struct Function_Traits
+{
+};
+
 template<typename Ret, typename ...Args>
+// Function pointer
 struct Function_Traits<Ret(*)(Args...)> : Function_Traits<Ret(Args...)> {};
 
 
@@ -33,6 +38,8 @@ struct Function_Traits<Ret(Args...)>
 	using return_type = Ret;
 	using fn_type = Ret(Args...);
 
+	using tuple_args = std::tuple<Args...>;
+	
 	static constexpr size_t argSize = sizeof...(Args);
 
 	template<size_t N>
@@ -68,7 +75,9 @@ template<typename Ret, typename UserClass, typename ...Args>
 struct Function_Traits<Ret(UserClass::*)(Args...)> : Function_Traits<Ret(UserClass&, Args...)>
 {
 	using element_type = UserClass;
+	using return_type = Ret;
 	using fn_type = Ret(Args...);
+	using tuple_args = std::tuple<UserClass&,Args...>;
 };
 
 // const member function pointer
@@ -76,6 +85,7 @@ template<typename Ret, typename UserClass, typename ...Args>
 struct Function_Traits<Ret(UserClass::*)(Args...) const> : Function_Traits<Ret(UserClass&, Args...)>
 {
 	using fn_type = Ret(Args...);
+	using tuple_args = std::tuple<Args...>;
 };
 
 //template<typename T, typename Ret, typename ...Args>

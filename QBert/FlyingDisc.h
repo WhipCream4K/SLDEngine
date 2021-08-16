@@ -12,7 +12,7 @@ public:
 	FlyingDisc(SLDWorldEntity& world, int row, int col);
 
 	void Update(float deltaTime);
-	void AttachToPlayer(const RefPtr<Player>& player);
+	void AttachToPlayer(const SharedPtr<Player>& player);
 	void SetTexture(const sf::Texture& texture);
 	void SetIsUsed(bool value);
 	[[nodiscard]] bool IsUsed() const;
@@ -27,9 +27,9 @@ private:
 	void SetUpSprite(SLDWorldEntity& world);
 
 	Level::LevelState* m_LevelState;
-	RefPtr<SLD::GameObject> m_GameObject;
-	RefPtr<sf::Sprite> m_Sprite;
-	RefPtr<SLD::Tracker> m_SpriteHandle;
+	SharedPtr<SLD::GameObject> m_GameObject;
+	SharedPtr<sf::Sprite> m_Sprite;
+	SharedPtr<SLD::Tracker> m_SpriteHandle;
 	WeakPtr<Player> m_Parent;
 	int m_RowPos;
 	int m_ColPos;

@@ -5,32 +5,25 @@
 
 #include "../Core/Base.h"
 #include "InputParams.h"
-#include "LLInputs.h"
-
-// SFML external dependencies
-//#include <SFML/Window.hpp>
-
-#include <optional>
-#include <variant>
+#include "Key.h"
 
 namespace SLD
-{
-	using namespace InputParams;
-	
-	struct EventQueueHandle
-	{
-		EventQueueHandle(const std::array<MessageBus, MinimumEventCnt>& ev,const uint8_t& evCnt)
-			: events(ev)
-			, eventCntThisFrame(evCnt)
-		{
-		}
-		
-		const std::array<MessageBus, MinimumEventCnt>& events;
-		const uint8_t& eventCntThisFrame;
-	};
+{	
+	//struct EventQueueHandle
+	//{
+	//	EventQueueHandle(const std::array<MessageBus, MinimumEventCnt>& ev,const uint8_t& evCnt)
+	//		: events(ev)
+	//		, eventCntThisFrame(evCnt)
+	//	{
+	//	}
+	//	
+	//	const std::array<MessageBus, MinimumEventCnt>& events;
+	//	const uint8_t& eventCntThisFrame;
+	//};
 
 	// SFML interface for this one
 	// NOTE: I couldn't explicitly type all the key codes just for the sake of originality
+	class Window;
 	class InputManager final
 	{
 	public:
@@ -40,7 +33,7 @@ namespace SLD
 		static uint32_t CreateHashId(const std::string& str, InputEvent ie);
 
 		//InputManager(const CurrentWindow& handle);
-		InputManager(LLInputs&& subSystem);
+		InputManager();
 
 		/// <summary>
 		/// From window API translate all the messages came through from the user
@@ -49,40 +42,27 @@ namespace SLD
 		/// <returns>return true if window exits</returns>
 		bool TranslateWindowsMessages();
 
-		[[nodiscard]] std::optional<const sf::Event*> QuerySingleEvent(
-			sf::Event::EventType evType) const noexcept;
-
-		[[nodiscard]] std::optional<std::vector<const sf::Event*>> QueryMultipleEvent(
-			std::initializer_list<sf::Event::EventType> evTypes) const;
-
-		[[nodiscard]] EventQueueHandle GetEventQueueHandle() const noexcept;
-
-		template<typename ControllerType>
-		std::optional<ControllerType> GetLowLevelController();
+		static void QueryUserInputsAsyncMaybe(
+			const SharedPtr<Window>& relativeWindow,
+			KeyPool& keyPool);
+		
+		static uint8_t PollXInputJoyStickEvent();
 		
 		InputManager(const InputManager&) = delete;
 		InputManager& operator=(const InputManager&) = delete;
 
-		InputManager(InputManager&& other) noexcept;
-		InputManager& operator=(InputManager&& other) noexcept;
+		InputManager(InputManager&& other) = delete;
+		InputManager& operator=(InputManager&& other) = delete;
 
 		~InputManager() = default;
+		
+		static constexpr uint8_t MaxSupportedControllers{ 4 };
 
 	private:
-		
-		std::array<MessageBus, MinimumEventCnt> m_EventBuses;
-		LLInputs m_SubSystemInput;
-		uint8_t m_EventCntThisFrame;
+
+		static std::array<InputParams::JoyStickEvent,
+		MaxSupportedControllers> m_MainJoyStickEvents;
 	};
-
-	template <typename ControllerType>
-	std::optional<ControllerType> InputManager::GetLowLevelController()
-	{
-		if (auto ll = std::get_if<ControllerType>(&m_SubSystemInput))
-			return ll;
-
-		return std::nullopt;
-	}
 }
 
 #endif

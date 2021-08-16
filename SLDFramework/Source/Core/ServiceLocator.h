@@ -14,18 +14,18 @@ namespace SLD
 	{
 	public:
 		
-		using service_type = std::variant<RefPtr<InputManager>>;
+		using service_type = std::variant<SharedPtr<InputManager>>;
 
-		void RegisterService(const RefPtr<service_type>& sv);
+		void RegisterService(const SharedPtr<service_type>& sv);
 		
 		template<typename T>
-		RefPtr<std::remove_all_extents_t<T>> GetService();
+		SharedPtr<std::remove_all_extents_t<T>> GetService();
 	
 	private:
 	};
 
 	template <typename T>
-	RefPtr<std::remove_all_extents_t<T>> ServiceLocator::GetService()
+	SharedPtr<std::remove_all_extents_t<T>> ServiceLocator::GetService()
 	{
 		return nullptr;
 	}

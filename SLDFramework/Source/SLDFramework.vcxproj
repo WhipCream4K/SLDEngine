@@ -117,13 +117,13 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions);MTR_ENABLED</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;$(SolutionDir)ExtDependencies\box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -131,8 +131,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;$(SolutionDir)ExtDependencies\fmod\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;$(SolutionDir)ExtDependencies\fmod\lib\x86;$(SolutionDir)ExtDependencies\box2d\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;box2d-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,13 +141,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions);MTR_ENABLED</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;$(SolutionDir)ExtDependencies\box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -157,21 +157,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;$(SolutionDir)ExtDependencies\fmod\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x86;$(SolutionDir)ExtDependencies\fmod\lib\x86;$(SolutionDir)ExtDependencies\box2d\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;%(AdditionalDependencies);box2d.lib;box2d.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions);MTR_ENABLED</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;$(SolutionDir)ExtDependencies\box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -179,8 +179,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;$(SolutionDir)ExtDependencies\fmod\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;$(SolutionDir)ExtDependencies\fmod\lib\x64;$(SolutionDir)ExtDependencies\box2d\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;box2d-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,13 +189,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;SFML_STATIC;%(PreprocessorDefinitions);MTR_ENABLED</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)IMGUI;$(SolutionDir)Source\Precompiled;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\fmod\inc;$(SolutionDir)ExtDependencies\box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -205,13 +205,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;$(SolutionDir)ExtDependencies\fmod\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExtDependencies\SFML\lib\x64;$(SolutionDir)ExtDependencies\fmod\lib\x64;$(SolutionDir)ExtDependencies\box2d\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-s.lib;sfml-window-s.lib;sfml-graphics-s.lib;freetype.lib;opengl32.lib;winmm.lib;gdi32.lib;fmod_vc.lib;xinput.lib;%(AdditionalDependencies);box2d.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Physics\Components\PhysicsUserData.h" />
+    <ClInclude Include="Physics\System\ContactFilter.h" />
+    <ClInclude Include="Physics\System\PhysicsToTransformUpdate.h" />
+    <ClInclude Include="Rendering\System\RenderObject.h" />
+    <ClInclude Include="System\SystemTemplate.h" />
+    <ClInclude Include="System\AsyncTransformUpdate.h" />
+    <ClInclude Include="Core\Application\Application.h" />
     <ClInclude Include="Components\BaseComponent.h" />
-    <ClInclude Include="Core\Window\MainSubSystem.h" />
+    <ClInclude Include="Core\Application\EntryPoint\ApplicationEntryPoint.h" />
+    <ClInclude Include="Core\IdGenerator\UniqueIdGenerator.h" />
     <ClInclude Include="Debugging\GUIDebugComponent.h" />
     <ClInclude Include="GameObject\GameObject.h" />
     <ClInclude Include="JSON\nlohmann\json.hpp" />
@@ -262,12 +270,17 @@
     <ClInclude Include="Core\PMR_Resource\PoolResource.h" />
     <ClInclude Include="Core\ObservePtr.h" />
     <ClInclude Include="Core\DynamicMulticastDelegate.h" />
+    <ClInclude Include="Components\Rendering2Component.h" />
+    <ClInclude Include="GameObject\Prefab.h" />
+    <ClInclude Include="Miscellaneous\WinXInput.h" />
+    <ClInclude Include="Physics\Components\Box2DComponent.h" />
+    <ClInclude Include="Physics\System\PhysicsCallback.h" />
     <ClInclude Include="Rendering\RenderBuffer.h" />
     <ClInclude Include="Rendering\DX12\DX12CommandQueue.h" />
     <ClInclude Include="Rendering\DX12\DX12Renderer.h" />
     <ClInclude Include="Helpers\utils.h" />
     <ClInclude Include="Inputs\InputParams.h" />
-    <ClInclude Include="Inputs\InputSetting.h" />
+    <ClInclude Include="Inputs\InputSettings.h" />
     <ClInclude Include="Core\DynamicDelegate.h" />
     <ClInclude Include="Core\Base.h" />
     <ClInclude Include="Core\Core.h" />
@@ -296,9 +309,9 @@
     <ClInclude Include="Rendering\RenderParams.h" />
     <ClInclude Include="Rendering\RenderTarget.h" />
     <ClInclude Include="Core\ScriptableChecks.h" />
-    <ClInclude Include="Inputs\SFMLInputs.h" />
     <ClInclude Include="Rendering\SFML\SFML2DRenderer.h" />
-    <ClInclude Include="Core\Window\SFML\SFMLWindow.h" />
+    <ClInclude Include="Rendering\System\RenderSystem.h" />
+    <ClInclude Include="Rendering\SFML\SFML2DRenderSystem.h" />
     <ClInclude Include="SLDFramework.h" />
     <ClInclude Include="Components\TickComponent.h" />
     <ClInclude Include="Core\Window\Window.h" />
@@ -308,22 +321,40 @@
     <ClInclude Include="Core\PersistentThreadWorker.h" />
     <ClInclude Include="Core\PMR_Resource\UnSynchronizedSpatialResource.h" />
     <ClInclude Include="Sound\SoundManager.h" />
+    <ClInclude Include="System\ECSTypes.h" />
+    <ClInclude Include="System\PipelineLayer.h" />
+    <ClInclude Include="System\SystemBase.h" />
+    <ClInclude Include="Core\Clock\WorldClock.h" />
+    <ClInclude Include="Core\Thread\SimpleThreadPool.h" />
+    <ClInclude Include="Tracer\minitrace.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\System\ContactFilter.cpp" />
+    <ClCompile Include="Physics\System\PhysicsToTransformUpdate.cpp" />
+    <ClCompile Include="System\SystemTemplate.cpp" />
+    <ClCompile Include="System\AsyncTransformUpdate.cpp" />
+    <ClCompile Include="Core\Application\Application.cpp" />
     <ClCompile Include="Components\BaseComponent.cpp" />
     <ClCompile Include="Core\Base.cpp" />
+    <ClCompile Include="Core\IdGenerator\UniqueIdGenerator.cpp" />
     <ClCompile Include="Core\Singleton.cpp" />
+    <ClCompile Include="Core\Window\SFML\Window_SFML.cpp" />
+    <ClCompile Include="Core\Window\Window.cpp" />
     <ClCompile Include="Debugging\GUIDebugComponent.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
     <ClCompile Include="Miscellaneous\DX12Resource.cpp" />
     <ClCompile Include="Core\PMR_Resource\PoolResource.cpp" />
     <ClCompile Include="Core\ObservePtr.cpp" />
     <ClCompile Include="Core\DynamicMulticastDelegate.cpp" />
+    <ClCompile Include="Components\Rendering2Component.cpp" />
+    <ClCompile Include="GameObject\Prefab.cpp" />
+    <ClCompile Include="Physics\Components\Box2DComponent.cpp" />
+    <ClCompile Include="Physics\System\PhysicsCallback.cpp" />
     <ClCompile Include="Rendering\RenderBuffer.cpp" />
     <ClCompile Include="Rendering\DX12\DX12CommandQueue.cpp" />
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp" />
     <ClCompile Include="Helpers\utils.cpp" />
-    <ClCompile Include="Inputs\InputSetting.cpp" />
+    <ClCompile Include="Inputs\InputSettings.cpp" />
     <ClCompile Include="Components\RenderingComponent.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Components\InputComponent.cpp" />
@@ -333,17 +364,20 @@
     <ClCompile Include="Components\NonTickComponent.cpp" />
     <ClCompile Include="Core\PMR_Resource\LoggingResource.cpp" />
     <ClCompile Include="Components\TickComponent.cpp" />
-    <ClCompile Include="Core\Window\Window.cpp" />
     <ClCompile Include="Debugging\TSLogger.cpp" />
-    <ClCompile Include="Inputs\SFMLInputs.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
     <ClCompile Include="Rendering\SFML\SFML2DRenderer.cpp" />
-    <ClCompile Include="Core\Window\SFML\SFMLWindow.cpp" />
     <ClCompile Include="Core\WorldEntity.cpp" />
     <ClCompile Include="Components\TransformComponent.cpp" />
     <ClCompile Include="Core\PersistentThreadWorker.cpp" />
     <ClCompile Include="Core\PMR_Resource\UnSynchronizedSpatialResource.cpp" />
+    <ClCompile Include="Rendering\System\RenderSystem.cpp" />
+    <ClCompile Include="Rendering\SFML\SFML2DRenderSystem.cpp" />
     <ClCompile Include="Sound\SoundManager.cpp" />
+    <ClCompile Include="System\SystemBase.cpp" />
+    <ClCompile Include="Core\Clock\WorldClock.cpp" />
+    <ClCompile Include="Core\Thread\SimpleThreadPool.cpp" />
+    <ClCompile Include="Tracer\minitrace.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IMGUI\IMGUI.vcxproj">

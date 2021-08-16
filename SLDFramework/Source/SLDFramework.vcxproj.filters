@@ -90,7 +90,7 @@
     <ClInclude Include="Inputs\InputCommandType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Inputs\InputSetting.h">
+    <ClInclude Include="Inputs\InputSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Helpers\utils.h">
@@ -106,9 +106,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Debugging\TSLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Inputs\SFMLInputs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Inputs\LLInputs.h">
@@ -129,9 +126,6 @@
     <ClInclude Include="Rendering\DX12\DX12CommandQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Window\MainSubSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Miscellaneous\DX12Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -139,9 +133,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\SFML\SFML2DRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Window\SFML\SFMLWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Miscellaneous\SFMLPrerequisite.h">
@@ -309,6 +300,72 @@
     <ClInclude Include="Core\DynamicMulticastDelegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Application\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Application\EntryPoint\ApplicationEntryPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System\SystemBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System\ECSTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\Rendering2Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IdGenerator\UniqueIdGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System\PipelineLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\System\RenderSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\SFML\SFML2DRenderSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Clock\WorldClock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Thread\SimpleThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Prefab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Miscellaneous\WinXInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Components\Box2DComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\System\PhysicsCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System\AsyncTransformUpdate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\System\PhysicsToTransformUpdate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System\SystemTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\System\ContactFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Components\PhysicsUserData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\System\RenderObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tracer\minitrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -338,22 +395,16 @@
     <ClCompile Include="Core\PMR_Resource\LoggingResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Inputs\InputSetting.cpp">
+    <ClCompile Include="Inputs\InputSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Debugging\GUIDebugComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Window\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Debugging\TSLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Helpers\utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Inputs\SFMLInputs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\DX12\DX12Renderer.cpp">
@@ -369,9 +420,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\SFML\SFML2DRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Window\SFML\SFMLWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\WorldEntity.cpp">
@@ -411,6 +459,60 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\DynamicMulticastDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Window\SFML\Window_SFML.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Window\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Application\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System\SystemBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\Rendering2Component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\System\RenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\SFML\SFML2DRenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IdGenerator\UniqueIdGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Clock\WorldClock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Thread\SimpleThreadPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Prefab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Components\Box2DComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\System\PhysicsCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System\AsyncTransformUpdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\System\PhysicsToTransformUpdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System\SystemTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\System\ContactFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tracer\minitrace.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

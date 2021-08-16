@@ -19,7 +19,8 @@ void SLD::PersistentThreadWorker::Wake()
 
 void SLD::PersistentThreadWorker::WaitTillFinished()
 {
-	m_BarrierFuture.get();
+	if(m_BarrierFuture.valid())
+		m_BarrierFuture.get();
 }
 
 SLD::PersistentThreadWorker::PersistentThreadWorker(PersistentThreadWorker&& other) noexcept

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{ce5b23a9-488c-47ec-a337-f730ec6751df}</ProjectGuid>
+    <RootNamespace>Galaga</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(SolutionDir)SLDFramework\Source;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\box2d\include;$(SolutionDir)ExtDependencies\vld\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(SolutionDir)SLDFramework\Source;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\box2d\include;$(SolutionDir)ExtDependencies\vld\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(SolutionDir)SLDFramework\Source;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\box2d\include;$(SolutionDir)ExtDependencies\vld\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(SolutionDir)SLDFramework\Source;$(SolutionDir)ExtDependencies\SFML\include;$(SolutionDir)ExtDependencies\box2d\include;$(SolutionDir)ExtDependencies\vld\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="BezierPath.cpp" />
+    <ClCompile Include="Box2DDebugDraw.cpp" />
+    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="BulletManager.cpp" />
+    <ClCompile Include="EnemyManager.cpp" />
+    <ClCompile Include="EnemyPath.cpp" />
+    <ClCompile Include="EnemySpawnerSystem.cpp" />
+    <ClCompile Include="EnemyStateSystem.cpp" />
+    <ClCompile Include="FormationWayPoints.cpp" />
+    <ClCompile Include="Galagas.cpp" />
+    <ClCompile Include="GameStateComponent.cpp" />
+    <ClCompile Include="GameStateSystem.cpp" />
+    <ClCompile Include="Goei.cpp" />
+    <ClCompile Include="HandleSpriteOutOfWindow.cpp" />
+    <ClCompile Include="LineDebugDraw.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="Galaga.cpp" />
+    <ClCompile Include="GalagaScene.cpp" />
+    <ClCompile Include="LimitPlayerToPlayArea.cpp" />
+    <ClCompile Include="OnBulletContact.cpp" />
+    <ClCompile Include="ParticleManager.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerInputSystem.cpp" />
+    <ClCompile Include="ReloadShooter.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="ShootableComponent.cpp" />
+    <ClCompile Include="SpawnStages.cpp" />
+    <ClCompile Include="SpriteRenderSystem.cpp" />
+    <ClCompile Include="UpdateFlyInPath.cpp" />
+    <ClCompile Include="UpdateFormationWayPoints.cpp" />
+    <ClCompile Include="UpdateParticle.cpp" />
+    <ClCompile Include="UpdateProjectile.cpp" />
+    <ClCompile Include="Zako.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SLDFramework\Source\SLDFramework.vcxproj">
+      <Project>{585c840c-29b5-4c0b-81ca-5e628c2bb03f}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BezierCurve.h" />
+    <ClInclude Include="BezierPath.h" />
+    <ClInclude Include="Box2DDebugDraw.h" />
+    <ClInclude Include="Bullet.h" />
+    <ClInclude Include="BulletManager.h" />
+    <ClInclude Include="CollisionGroup.h" />
+    <ClInclude Include="EnemyManager.h" />
+    <ClInclude Include="EnemyPath.h" />
+    <ClInclude Include="EnemySpawnerSystem.h" />
+    <ClInclude Include="EnemyStateSystem.h" />
+    <ClInclude Include="EnemyVariable.h" />
+    <ClInclude Include="FormationWayPoints.h" />
+    <ClInclude Include="Galagas.h" />
+    <ClInclude Include="GameStateComponent.h" />
+    <ClInclude Include="GameStateSystem.h" />
+    <ClInclude Include="Goei.h" />
+    <ClInclude Include="HandleSpriteOutOfWindow.h" />
+    <ClInclude Include="LineDebugDraw.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="LimitPlayerToPlayArea.h" />
+    <ClInclude Include="MyComponents.h" />
+    <ClInclude Include="GalagaScene.h" />
+    <ClInclude Include="OnBulletContact.h" />
+    <ClInclude Include="ParticleManager.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerInputSystem.h" />
+    <ClInclude Include="PlaySystem.h" />
+    <ClInclude Include="ReloadShooter.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="ShootableComponent.h" />
+    <ClInclude Include="SpawnData.h" />
+    <ClInclude Include="SpawnPaths.h" />
+    <ClInclude Include="SpawnStages.h" />
+    <ClInclude Include="SpriteRenderSystem.h" />
+    <ClInclude Include="UpdateFlyInPath.h" />
+    <ClInclude Include="UpdateFormationWayPoints.h" />
+    <ClInclude Include="UpdateParticle.h" />
+    <ClInclude Include="UpdateProjectile.h" />
+    <ClInclude Include="Zako.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

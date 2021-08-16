@@ -4,12 +4,11 @@
 
 #include "../Core/Base.h"
 #include "BaseComponent.h"
-#include "../Core/ScriptableChecks.h"
 
 
 namespace SLD
 {
-	
+	class WorldEntity;
 	class TickComponent : public BaseComponent
 	{
 	public:
@@ -21,6 +20,7 @@ namespace SLD
 			Count // Use to keep track of all the tick component
 		};
 
+		//virtual void OnPreAsyncUpdate(const SharedPtr<WorldEntity>& world,float deltaTime) {}
 		virtual void AsyncUpdate([[maybe_unused]] float) {}
 
 		virtual ~TickComponent() override = default;

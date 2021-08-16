@@ -18,7 +18,7 @@ class DX12Renderer final
 {
 public:
 	
-	void Render(const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents) const;
+	void Render(const std::vector<SharedPtr<SLD::RenderingComponent>>& renderingComponents) const;
 
 	void Render(const std::vector<SLD::RenderingComponent>& renderingComponents) const;
 
@@ -28,7 +28,7 @@ public:
 	//	D3D12_CPU_DESCRIPTOR_HANDLE dsvPos = {}) const;
 
 	void SetRenderTarget(const SLD::Window& renderWindow);
-	void SetRenderTarget(const RefPtr<SLD::Window>& renderWindow);
+	void SetRenderTarget(const SharedPtr<SLD::Window>& renderWindow);
 
 private:
 

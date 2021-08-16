@@ -3,7 +3,7 @@
 #include "../Core/Window/Window.h"
 #include "../Components/RenderingComponent.h"
 
-//void SLD::Renderer::Render(const std::vector<RefPtr<RenderingComponent>>& renderingComponents)
+//void SLD::Renderer::Render(const std::vector<SharedPtr<RenderingComponent>>& renderingComponents)
 //{
 //	auto callRender{ [&renderingComponents](auto& subsystem) -> void
 //	{
@@ -13,15 +13,15 @@
 //	std::visit(callRender, m_SubSystemRenderer);
 //}
 
-void SLD::Renderer::Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize)
-{
-	auto callRender{ [&elemCnt,&bufferHead,&bufferSize](auto& subSystem)
-	{
-		subSystem.Render(elemCnt,bufferHead,bufferSize);
-	} };
-
-	std::visit(callRender, m_SubSystemRenderer);
-}
+//void SLD::Renderer::Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize)
+//{
+//	auto callRender{ [&elemCnt,&bufferHead,&bufferSize](auto& subSystem)
+//	{
+//		subSystem.Render(elemCnt,bufferHead,bufferSize);
+//	} };
+//
+//	std::visit(callRender, m_SubSystemRenderer);
+//}
 
 //void SLD::Renderer::Render(const std::vector<RenderingComponent>& renderingComponents)
 //{
@@ -43,22 +43,27 @@ void SLD::Renderer::Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferS
 //	std::visit(callRender, m_SubSystemRenderer);
 //}
 
-void SLD::Renderer::SetRenderWindow(const RefPtr<Window>& renderWindow)
-{
-	auto callSetRenderTarget{ [&renderWindow](auto& subSystem) -> void
-	{
-		subSystem.SetRenderTarget(renderWindow);
-	} };
+//void SLD::Renderer::SetRenderWindow(const SharedPtr<Window>& renderWindow)
+//{
+//	auto callSetRenderTarget{ [&renderWindow](auto& subSystem) -> void
+//	{
+//		subSystem.SetRenderTarget(renderWindow);
+//	} };
+//
+//	std::visit(callSetRenderTarget, m_SubSystemRenderer);
+//}
+//
+//void SLD::Renderer::SetRenderWindow(Window& renderWindow)
+//{
+//	auto callSetRenderTarget{ [&renderWindow](auto& subSystem) -> void
+//{
+//	subSystem.SetRenderTarget(renderWindow);
+//} };
+//
+//	std::visit(callSetRenderTarget, m_SubSystemRenderer);
+//}
 
-	std::visit(callSetRenderTarget, m_SubSystemRenderer);
-}
-
-void SLD::Renderer::SetRenderWindow(Window& renderWindow)
+void SLD::Renderer::Render(const SharedPtr<Window>&)
 {
-	auto callSetRenderTarget{ [&renderWindow](auto& subSystem) -> void
-{
-	subSystem.SetRenderTarget(renderWindow);
-} };
-
-	std::visit(callSetRenderTarget, m_SubSystemRenderer);
+	
 }

@@ -178,7 +178,7 @@ namespace SLD
 		/// <param name="pSmartMem"></param>
 		/// <param name="currentSize"></param>
 		/// <param name="maxSize"></param>
-		CustomStaticArray(const RefPtr<T> pSmartMem, size_t maxSize, size_t currentSize = 0)
+		CustomStaticArray(const SharedPtr<T> pSmartMem, size_t maxSize, size_t currentSize = 0)
 			: m_pHead(pSmartMem.get())
 			, m_pStrongRef(pSmartMem)
 			, m_CurrentSize(currentSize)
@@ -261,7 +261,7 @@ namespace SLD
 		pointer m_pHead;
 
 
-		RefPtr<T> m_pStrongRef;
+		SharedPtr<T> m_pStrongRef;
 
 		size_t m_CurrentSize;
 		size_t m_MaxSize;

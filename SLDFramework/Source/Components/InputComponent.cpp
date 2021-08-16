@@ -44,12 +44,12 @@
 //}
 //
 //
-//SLD::InputComponent::InputComponent(InputSetting& InputSetting)
-//	: m_InputSettingRef(InputSetting)
+//SLD::InputComponent::InputComponent(InputSettings& InputSettings)
+//	: m_InputSettingRef(InputSettings)
 //{
 //}
 //
-//void SLD::InputComponent::OnCreate(const RefPtr<InputManager>& manager)
+//void SLD::InputComponent::OnCreate(const SharedPtr<InputManager>& manager)
 //{
 //}
 //
@@ -98,33 +98,72 @@
 //	//return m_AxisHandleGroup.at(keyId);
 //}
 
-//SLD::InputComponent::InputComponent(const RefPtr<WorldEntity>& world)
+//SLD::InputComponent::InputComponent(const SharedPtr<WorldEntity>& world)
 //	: NonTickComponent(world)
-//	, m_InputSettingRef(const_cast<InputSetting&>(world->GetWorldInputSetting()))
+//	, m_InputSettingRef(const_cast<InputSettings&>(world->GetWorldInputSetting()))
 //{
 //}
 
-SLD::InputComponent::InputComponent(WeakPtr<GameObject> gameObject)
-	: m_Parent(gameObject)
-{
-}
-
-SLD::InputComponent::InputComponent(const RefPtr<GameObject>& gameObject)
-	: m_Parent(gameObject)
-{
-}
-
-SLD::InputComponent::~InputComponent()
-{
-	if (auto parent{ m_Parent.lock() }; parent)
-	{
-		parent->GetWorld().get().GetWorldInputSetting().RemoveCommands(m_Parent);
-		std::cout << "Yp" << std::endl;
-	}
-}
-
+//SLD::InputComponent::InputComponent(WeakPtr<GameObject> gameObject)
+//	: m_Parent(gameObject)
+//{
+//}
+//
+//SLD::InputComponent::InputComponent(const SharedPtr<GameObject>& gameObject)
+//	: m_Parent(gameObject)
+//{
+//}
+//
 //SLD::InputComponent::~InputComponent()
 //{
 //	if (auto parent{ m_Parent.lock() }; parent)
-//		parent->GetWorld().get().GetWorldInputSetting().RemoveCommands(m_Parent);
+//	{
+//		parent->GetWorld().GetWorldInputSetting().RemoveCommands(m_Parent);
+//		std::cout << "Yp" << std::endl;
+//	}
 //}
+
+SLD::InputComponent::InputComponent(WorldEntity& world, GameObjectId id)
+	: m_WorldRef(world)
+	, m_Parent(id)
+{
+}
+
+const SLD::ActionHandle& SLD::InputComponent::GetActionHandleFromActionGroup(
+	const std::string& groupName,
+	InputEvent eventType) const
+{
+	return m_ActionHandleMap.at(groupName)[size_t(eventType)];
+}
+
+const std::array<SLD::ActionHandle,
+	SLD::InputParams::InputEventCount>& SLD::InputComponent::GetActionHandlesFromActionGroup(
+		const std::string& groupName) const
+{
+	return m_ActionHandleMap.at(groupName);
+}
+
+const SLD::AxisHandle& SLD::InputComponent::GetAxisHandleFromAxisGroup(const std::string& groupName) const
+{
+	return m_AxisHandleMap.at(groupName);
+}
+
+void SLD::InputComponent::SetReceiveIndex(size_t idx)
+{
+	m_ReceiveIndex = idx;
+}
+
+size_t SLD::InputComponent::GetReceiveIndex() const
+{
+	return m_ReceiveIndex;
+}
+
+SLD::InputComponent::KeyToActionHandleMap& SLD::InputComponent::GetActionHandleMap()
+{
+	return m_ActionHandleMap;
+}
+
+SLD::InputComponent::KeyToAxisHandleMap& SLD::InputComponent::GetAxisHandleMap()
+{
+	return m_AxisHandleMap;
+}

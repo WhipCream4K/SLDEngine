@@ -27,18 +27,22 @@ namespace SLD
 		template<
 			typename FnSig,
 			typename Object = typename Function_Traits<FnSig>::element_type,
-			typename = EnableIf<std::is_same_v<FnSignature,typename Function_Traits<FnSig>::fn_type>>>
-			void AddDynamic(FnSig fnPtr, Object* instance);
+			typename = EnableIf<std::is_same_v<FnSignature, typename Function_Traits<FnSig>::fn_type>>>
+			size_t AddDynamic(FnSig fnPtr, Object* instance);
 
 		template<
 			typename FnSig,
 			typename Object = typename Function_Traits<FnSig>::element_type,
 			typename = EnableIf<std::is_same_v<FnSignature, typename Function_Traits<FnSig>::fn_type>>>
-			void AddDynamic(FnSig fnPtr,const RefPtr<Object>& instance);
+			size_t AddDynamic(FnSig fnPtr,const SharedPtr<Object>& instance);
+
+		void UnBind(size_t idx);
+
+		size_t AddDynamic(FnSignature fn);
 
 	private:
 
-		std::vector<RefPtr<DynamicDelegate<FnSignature>>> m_Events;
+		std::vector<SharedPtr<DynamicDelegate<FnSignature>>> m_Events;
 	};
 
 	template <typename Ret, typename ... Args>
@@ -53,19 +57,44 @@ namespace SLD
 
 	template <typename Ret, typename ... Args>
 	template <typename FnSig, typename Object, typename>
-	void DynamicMulticastDelegate<Ret(Args...)>::AddDynamic(FnSig fnPtr, Object* instance)
+	size_t DynamicMulticastDelegate<Ret(Args...)>::AddDynamic(FnSig fnPtr, Object* instance)
 	{
 		if(instance)
 			m_Events.emplace_back(std::make_shared<CAction<FnSignature, Object>>(fnPtr, instance));
+		return m_Events.size();
 	}
 
 	template <typename Ret, typename ... Args>
 	template <typename FnSig, typename Object, typename>
-	void DynamicMulticastDelegate<Ret(Args...)>::AddDynamic(FnSig fnPtr, const RefPtr<Object>& instance)
+	size_t DynamicMulticastDelegate<Ret(Args...)>::AddDynamic(FnSig fnPtr, const SharedPtr<Object>& instance)
 	{
 		if(instance)
-			m_Events.emplace_back(std::make_shared<CAction<FnSignature, Object>>(fnPtr, instance));\
+			m_Events.emplace_back(std::make_shared<CAction<FnSignature, Object>>(fnPtr, instance));
+		return m_Events.size();
 	}
+
+	template <typename Ret, typename ... Args>
+	void DynamicMulticastDelegate<Ret(Args...)>::UnBind(size_t idx)
+	{
+		if (idx > m_Events.size() ||
+			idx < 0)
+			return;
+
+		m_Events.erase(std::find(m_Events.begin(),m_Events.end(),m_Events[idx]));
+	}
+
+	template <typename Ret, typename ... Args>
+	size_t DynamicMulticastDelegate<Ret(Args...)>::AddDynamic(FnSignature fn)
+	{
+		m_Events.emplace_back(std::make_shared<CAction<FnSignature,SLD::Empty>>(fn));
+		return m_Events.size();
+	}
+
+	//template <typename Ret, typename ... Args>
+	//size_t DynamicMulticastDelegate<Ret(Args...)>::AddDynamic(typename Function_Traits<FnSignature>::fn_type&& fn)
+	//{
+	//	return m_Events.size();
+	//}
 }
 
 

@@ -24,7 +24,7 @@ namespace SLD
 	public:
 
 		GUIDebugComponent();
-		bool AttachDrawWindow(const RefPtr<Window>& drawWindow);
+		bool AttachDrawWindow(const SharedPtr<Window>& drawWindow);
 
 		// Dangerous; no runtime null checking here, be sure to attach the viewport before call this function
 		void NewImmediateFrame(float dt);
@@ -40,7 +40,7 @@ namespace SLD
 
 		//static constexpr uint8_t m_MinimumBackBufferCnt{ 3 };
 
-		RefPtr<ImGuiContext> m_ImGuiContext{};
+		SharedPtr<ImGuiContext> m_ImGuiContext{};
 		WeakPtr<Window> m_DrawWindow;
 		bool m_IsInitialized{};
 

@@ -1,0 +1,99 @@
+{
+    "1": [
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                },
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 0.5
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 2,
+                    "Types": [
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 5.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 3,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 5.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 5.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 5.0
+        }
+    ]
+}

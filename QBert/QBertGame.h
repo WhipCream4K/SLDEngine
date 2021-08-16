@@ -30,9 +30,9 @@ private:
 	SLDFramework m_Framework;
 	
 	// Game Data
-	RefPtr<Player> m_Player;
-	RefPtr<Level> m_Level;
-	RefPtr<HUD> m_HUD;
+	SharedPtr<Player> m_Player;
+	SharedPtr<Level> m_Level;
+	SharedPtr<HUD> m_HUD;
 	
 	// Texture Resource
 	sf::Texture m_QBertSprite;

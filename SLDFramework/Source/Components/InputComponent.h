@@ -3,41 +3,29 @@
 #ifndef SLDFRAMEWORK_INPUTCOMPONENT_H
 #define SLDFRAMEWORK_INPUTCOMPONENT_H
 
-#include "../Core/ScriptableChecks.h"
-#include "../Core/Event.h"
-#include "../Inputs/InputSetting.h"
-#include "NonTickComponent.h"
 #include "../Core/WorldEntity.h"
-#include "../GameObject/GameObject.h"
-
+#include "../Inputs/InputSettings.h"
+#include "NonTickComponent.h"
+#include "../Inputs/InputParams.h"
 
 namespace SLD
 {
-	class InputComponent;
-	class ActionHandle
+	struct ActionHandle
 	{
-	public:
-
-		friend class InputComponent;
-		bool GetKeyValueThisFrame() const { return *m_IsValid; }
-
-	private:
-
-		bool* m_IsValid{};
+		bool isValid{};
 	};
 
 	class AxisHandle
 	{
-	public:
-
-		friend class InputComponent;
-		float GetAxisValueThisFrame() const { return *m_ResultAxis; }
-		
-	private:
-		
-		float* m_ResultAxis{};
+		float axisValue{};
 	};
 
+	struct InputCallbackHandle
+	{
+		float axisValue{};
+		bool isTriggered{};
+	};
+	
 	//class InputActionKeyBinding
 	//{
 	//public:
@@ -53,13 +41,13 @@ namespace SLD
 	//		typename ...Args>
 	//		constexpr auto RegisterCallback(
 	//			FuncPtr fnPtr,
-	//			const RefPtr<ObjectType>& instance,
+	//			const SharedPtr<ObjectType>& instance,
 	//			Args&&... args) noexcept(false) -> void;
 
 	//private:
 
 	//	// some vector of delegate
-	//	std::pmr::vector<RefPtr<EventHandler>> m_Callbacks;
+	//	std::pmr::vector<SharedPtr<EventHandler>> m_Callbacks;
 	//	std::string m_ActionName;
 	//	ActionHandle m_Handle;
 	//};
@@ -79,172 +67,223 @@ namespace SLD
 
 	//	template<typename FuncPtr,
 	//		typename ObjectType = typename Function_Traits<FuncPtr>::element_type>
-	//		constexpr auto RegisterCallback(FuncPtr fnPtr, const RefPtr<ObjectType>& instance) noexcept(false) -> void;
+	//		constexpr auto RegisterCallback(FuncPtr fnPtr, const SharedPtr<ObjectType>& instance) noexcept(false) -> void;
 
 	//private:
 
-	//	std::pmr::vector<RefPtr<DynamicDelegate<binding_type>>> m_Callbacks;
+	//	std::pmr::vector<SharedPtr<DynamicDelegate<binding_type>>> m_Callbacks;
 	//	AxisHandle m_Handle;
 	//};
+
 
 	class InputComponent final : public NonTickComponent
 	{
 	public:
 
+		friend class InputSystem;
+		
 		static constexpr const char* UniqueId{ "InputComponent" };
 		
-		InputComponent(WeakPtr<GameObject> gameObject);
-		InputComponent(const RefPtr<GameObject>& gameObject);
+		//InputComponent(WeakPtr<GameObject> gameObject);
+		//InputComponent(const SharedPtr<GameObject>& gameObject);
 		
-		//InputComponent* GetMe();
+		InputComponent(WorldEntity& world, GameObjectId id);
+
+		const ActionHandle& GetActionHandleFromActionGroup(
+			const std::string& groupName,
+			InputEvent eventType) const;
 		
-		template<typename FuncPtr,
-			typename = EnableIf<IsMemberFunc<FuncPtr>>,
-			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
-			typename ...Args>
-			[[maybe_unused]] constexpr auto BindAction(
-				const std::string& actionName,
-				InputEvent ie,
-				FuncPtr fnPtr,
-				const RefPtr<ObjectType>& instance,
-				Args&&... args) noexcept(false) -> ActionHandle;
+		const std::array<ActionHandle,
+		InputParams::InputEventCount>& GetActionHandlesFromActionGroup(const std::string& groupName) const;
 		
-		template<typename FuncPtr,
-			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
-			typename = EnableIf<IsFuncSameType<FuncPtr, AxisCallbackType>::value>>
-			[[maybe_unused]] constexpr auto BindAxis(
-				const std::string& axisName,
-				FuncPtr fnPtr,
-				const RefPtr<ObjectType>& instance) noexcept -> AxisHandle;
+		const AxisHandle& GetAxisHandleFromAxisGroup(const std::string& groupName) const;
 
-		template<typename FuncPtr,
-			typename = EnableIf<IsMemberFunc<FuncPtr>>,
-			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
-			typename ...Args>
-			[[maybe_unused]] constexpr auto BindAction(
-				const std::string& actionName,
-				InputEvent ie,
-				FuncPtr fnPtr,
-				ObjectType* instance,
-				Args&&... args) noexcept ->ActionHandle;
+		void SetReceiveIndex(size_t idx);
+		size_t GetReceiveIndex() const; 
 
-		template<typename FuncPtr,
-			typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
-			typename = EnableIf<IsFuncSameType<FuncPtr, AxisCallbackType>::value>>
-			[[maybe_unused]] constexpr auto BindAxis(
-				const std::string& axisName,
-				FuncPtr fnPtr,
-				ObjectType* instance) noexcept -> AxisHandle;
+		template<typename FuncPtr,typename ...Args>
+		void BindAction(
+			const std::string& groupName,
+			FuncPtr&& callback,
+			Args&&... message);
 
-		~InputComponent() override;
+		template<typename FuncPtr, typename ...Args>
+		void BindAxis(
+			const std::string& groupName,
+			FuncPtr&& callback,
+			Args&&... message);
+		
+		//template<typename FuncPtr,
+		//	typename = EnableIf<IsMemberFunc<FuncPtr>>,
+		//	typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
+		//	typename ...Args>
+		//	[[maybe_unused]] constexpr auto BindAction(
+		//		const std::string& actionName,
+		//		InputEvent ie,
+		//		FuncPtr fnPtr,
+		//		const SharedPtr<ObjectType>& instance,
+		//		Args&&... args) noexcept(false) -> ActionHandle;
+		//
+		//template<typename FuncPtr,
+		//	typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
+		//	typename = EnableIf<IsFuncSameType<FuncPtr, AxisCallbackType>::value>>
+		//	[[maybe_unused]] constexpr auto BindAxis(
+		//		const std::string& axisName,
+		//		FuncPtr fnPtr,
+		//		const SharedPtr<ObjectType>& instance) noexcept -> AxisHandle;
+		
+		//template<typename FuncPtr,
+		//	typename = EnableIf<IsMemberFunc<FuncPtr>>,
+		//	typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
+		//	typename ...Args>
+		//	[[maybe_unused]] constexpr auto BindAction(
+		//		const std::string& actionName,
+		//		InputEvent ie,
+		//		FuncPtr fnPtr,
+		//		ObjectType* instance,
+		//		Args&&... args) noexcept ->ActionHandle;
+
+		//template<typename FuncPtr,
+		//	typename ObjectType = typename Function_Traits<FuncPtr>::element_type,
+		//	typename = EnableIf<IsFuncSameType<FuncPtr, AxisCallbackType>::value>>
+		//	[[maybe_unused]] constexpr auto BindAxis(
+		//		const std::string& axisName,
+		//		FuncPtr fnPtr,
+		//		ObjectType* instance) noexcept -> AxisHandle;
+
+		using KeyToActionHandleMap = std::unordered_map<std::string, std::array<ActionHandle, InputParams::InputEventCount>>;
+		using KeyToAxisHandleMap = std::unordered_map<std::string, AxisHandle>;
 	
 	private:
 
+	
+		KeyToActionHandleMap& GetActionHandleMap();
+		KeyToAxisHandleMap& GetAxisHandleMap();
+
+		WorldEntity& m_WorldRef;
+		GameObjectId m_Parent;
+		KeyToActionHandleMap m_ActionHandleMap;
+		KeyToAxisHandleMap m_AxisHandleMap;
+		size_t m_ReceiveIndex{};
+		
 		// InputComponent is the only component that hardly tied to the owner (GameObject)
 		// Because in order to destroy commands create by this InputComponent
 		// We need some sort of reference point to delete from the table
-		// TODO: Make input component owned the commands
-		WeakPtr<GameObject> m_Parent;
 
-		using CompActionCommand = RefPtr<EventHandler>;
-		using CompAxisCommand = RefPtr<DynamicDelegate<AxisCallbackType>>;
+		std::vector<SharedPtr<EventHandler>> m_ActionCommand;
+		std::vector<SharedPtr<EventHandler>> m_AxisCommand;
+		
+		//using CompActionCommand = SharedPtr<EventHandler>;
+		//using CompAxisCommand = SharedPtr<DynamicDelegate<AxisCallbackType>>;
 		
 		//std::vector<CompActionCommand> m_ActionCommand;
 		//std::vector<CompAxisCommand> m_AxisCommand;
 	};
 
-	template <typename FuncPtr, typename, typename ObjectType, typename ... Args>
-	constexpr auto InputComponent::BindAction(const std::string& actionName, InputEvent ie, FuncPtr fnPtr,
-		const RefPtr<ObjectType>& instance, Args&&... args) noexcept(false) -> ActionHandle
+	template <typename FuncPtr, typename ... Args>
+	void InputComponent::BindAction(const std::string& groupName, FuncPtr&& callback, Args&&... message)
 	{
-		ActionHandle handle{};
-
-		if (auto parentPointer{ m_Parent.lock() }; parentPointer)
-			parentPointer->GetWorld().get().GetWorldInputSetting().CreateActionCommand(
-				actionName,
-				m_Parent,
-				ie,
-				fnPtr,
-				instance.get(),
-				&handle.m_IsValid,
-				std::forward<Args>(args)...
-			);
-
-		return handle;
+		m_ActionCommand.emplace_back(std::make_shared<Event<FuncPtr>>(callback,m_WorldRef,m_Parent,std::forward<Args>(message)...));
 	}
 
-	template <typename FuncPtr, typename ObjectType, typename>
-	constexpr auto InputComponent::BindAxis(
-		const std::string& axisName,
-		FuncPtr fnPtr,
-		const RefPtr<ObjectType>& instance) noexcept -> AxisHandle
+	template <typename FuncPtr, typename ... Args>
+	void InputComponent::BindAxis(const std::string& groupName, FuncPtr&& callback, Args&&... message)
 	{
-		AxisHandle handle{};
-		if (auto parentPtr{ m_Parent.lock() }; parentPtr)
-			parentPtr->GetWorld().get().GetWorldInputSetting().CreateAxisCommand(
-				axisName,
-				m_Parent,
-				fnPtr,
-				instance.get(),
-				&handle.m_ResultAxis
-			);
-
-		return handle;
-	}
-
-	template <typename FuncPtr, typename, typename ObjectType, typename ... Args>
-	constexpr auto InputComponent::BindAction(const std::string& actionName, InputEvent ie, FuncPtr fnPtr,
-		ObjectType* instance, Args&&... args) noexcept -> ActionHandle
-	{
-		ActionHandle handle{};
-
-		if (auto parentPointer{ m_Parent.lock() }; parentPointer)
-			parentPointer->GetWorld().get().GetWorldInputSetting().CreateActionCommand(
-				actionName,
-				m_Parent,
-				ie,
-				fnPtr,
-				instance,
-				&handle.m_IsValid,
-				std::forward<Args>(args)...
-			);
 		
-		return handle;
 	}
 
-	template <typename FuncPtr, typename ObjectType, typename>
-	constexpr auto InputComponent::BindAxis(const std::string& axisName, FuncPtr fnPtr,
-		ObjectType* instance) noexcept -> AxisHandle
-	{
-		AxisHandle handle{};
-		if (auto parentPtr{ m_Parent.lock() }; parentPtr)
-			parentPtr->GetWorld().get().GetWorldInputSetting().CreateAxisCommand(
-				axisName,
-				m_Parent,
-				fnPtr,
-				instance,
-				&handle.m_ResultAxis
-		);
+	//template <typename FuncPtr, typename, typename ObjectType, typename ... Args>
+	//constexpr auto InputComponent::BindAction(const std::string& actionName, InputEvent ie, FuncPtr fnPtr,
+	//	const SharedPtr<ObjectType>& instance, Args&&... args) noexcept(false) -> ActionHandle
+	//{
+	//	ActionHandle handle{};
 
-		return handle;
-	}
+	//	if (auto parentPointer{ m_Parent.lock() }; parentPointer)
+	//		parentPointer->GetWorld().GetWorldInputSetting().CreateActionCommand(
+	//			actionName,
+	//			m_Parent,
+	//			ie,
+	//			fnPtr,
+	//			instance.get(),
+	//			&handle.m_IsValid,
+	//			std::forward<Args>(args)...
+	//		);
+
+	//	return handle;
+	//}
+
+	//template <typename FuncPtr, typename ObjectType, typename>
+	//constexpr auto InputComponent::BindAxis(
+	//	const std::string& axisName,
+	//	FuncPtr fnPtr,
+	//	const SharedPtr<ObjectType>& instance) noexcept -> AxisHandle
+	//{
+	//	AxisHandle handle{};
+	//	if (auto parentPtr{ m_Parent.lock() }; parentPtr)
+	//		parentPtr->GetWorld().GetWorldInputSetting().CreateAxisCommand(
+	//			axisName,
+	//			m_Parent,
+	//			fnPtr,
+	//			instance.get(),
+	//			&handle.m_ResultAxis
+	//		);
+
+	//	return handle;
+	//}
+
+	//template <typename FuncPtr, typename, typename ObjectType, typename ... Args>
+	//constexpr auto InputComponent::BindAction(const std::string& actionName, InputEvent ie, FuncPtr fnPtr,
+	//	ObjectType* instance, Args&&... args) noexcept -> ActionHandle
+	//{
+	//	ActionHandle handle{};
+
+	//	if (auto parentPointer{ m_Parent.lock() }; parentPointer)
+	//		parentPointer->GetWorld().GetWorldInputSetting().CreateActionCommand(
+	//			actionName,
+	//			m_Parent,
+	//			ie,
+	//			fnPtr,
+	//			instance,
+	//			&handle.m_IsValid,
+	//			std::forward<Args>(args)...
+	//		);
+	//	
+	//	return handle;
+	//}
+
+	//template <typename FuncPtr, typename ObjectType, typename>
+	//constexpr auto InputComponent::BindAxis(const std::string& axisName, FuncPtr fnPtr,
+	//	ObjectType* instance) noexcept -> AxisHandle
+	//{
+	//	AxisHandle handle{};
+	//	if (auto parentPtr{ m_Parent.lock() }; parentPtr)
+	//		parentPtr->GetWorld().GetWorldInputSetting().CreateAxisCommand(
+	//			axisName,
+	//			m_Parent,
+	//			fnPtr,
+	//			instance,
+	//			&handle.m_ResultAxis
+	//	);
+
+	//	return handle;
+	//}
 
 	//template <typename FuncPtr, typename ObjectType, typename ... Args>
 	//constexpr auto InputActionKeyBinding::RegisterCallback(
 	//	FuncPtr fnPtr,
-	//	const RefPtr<ObjectType>& instance,
+	//	const SharedPtr<ObjectType>& instance,
 	//	Args&&... args) noexcept(false) -> void
 	//{
-	//	RefPtr<EventHandler> acEvent{ std::make_shared<Event<FuncPtr>>(fnPtr,instance,std::forward<Args>(args)...) };
+	//	SharedPtr<EventHandler> acEvent{ std::make_shared<Event<FuncPtr>>(fnPtr,instance,std::forward<Args>(args)...) };
 	//	m_Callbacks.emplace_back(acEvent);
 	//}
 
 	//template <typename FuncPtr, typename ObjectType>
 	//constexpr auto InputAxisKeyBinding::RegisterCallback(
 	//	FuncPtr fnPtr,
-	//	const RefPtr<ObjectType>& instance) noexcept(false) -> void
+	//	const SharedPtr<ObjectType>& instance) noexcept(false) -> void
 	//{
-	//	RefPtr<DynamicDelegate<AxisHandle::Signature>> axAction{ std::make_shared<CAction<AxisHandle::Signature,ObjectType>>(fnPtr,instance) };
+	//	SharedPtr<DynamicDelegate<AxisHandle::Signature>> axAction{ std::make_shared<CAction<AxisHandle::Signature,ObjectType>>(fnPtr,instance) };
 	//	m_Callbacks.emplace_back(axAction);
 	//}
 
@@ -253,7 +292,7 @@ namespace SLD
 	//	const std::string& actionName,
 	//	InputEvent ie,
 	//	FuncPtr fnPtr,
-	//	const RefPtr<ObjectType>& instance,
+	//	const SharedPtr<ObjectType>& instance,
 	//	Args&&... args) noexcept(false) -> const ActionHandle&
 	//{
 	//	const uint32_t keyId{ InputManager::CreateHashId(actionName,ie) };
@@ -266,7 +305,7 @@ namespace SLD
 	//constexpr auto InputComponent::BindAxis(
 	//	const std::string& axisName,
 	//	FuncPtr fnPtr,
-	//	const RefPtr<ObjectType>& instance) noexcept -> const AxisHandle&
+	//	const SharedPtr<ObjectType>& instance) noexcept -> const AxisHandle&
 	//{
 	//	const uint32_t keyId{ InputManager::CreateHashId(axisName,InputEvent::IE_None) };
 	//	InputAxisKeyBinding& tryManager{ m_AxisHandleGroup[keyId] };
@@ -278,7 +317,7 @@ namespace SLD
 	//constexpr auto InputComponent::BindWindowEvent(
 	//	uint8_t eventType,
 	//	FuncPtr fnPtr,
-	//	const RefPtr<ObjectTpye>& instance) noexcept -> void
+	//	const SharedPtr<ObjectTpye>& instance) noexcept -> void
 	//{
 	//	
 	//}

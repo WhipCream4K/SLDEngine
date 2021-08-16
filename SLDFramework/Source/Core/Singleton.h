@@ -11,7 +11,7 @@ namespace SLD
 	class Singleton;
 	
 	template<typename T>
-	RefPtr<T> Instance();
+	SharedPtr<T> Instance();
 	
 	template<typename T>
 	class Singleton
@@ -21,7 +21,7 @@ namespace SLD
 		using value_type = std::remove_all_extents_t<T>;
 
 		template<typename U>
-		friend RefPtr<U> Instance();
+		friend SharedPtr<U> Instance();
 
 		Singleton(const Singleton&) = delete;
 		Singleton& operator=(const Singleton&) = delete;
@@ -29,7 +29,7 @@ namespace SLD
 
 	protected:
 		
-		static RefPtr<value_type> GetInstance()
+		static SharedPtr<value_type> GetInstance()
 		{
 			if (!m_Instance)
 				m_Instance = std::make_shared<value_type>();
@@ -40,14 +40,14 @@ namespace SLD
 
 	private:
 		
-		static RefPtr<value_type> m_Instance;
+		static SharedPtr<value_type> m_Instance;
 	};
 
 	template<typename T>
 	std::shared_ptr<typename Singleton<T>::value_type> Singleton<T>::m_Instance{};
 	
 	template<typename T>
-	inline RefPtr<T> Instance()
+	inline SharedPtr<T> Instance()
 	{
 		return Singleton<T>::GetInstance();
 	}

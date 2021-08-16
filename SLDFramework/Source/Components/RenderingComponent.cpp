@@ -37,8 +37,8 @@
 //{
 //}
 
-//SLD::RenderingComponent::RenderingComponent(const RefPtr<ObservePtr<TransformComponent>>& transform,
-//	const RefPtr<uint8_t*>& pointerToBuffer, const ObservePtr<std::nullptr_t>& bufferObserver, size_t elemSize,
+//SLD::RenderingComponent::RenderingComponent(const SharedPtr<ObservePtr<TransformComponent>>& transform,
+//	const SharedPtr<uint8_t*>& pointerToBuffer, const ObservePtr<std::nullptr_t>& bufferObserver, size_t elemSize,
 //	uint32_t elemCnt)
 //	: m_Transform(transform)
 //	, m_PointToBuffer(pointerToBuffer)
@@ -52,8 +52,8 @@
 //	m_UsedData += sizeof(void*);
 //}
 
-SLD::RenderingComponent::RenderingComponent(const RefPtr<ObservePtr<TransformComponent>>& transform,
-	const RefPtr<uint8_t>& pointerToBuffer, const ObservePtr<std::nullptr_t>& bufferObserver, size_t elemSize,
+SLD::RenderingComponent::RenderingComponent(const SharedPtr<ObservePtr<TransformComponent>>& transform,
+	const SharedPtr<uint8_t>& pointerToBuffer, const ObservePtr<std::nullptr_t>& bufferObserver, size_t elemSize,
 	uint32_t elemCnt)
 	: m_Transform(transform)
 	, m_PointToBuffer(pointerToBuffer)

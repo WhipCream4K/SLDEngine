@@ -107,7 +107,7 @@ void Level::ChangeAllPlatformSprite(int id)
 	}
 }
 
-void Level::ChangeAllPlatformSprite(const RefPtr<sf::Sprite>& sprite)
+void Level::ChangeAllPlatformSprite(const SharedPtr<sf::Sprite>& sprite)
 {
 	sprite;
 	const auto* target{ sprite.get() };
@@ -120,7 +120,7 @@ void Level::ChangeAllPlatformSprite(const RefPtr<sf::Sprite>& sprite)
 	}
 }
 
-void Level::ChangePlatformSprite(const RefPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col)
+void Level::ChangePlatformSprite(const SharedPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col)
 {
 	const auto* target{ sprite.get() };
 	auto handle{ m_HexPlatform.at(row)[col].spriteHandle };
@@ -305,7 +305,7 @@ bool Level::IsFlyingDiscExist(const Node& check)
 	return isExist;
 }
 
-void Level::UseFlyingDisc(const RefPtr<Player>& player, int row, int col)
+void Level::UseFlyingDisc(const SharedPtr<Player>& player, int row, int col)
 {
 	if (player)
 	{

@@ -257,7 +257,7 @@ namespace SLD
 	using EventHandler = IEvent;
 
 	template<typename FuncPtr, typename UserClass, typename ...Args>
-	RefPtr<EventHandler> CreateEvent(const RefPtr<UserClass>& objInstance, FuncPtr fnPtr, Args&&... args)
+	SharedPtr<EventHandler> CreateEvent(const SharedPtr<UserClass>& objInstance, FuncPtr fnPtr, Args&&... args)
 	{
 		return std::make_shared<Event<FuncPtr, UserClass>>(fnPtr, objInstance, std::forward<Args>(args)...);
 	}

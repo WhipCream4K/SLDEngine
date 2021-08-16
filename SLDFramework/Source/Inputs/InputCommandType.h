@@ -13,7 +13,7 @@ namespace SLD
 	
 	struct ActionCommand
 	{
-		RefPtr<EventHandler> callback{};
+		SharedPtr<EventHandler> callback{};
 		//WeakPtr<EventHandler> callback{};
 		InputEvent iEvent{ InputEvent::IE_None };
 		WeakPtr<GameObject> referencePointer{};
@@ -21,12 +21,12 @@ namespace SLD
 
 	struct AxisCommand
 	{
-		RefPtr<DynamicDelegate<AxisCallbackType>> callback{};
+		SharedPtr<DynamicDelegate<AxisCallbackType>> callback{};
 		//WeakPtr<DynamicDelegate<AxisCallbackType>> callback{};
 		WeakPtr<GameObject> referencePointer{};
 	};
 	
-	using AxisCommandType = RefPtr<DynamicDelegate<AxisCallbackType>>;
+	using AxisCommandType = SharedPtr<DynamicDelegate<AxisCallbackType>>;
 }
 
 #endif

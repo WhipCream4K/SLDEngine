@@ -22,10 +22,10 @@ namespace SLD
 		void PushRenderElement(uint8_t* buffer, size_t size);
 
 		template<typename DataType>
-			[[nodiscard]] RefPtr<Tracker> PushRenderElement(const RefPtr<ObservePtr<TransformComponent>>& transform, RenderIdentifier id, DataType* data);
+			[[nodiscard]] SharedPtr<Tracker> PushRenderElement(const SharedPtr<ObservePtr<TransformComponent>>& transform, RenderIdentifier id, DataType* data);
 
 		template<typename DataType>
-			[[nodiscard]] RefPtr<Tracker> AllocRenderElement(const RefPtr<ObservePtr<TransformComponent>>& transform, RenderIdentifier id);
+			[[nodiscard]] SharedPtr<Tracker> AllocRenderElement(const SharedPtr<ObservePtr<TransformComponent>>& transform, RenderIdentifier id);
 
 		//void PushRenderElement(ObservePtr<TransformComponent>* transform,)
 		void Resize(size_t count);
@@ -51,7 +51,7 @@ namespace SLD
 	};
 
 	template <typename DataType>
-	RefPtr<Tracker> RenderBuffer::PushRenderElement(const RefPtr<ObservePtr<TransformComponent>>& transform,
+	SharedPtr<Tracker> RenderBuffer::PushRenderElement(const SharedPtr<ObservePtr<TransformComponent>>& transform,
 		RenderIdentifier id, DataType* data)
 	{
 		m_RenderElemCnt++;
@@ -79,7 +79,7 @@ namespace SLD
 		std::copy_n((uint8_t*)data, sizeof(DataType), buffer + m_CurrentBufferSize);
 		m_CurrentBufferSize += sizeof(DataType);
 
-		auto out{ RefPtr<Tracker>{&ptrAddress,[this](Tracker* ptr)
+		auto out{ SharedPtr<Tracker>{&ptrAddress,[this](Tracker* ptr)
 		{
 			EraseWatcherThenShift(*ptr,sizeof(DataType));
 		}} };
@@ -88,7 +88,7 @@ namespace SLD
 	}
 
 	template <typename DataType>
-	RefPtr<Tracker> RenderBuffer::AllocRenderElement(const RefPtr<ObservePtr<TransformComponent>>& transform,
+	SharedPtr<Tracker> RenderBuffer::AllocRenderElement(const SharedPtr<ObservePtr<TransformComponent>>& transform,
 		RenderIdentifier id)
 	{
 		m_RenderElemCnt++;
@@ -116,7 +116,7 @@ namespace SLD
 		//std::copy_n((uint8_t*)data, sizeof(DataType), buffer + m_CurrentBufferSize);
 		m_CurrentBufferSize += sizeof(DataType);
 
-		auto out{ RefPtr<Tracker>{&ptrAddress,[this](Tracker* ptr)
+		auto out{ SharedPtr<Tracker>{&ptrAddress,[this](Tracker* ptr)
 		{
 			EraseWatcherThenShift(*ptr,sizeof(DataType));
 		}} };
@@ -126,7 +126,7 @@ namespace SLD
 }
 
 template<typename DataType>
-inline void CopyTextureRegion(DataType* from, const RefPtr<SLD::Tracker>& tracker)
+inline void CopyTextureRegion(DataType* from, const SharedPtr<SLD::Tracker>& tracker)
 {
 	std::copy_n((uint8_t*)from, sizeof(DataType), *tracker.get());
 }

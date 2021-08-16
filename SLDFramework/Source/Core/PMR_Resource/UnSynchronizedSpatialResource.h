@@ -34,7 +34,7 @@ namespace SLD
 	};
 
 	//template <typename T, typename ... Args>
-	//RefPtr<ObservePtr<T>> UnSynchronizedSpatialResource::DoAllocate(Args&&... args)
+	//SharedPtr<ObservePtr<T>> UnSynchronizedSpatialResource::DoAllocate(Args&&... args)
 	//{
 	//	constexpr size_t TSize{ sizeof(T) };
 	//	const size_t sizeFromHead{ m_Buffer.size() };
@@ -48,14 +48,14 @@ namespace SLD
 	//}
 
 	//template <typename T, typename ... Args>
-	//RefPtr<ObservePtr<T>> UnSynchronizedSpatialResource::Alloc(Args&&... args)
+	//SharedPtr<ObservePtr<T>> UnSynchronizedSpatialResource::Alloc(Args&&... args)
 	//{
 	//	const size_t sizeFromHead{ m_Buffer.size() };
 	//	new (m_pCurrent) T{ std::forward<Args>(args)... };
 	//	auto& ob{ m_Observer.emplace_back(m_pHead,sizeFromHead) };
 	//	auto out{ reinterpret_cast<ObservePtr<T>&>(ob) };
 	//	m_pCurrent += sizeof(T);
-	//	return RefPtr<ObservePtr<T>>{&out, [this](ObservePtr<T>* ptr)
+	//	return SharedPtr<ObservePtr<T>>{&out, [this](ObservePtr<T>* ptr)
 	//		{
 	//			DoDeAllocate(ptr->GetPtrPointTo(), sizeof(T));
 	//			ptr = nullptr;

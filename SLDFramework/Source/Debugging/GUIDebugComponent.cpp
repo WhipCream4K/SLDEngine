@@ -8,7 +8,7 @@ SLD::GUIDebugComponent::GUIDebugComponent()
 {
 	IMGUI_CHECKVERSION();
 
-	m_ImGuiContext = RefPtr<ImGuiContext>{ ImGui::CreateContext(),[](ImGuiContext* context)
+	m_ImGuiContext = SharedPtr<ImGuiContext>{ ImGui::CreateContext(),[](ImGuiContext* context)
 	{
 		ImGui::DestroyContext(context);
 		context = nullptr;
@@ -42,7 +42,7 @@ SLD::GUIDebugComponent::GUIDebugComponent()
 #endif
 }
 
-bool SLD::GUIDebugComponent::AttachDrawWindow(const RefPtr<Window>& drawWindow)
+bool SLD::GUIDebugComponent::AttachDrawWindow(const SharedPtr<Window>& drawWindow)
 {
 	if (drawWindow)
 	{
@@ -52,7 +52,7 @@ bool SLD::GUIDebugComponent::AttachDrawWindow(const RefPtr<Window>& drawWindow)
 		//// NOTE: THIS VERSION OF ImGui IS NOT THREAD-SAFE
 		//IMGUI_CHECKVERSION();
 
-		//m_ImGuiContext = RefPtr<ImGuiContext>{ ImGui::CreateContext(),[](ImGuiContext* context)
+		//m_ImGuiContext = SharedPtr<ImGuiContext>{ ImGui::CreateContext(),[](ImGuiContext* context)
 		//{
 		//	ImGui::DestroyContext(context);
 		//	context = nullptr;
@@ -68,8 +68,8 @@ bool SLD::GUIDebugComponent::AttachDrawWindow(const RefPtr<Window>& drawWindow)
 
 		ImGuiIO& imGuiIO = m_ImGuiContext->IO;
 
-		imGuiIO.BackendPlatformName = drawWindow->GetViewPortName().c_str();
-		imGuiIO.ImeWindowHandle = drawWindow->GetWindowHandleToType<HWND>();
+		imGuiIO.BackendPlatformName = drawWindow->GetTitleName().c_str();
+		imGuiIO.ImeWindowHandle = drawWindow->GetNativeWindowHandle().get();
 
 		return true;
 	}
@@ -89,47 +89,48 @@ void SLD::GUIDebugComponent::NewImmediateFrame(float dt)
 	io.DeltaTime = dt;
 
 	// Update user events
-	const auto inputsFromViewPort = currWindow->GetInputData();
+	//std::array<>
+	//const EventQueueHandle inputsFromViewPort{};
 
-	for (uint8_t i = 0; i < inputsFromViewPort.eventCntThisFrame; ++i)
-	{
-		const auto& message{ inputsFromViewPort.events[i] };
+	//for (uint8_t i = 0; i < inputsFromViewPort.eventCntThisFrame; ++i)
+	//{
+	//	const auto& message{ inputsFromViewPort.events[i] };
 
-		switch (message.eventId)
-		{
-		case EventType::KeyPressed:
+	//	switch (message.eventId)
+	//	{
+	//	case EventType::KeyPressed:
 
-			io.KeysDown[message.data.keyboard.key] = true;
-			io.KeyCtrl = message.data.keyboard.ctrl;
-			io.KeyAlt = message.data.keyboard.alt;
-			io.KeyShift = message.data.keyboard.shift;
-			io.KeySuper = message.data.keyboard.system;
+	//		io.KeysDown[message.data.keyboard.key] = true;
+	//		io.KeyCtrl = message.data.keyboard.ctrl;
+	//		io.KeyAlt = message.data.keyboard.alt;
+	//		io.KeyShift = message.data.keyboard.shift;
+	//		io.KeySuper = message.data.keyboard.system;
 
-			break;
+	//		break;
 
-		case EventType::KeyReleased:
+	//	case EventType::KeyReleased:
 
-			io.KeysDown[message.data.keyboard.key] = false;
-			io.KeyCtrl = message.data.keyboard.ctrl;
-			io.KeyAlt = message.data.keyboard.alt;
-			io.KeyShift = message.data.keyboard.shift;
-			io.KeySuper = message.data.keyboard.system;
+	//		io.KeysDown[message.data.keyboard.key] = false;
+	//		io.KeyCtrl = message.data.keyboard.ctrl;
+	//		io.KeyAlt = message.data.keyboard.alt;
+	//		io.KeyShift = message.data.keyboard.shift;
+	//		io.KeySuper = message.data.keyboard.system;
 
-			break;
-		case EventType::MouseButtonPressed:		io.MouseDown[int(message.data.mouse.key)] = true;								break;
-		case EventType::MouseButtonReleased:	io.MouseDown[int(message.data.mouse.key)] = false;								break;
-		case EventType::MouseWheelScrolled:		io.MouseWheel = message.data.mouse.verticalScroll;								break;
-		case EventType::MouseMoved:				io.MousePos = { message.data.mouse.x,message.data.mouse.y };					break;
-		default:																												break;
-		}
-	}
+	//		break;
+	//	case EventType::MouseButtonPressed:		io.MouseDown[int(message.data.mouse.key)] = true;								break;
+	//	case EventType::MouseButtonReleased:	io.MouseDown[int(message.data.mouse.key)] = false;								break;
+	//	case EventType::MouseWheelScrolled:		io.MouseWheel = message.data.mouse.verticalScroll;								break;
+	//	case EventType::MouseMoved:				io.MousePos = { message.data.mouse.x,message.data.mouse.y };					break;
+	//	default:																												break;
+	//	}
+	//}
 
-	// TODO: Probably also update the gamepad as well
+	//// TODO: Probably also update the gamepad as well
 
-	// TODO: Create Immediate Rendering Commponent
+	//// TODO: Create Immediate Rendering Commponent
 
-	// External ImGui
-	ImGui::NewFrame();
+	//// External ImGui
+	//ImGui::NewFrame();
 }
 
 //SLD::RenderingComponent SLD::GUIDebugComponent::GetImmedateRenderComponent() const

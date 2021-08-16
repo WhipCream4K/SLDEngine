@@ -13,7 +13,7 @@
 //	window;
 //}
 
-//SFMLInputs::SFMLInputs(const RefPtr<SFMLWindow>& window)
+//SFMLInputs::SFMLInputs(const SharedPtr<SFMLWindow>& window)
 //	: m_InputWindow(window)
 //{
 //}

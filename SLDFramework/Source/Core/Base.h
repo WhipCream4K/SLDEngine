@@ -15,10 +15,10 @@
 
 #include "CustomTypes.h"
 #include "EngineContext.h"
-#include "../Helpers/utils.h"
 #include "../Debugging/TSLogger.h"
 #include "../Math/RealTimeMath.h"
 #include "ObservePtr.h"
+//#include "../Helpers/utils.h"
 //#include "../Miscellaneous/RealTimeMath.h"
 
 //void* operator new(size_t size);
@@ -40,9 +40,9 @@ namespace SLD
 	}
 
 	template<typename T>
-	RefPtr<T> MakeShared()
+	SharedPtr<T> MakeShared()
 	{
-		return RefPtr<T>{New<T>(),[](T* pointer)
+		return SharedPtr<T>{New<T>(),[](T* pointer)
 		{
 				delete pointer;
 				pointer = nullptr;
@@ -50,12 +50,12 @@ namespace SLD
 	}
 
 	template<typename T,typename Dx>
-	RefPtr<T> MakeShared(Dx deleteFunc)
+	SharedPtr<T> MakeShared(Dx deleteFunc)
 	{
-		return RefPtr<T>{New<T>(), deleteFunc};
+		return SharedPtr<T>{New<T>(), deleteFunc};
 	}
 }
 
-
+#define SLD_SUPPORT_SFML	1
 
 #endif

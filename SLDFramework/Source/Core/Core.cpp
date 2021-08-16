@@ -2,6 +2,7 @@
 #include "Window/Window.h"
 
 #include "../Miscellaneous/DX12Resource.h"
+//#include "../Tracer/minitrace.h"
 
 bool SLD::Core::Init()
 {
@@ -19,6 +20,9 @@ bool SLD::Core::Init()
 SLD::Core::Core()
 {
 	SLD_LOG_INIT();
+	//mtr_init("./tracer.json");
+	//MTR_META_PROCESS_NAME("minitrace_test");
+	//MTR_META_THREAD_NAME("main thread");
 }
 
 bool SLD::Core::CreateViewPortFromHWND(const windowHandle& anyWindowHandle)
@@ -64,35 +68,41 @@ bool SLD::Core::CreateViewPortFromHWND(const windowHandle& anyWindowHandle)
 
 	delete[] strWinTitle;
 
-	
-	LLWindow windowSubSystem{
-#ifdef HAS_SFML
-		SFMLWindow{anyWindowHandle,windowWidth,windowHeight}
-#endif
-	};
 
+	//	LLWindow windowSubSystem{
+	//#ifdef HAS_SFML
+	//		SFMLWindow{anyWindowHandle,windowWidth,windowHeight}
+	//#endif
+	//	};
+	//
+	//
+	//	LLInputs inputSubSystem{
+	//#ifdef HAS_SFML
+	//		SFMLInputs{windowHandle}
+	//		//SFMLInputs{SharedPtr<SFMLWindow>{std::get_if<SFMLWindow>(&windowSubSystem),[](SFMLWindow*){}}}
+	//		//SFMLInputs{std::get_if<SFMLWindow>(&windowSubSystem)}
+	//#endif
+	//	};
+	//
+	//
+	//	m_MainViewPort = std::make_shared<Window>(windowWidth, windowHeight,
+	//		std::move(windowSubSystem),
+	//		std::move(inputSubSystem),
+	//		anyWindowHandle,
+	//		strWindowTitle);
 
-	LLInputs inputSubSystem{
-#ifdef HAS_SFML
-		SFMLInputs{windowHandle}
-		//SFMLInputs{RefPtr<SFMLWindow>{std::get_if<SFMLWindow>(&windowSubSystem),[](SFMLWindow*){}}}
-		//SFMLInputs{std::get_if<SFMLWindow>(&windowSubSystem)}
-#endif
-	};
-
-
-	m_MainViewPort = std::make_shared<Window>(windowWidth, windowHeight,
-		std::move(windowSubSystem),
-		std::move(inputSubSystem),
-		anyWindowHandle,
-		strWindowTitle);
-
-	m_MainRenderer.SetRenderWindow(m_MainViewPort);
+		//m_MainRenderer.SetRenderWindow(m_MainViewPort);
 
 	if (!m_GuiDebugger.AttachDrawWindow(m_MainViewPort))
 		return false;
 #endif
 
+	return true;
+}
+
+bool SLD::Core::CreateWindowFrame(uint32_t width, uint32_t height, const std::string& titleName)
+{
+	m_MainViewPort = std::make_shared<Window>(width, height, titleName);
 	return true;
 }
 
@@ -180,28 +190,28 @@ bool SLD::Core::CreateNewViewPort(uint32_t width, uint32_t height, const std::st
 //#endif
 //	};
 
-	LLWindow windowSubSystem{
-#ifdef HAS_SFML
-		SFMLWindow{hWnd,width,height}
-#endif
-	};
+//	LLWindow windowSubSystem{
+//#ifdef HAS_SFML
+//		SFMLWindow{hWnd,width,height}
+//#endif
+//	};
+//
+//	
+//	LLInputs inputSubSystem{
+//#ifdef HAS_SFML
+//		//SFMLInputs{SharedPtr<SFMLWindow>{std::get_if<SFMLWindow>(&windowSubSystem),[](SFMLWindow*){}}}
+//		//SFMLInputs{std::get_if<SFMLWindow>(&windowSubSystem)}
+//		SFMLInputs{hWnd}
+//#endif
+//	};
 
-	
-	LLInputs inputSubSystem{
-#ifdef HAS_SFML
-		//SFMLInputs{RefPtr<SFMLWindow>{std::get_if<SFMLWindow>(&windowSubSystem),[](SFMLWindow*){}}}
-		//SFMLInputs{std::get_if<SFMLWindow>(&windowSubSystem)}
-		SFMLInputs{hWnd}
-#endif
-	};
+	//m_MainViewPort = std::make_shared<Window>(width, height,
+	//	std::move(windowSubSystem),
+	//	std::move(inputSubSystem),
+	//	hWnd,
+	//	winName);
 
-	m_MainViewPort = std::make_shared<Window>(width, height,
-		std::move(windowSubSystem),
-		std::move(inputSubSystem),
-		hWnd,
-		winName);
-
-	m_MainRenderer.SetRenderWindow(m_MainViewPort);
+	//m_MainRenderer.SetRenderWindow(m_MainViewPort);
 
 	if (!m_GuiDebugger.AttachDrawWindow(m_MainViewPort))
 		return false;
@@ -213,50 +223,56 @@ bool SLD::Core::CreateNewViewPort(uint32_t width, uint32_t height, const std::st
 
 bool SLD::Core::TranslateUserInputs()
 {
-	m_WorldEntity.StartWorldTime();
+	m_WorldClock.StartTime();
 
-	const bool isQuit{ m_MainViewPort->PollUserInputs()};
-	if (!isQuit)
-	{
-		const auto userEvData{ m_MainViewPort->GetInputData() };
-		ShouldResizeWindow(m_MainViewPort, userEvData);
+	bool isQuit{};
+	
+	m_MainViewPort->PollWindowMessages(isQuit);
 
-		// World Input interaction
-		for (int i = 0; i < userEvData.eventCntThisFrame; ++i)
-		{
-			m_WorldEntity.GetWorldInputSetting().ParseMessage(userEvData.events[i]);
-		}
-	}
-
-	return isQuit;
+	return !isQuit;
 }
 
 void SLD::Core::Step()
 {
+	const float dt{ m_WorldClock.GetDeltaTime() };
+	
 	// *** UPDATE WORLD ***
-	m_WorldEntity.WakeAllAsyncUpdates();
+	m_WorldEntity.OnStartFrame();
 
-	// JOIN THREADS
-	m_WorldEntity.JoinAllAsyncUpdates();
+	m_WorldEntity.OnInputValidation(m_MainViewPort);
+	
+	m_WorldEntity.OnPreAsyncUpdate(dt);
 
+	m_WorldEntity.OnPhysicsValidation(m_WorldClock.GetFixedDeltaTime());
+	
+	m_WorldEntity.OnPreRenderUpdate(dt);
+	
 	// *** Render ***
+	// Point beyond data manipulation
+
+	m_WorldEntity.OnValidation();
+	
 	m_MainViewPort->ClearBackBuffer();
 
-	//auto& allRenderComponent{ m_WorldEntity.GetAllRenderComponents() };
-	auto& renderBuffer{ m_WorldEntity.GetRenderBuffer() };
-	m_MainRenderer.Render(
-		renderBuffer.GetElementCnt(),
-		renderBuffer.GetBufferStart(),
-		renderBuffer.GetBufferSize());
+	m_WorldEntity.OnRenderSystem(m_MainViewPort);
+
+	m_WorldEntity.SwapCopyBufferToReadBuffer();
+	
+	m_WorldEntity.CleanArchetypeMarked();
 
 	m_MainViewPort->Present();
 
-	m_WorldEntity.EndWorldTime();
+	m_WorldClock.EndTime();
 }
 
 SLD::WorldEntity& SLD::Core::GetDefaultWorldEntity()
 {
 	return m_WorldEntity;
+}
+
+SLD::WorldClock& SLD::Core::GetClock()
+{
+	return m_WorldClock;
 }
 
 SLD::Core::~Core()
@@ -268,21 +284,24 @@ SLD::Core::~Core()
 		::UnregisterClassW(m_WindowClass.lpszClassName, m_WindowClass.hInstance);
 	}
 #endif
+
+	//mtr_flush();
+	//mtr_shutdown();
 }
 
-void SLD::Core::ShouldResizeWindow(const RefPtr<Window>& window, const EventQueueHandle& userEv)
-{
-	for (int i = 0; i < userEv.eventCntThisFrame; ++i)
-	{
-		auto& evData{ userEv.events[i].data };
-		switch (userEv.events[i].eventId)
-		{
-		case uint8_t(InputParams::WindowEventType::WE_Resized):
-		{
-			window->Resize(evData.windowSize.width, evData.windowSize.height);
-			break;
-		}
-		}
-	}
-}
+//void SLD::Core::ShouldResizeWindow(const SharedPtr<Window>& window, const EventQueueHandle& userEv)
+//{
+//	for (int i = 0; i < userEv.eventCntThisFrame; ++i)
+//	{
+//		auto& evData{ userEv.events[i].data };
+//		switch (userEv.events[i].eventId)
+//		{
+//		case uint8_t(InputParams::WindowEventType::WE_Resized):
+//		{
+//			window->Resize(evData.windowSize.width, evData.windowSize.height);
+//			break;
+//		}
+//		}
+//	}
+//}
 

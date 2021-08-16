@@ -1,21 +1,38 @@
 #ifndef SLDFRAMEWORK_INPUTPARAMS_H
 #define SLDFRAMEWORK_INPUTPARAMS_H
 
+#include <any>
+#include <unordered_map>
 #include <array>
 
 namespace SLD
 {
+	struct InputState;
+	struct KeyHasher;
+	struct Key;
 	inline constexpr size_t MinimumEventCnt{ 23 };
 
-	namespace InputParams
+	enum class InputEvent
 	{
-		enum class InputEvent
-		{
-			IE_Pressed,
-			IE_Released,
-			IE_None
-		};
+		IE_Pressed,
+		IE_Released,
+		IE_Down,
+		IE_None
+	};
 
+	struct InputState
+	{
+		InputEvent keyEvent{ InputEvent::IE_None };
+		uint8_t userIndex{};
+		float axisValue{};
+	};
+	
+	using KeyPool = std::unordered_map<Key, InputState, KeyHasher>;
+	
+	namespace InputParams
+	{	
+		constexpr size_t InputEventCount{ 3 };
+		
 		enum class MouseKey : uint8_t
 		{
 			MK_Left,
@@ -41,14 +58,15 @@ namespace SLD
 			GPK_Right_Thumb = (1 << 7),
 			GPK_Left_Shoulder = (1 << 8),
 			GPK_Right_Shoulder = (1 << 9),
-			GPK_A = (1 << 12),
-			GPK_B = (1 << 13),
-			GPK_X = (1 << 14),
-			GPK_Y = (1 << 15),
 			GPK_Right_AxisX = (1 << 10),
 			GPK_Right_AxisY,
 			GPK_Left_AxisX,
 			GPK_Left_AxisY,
+			GPK_A = (1 << 12),
+			GPK_B = (1 << 13),
+			GPK_X = (1 << 14),
+			GPK_Y = (1 << 15),
+
 
 			GPK_KEY_CHECK = 0b111100111111111
 		};
@@ -122,6 +140,7 @@ namespace SLD
 			float leftThumbY;
 			float rightTrigger;
 			float leftTrigger;
+			bool axisValueTriggered{};
 		};
 
 		union EventData
@@ -137,6 +156,13 @@ namespace SLD
 		{
 			EventData data{};
 			uint8_t eventId{}; // can be asked from L-L inputs
+		};
+
+		struct MessageBus2
+		{
+			std::any data{};
+			int size = 0;
+			uint8_t eventId = 0;
 		};
 
 		struct ReadOut

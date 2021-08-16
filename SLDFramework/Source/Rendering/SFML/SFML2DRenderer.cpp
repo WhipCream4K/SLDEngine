@@ -14,7 +14,7 @@ public:
 	ImplSFML2DRenderer();
 	void Render(uint32_t elemCnt, uint8_t* bufferHead, size_t bufferSize);
 	void SetRenderTarget(SLD::Window& renderWindow);
-	void SetRenderTarget(const RefPtr<SLD::Window>& renderWindow);
+	void SetRenderTarget(const SharedPtr<SLD::Window>& renderWindow);
 
 private:
 
@@ -93,7 +93,7 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 		if (transform)
 		{
 
-			auto& objMat{ transform->GetPtr()->GetWorldFinishMatrix() };
+			auto& objMat{ transform->GetPtr()->GetWorldMatrix() };
 			auto& component{ m_2DDrawComponent[cnt] };
 
 			sf::Vector3f posVec{};
@@ -140,26 +140,27 @@ void SFML2DRenderer::ImplSFML2DRenderer::Render(uint32_t elemCnt, uint8_t* buffe
 
 }
 
-void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(SLD::Window& renderWindow)
+void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(SLD::Window&)
 {
-	auto winHandle{ renderWindow.GetWindowHandleToType<sf::WindowHandle>() };
-	if (m_RenderWindow->getSystemHandle() != winHandle)
-	{
-		m_RenderWindow = &renderWindow.GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
-	}
+	//auto winHandle{ renderWindow.GetWindowHandleToType<sf::WindowHandle>() };
+	//if (m_RenderWindow->getSystemHandle() != winHandle)
+	//{
+	//	m_RenderWindow = &renderWindow.GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
+	//}
 }
 
-void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
+void SFML2DRenderer::ImplSFML2DRenderer::SetRenderTarget(const SharedPtr<SLD::Window>&)
 {
-	if (renderWindow)
-	{
-		auto winHandle{ renderWindow->GetWindowHandleToType<sf::WindowHandle>() };
-		if (!m_RenderWindow ||
-			m_RenderWindow->getSystemHandle() != winHandle)
-		{
-			m_RenderWindow = &renderWindow->GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
-		}
-	}
+	
+	//if (renderWindow)
+	//{
+	//	auto winHandle{ renderWindow->GetWindowHandleToType<sf::WindowHandle>() };
+	//	if (!m_RenderWindow ||
+	//		m_RenderWindow->getSystemHandle() != winHandle)
+	//	{
+	//		m_RenderWindow = &renderWindow->GetWindowSubSystem<SFMLWindow>()->GetSFMLWindow();
+	//	}
+	//}
 }
 
 
@@ -180,7 +181,7 @@ void SFML2DRenderer::SetRenderTarget(SLD::Window & renderWindow)
 	m_pImplRenderWindow->SetRenderTarget(renderWindow);
 }
 
-void SFML2DRenderer::SetRenderTarget(const RefPtr<SLD::Window>&renderWindow)
+void SFML2DRenderer::SetRenderTarget(const SharedPtr<SLD::Window>&renderWindow)
 {
 	m_pImplRenderWindow->SetRenderTarget(renderWindow);
 }

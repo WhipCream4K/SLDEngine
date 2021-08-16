@@ -1,5 +1,3 @@
-
-
 #ifndef SLDFRAMEWORK_CORE_H
 #define SLDFRAMEWORK_CORE_H
 
@@ -8,7 +6,9 @@
 
 #include "../Debugging/GUIDebugComponent.h"
 #include "../Rendering/Renderer.h"
+#include "Window/Window.h"
 #include "WorldEntity.h"
+#include "Clock/WorldClock.h"
 
 #define CAN_CREATE_WINDOW_HANDLE 
 
@@ -18,7 +18,7 @@
 
 namespace SLD
 {
-	class Core final // singleton
+	class Core final
 	{
 	public:
 
@@ -29,16 +29,19 @@ namespace SLD
 		using windowHandle = std::any;
 		bool CreateViewPortFromHWND(const windowHandle& windowHandle);
 
+		bool CreateWindowFrame(uint32_t width, uint32_t height, const std::string& titleName);
+		
 #ifdef CAN_CREATE_WINDOW_HANDLE
 		bool CreateNewViewPort(uint32_t width, uint32_t height,const std::string& winName);
 #endif
 
-#pragma region Big 5
-
 		bool TranslateUserInputs();
 		void Step();
 		WorldEntity& GetDefaultWorldEntity();
+		WorldClock& GetClock();
 		
+#pragma region Big 5
+
 		Core(const Core&) = delete;
 		Core& operator=(const Core&) = delete;
 		Core(Core&&) = delete;
@@ -51,12 +54,13 @@ namespace SLD
 	private:
 
 		// TODO: possible implementation; make multiple windows
-		RefPtr<Window> m_MainViewPort;
+		SharedPtr<Window> m_MainViewPort;
 		GUIDebugComponent m_GuiDebugger;
 		Renderer m_MainRenderer;
 		WorldEntity m_WorldEntity;
+		WorldClock m_WorldClock;
 
-		void ShouldResizeWindow(const RefPtr<Window>& window, const EventQueueHandle& userEv);
+		//void ShouldResizeWindow(const SharedPtr<Window>& window, const EventQueueHandle& userEv);
 		
 #if defined(_WIN32) && defined(CAN_CREATE_WINDOW_HANDLE)
 		WNDCLASSEX m_WindowClass{};

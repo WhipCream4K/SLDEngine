@@ -4,14 +4,17 @@
 #include "../Math/rtm/qvvf.h"
 
 SLD::TransformComponent::TransformComponent()
-	: TickComponent()
-	, m_WorldPos()
+	: m_WorldPos()
 	, m_Scale(rtm::float3f{ 1.0f,1.0f,1.0f })
 	, m_Rotation()
 	, m_WorldFinishMatrix()
-	, m_HasUpdateWorldMatrix()
+	, m_State(TransformState::ShouldUpdateMatrix)
 {
 	UpdateWorldMatrix();
+}
+
+SLD::TransformComponent::~TransformComponent()
+{
 }
 
 
@@ -20,28 +23,52 @@ void SLD::TransformComponent::Translate(float x, float y, float z)
 	m_WorldPos.x = x;
 	m_WorldPos.y = y;
 	m_WorldPos.z = z;
+
+	m_WorldFinishMatrix.translation = rtm::vector_load3(&m_WorldPos);
+	m_State = TransformState::ShouldUpdateMatrix;
 }
 
 
 void SLD::TransformComponent::Translate(const rtm::float3f& pos)
 {
 	m_WorldPos = pos;
+	m_WorldFinishMatrix.translation = rtm::vector_load3(&m_WorldPos);
+	m_State = TransformState::ShouldUpdateMatrix;
+}
+
+void SLD::TransformComponent::Translate(const rtm::vector4f& pos)
+{
+	rtm::float3f newPos{};
+	rtm::vector_store3(pos, &newPos);
+	m_WorldPos = newPos;
+	m_WorldFinishMatrix.translation = pos;
+	m_State = TransformState::ShouldUpdateMatrix;
 }
 
 void SLD::TransformComponent::SetRotation(float x, float y, float z)
 {
 	const auto rotation = rtm::quat_from_euler(x, y, z);
 	rtm::quat_store(rotation, &m_Rotation);
+
+	m_WorldFinishMatrix.rotation = rtm::quat_load(&m_Rotation);
+	m_State = TransformState::ShouldUpdateMatrix;
 }
 
 void SLD::TransformComponent::SetRotation(const rtm::float4f& rot)
 {
 	m_Rotation = rot;
+
+	m_WorldFinishMatrix.rotation = rtm::quat_load(&m_Rotation);
+
+	m_State = TransformState::ShouldUpdateMatrix;
 }
 
 void SLD::TransformComponent::SetRotation(const rtm::quatf& rot)
 {
 	rtm::quat_store(rot, &m_Rotation);
+
+	m_WorldFinishMatrix.rotation = rtm::quat_load(&m_Rotation);
+	m_State = TransformState::ShouldUpdateMatrix;
 }
 
 void SLD::TransformComponent::SetScale(float x, float y, float z)
@@ -49,11 +76,17 @@ void SLD::TransformComponent::SetScale(float x, float y, float z)
 	m_Scale.x = x;
 	m_Scale.y = y;
 	m_Scale.z = z;
+
+	m_WorldFinishMatrix.scale = rtm::vector_load3(&m_Scale);
+	m_State = TransformState::ShouldUpdateMatrix;
 }
 
 void SLD::TransformComponent::SetScale(const rtm::float3f& scale)
 {
 	m_Scale = scale;
+	m_WorldFinishMatrix.scale = rtm::vector_load3(&m_Scale);
+
+	m_State = TransformState::ShouldUpdateMatrix;
 }
 
 const rtm::float3f& SLD::TransformComponent::GetWorldPos() const
@@ -76,14 +109,25 @@ rtm::float3f SLD::TransformComponent::GetLocalRotationEuler() const
 	return rtm::float3f{};
 }
 
-const rtm::qvvf& SLD::TransformComponent::GetWorldFinishMatrix() const
+SLD::TransformState SLD::TransformComponent::GetTransformState() const
+{
+	return m_State;
+}
+
+const rtm::qvvf& SLD::TransformComponent::GetWorldMatrix() const
 {
 	return m_WorldFinishMatrix;
 }
 
-void SLD::TransformComponent::AsyncUpdate([[maybe_unused]] float deltaTime)
+const rtm::qvvf& SLD::TransformComponent::GetWorldMatrix()
 {
-	UpdateWorldMatrix();
+	switch (m_State)
+	{
+	case TransformState::ShouldUpdateMatrix:	UpdateWorldMatrix(); return m_WorldFinishMatrix;
+	case TransformState::UpToDateMatrix:		return m_WorldFinishMatrix;
+	}
+
+	return m_WorldFinishMatrix;
 }
 
 void SLD::TransformComponent::UpdateWorldMatrix()
@@ -97,5 +141,5 @@ void SLD::TransformComponent::UpdateWorldMatrix()
 	// translation
 	m_WorldFinishMatrix.translation = rtm::vector_load3(&m_WorldPos);
 
-	//m_WorldMatrix = rtm::matrix_from_qvv()
+	m_State = TransformState::UpToDateMatrix;
 }

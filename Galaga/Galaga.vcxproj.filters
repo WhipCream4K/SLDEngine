@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{fa81b180-9616-442b-bd6d-12856983dcf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prefabs">
+      <UniqueIdentifier>{9ce4ff15-a999-4b8f-ac3b-39c89f276138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{ca8fc331-5f7e-44a3-b950-18bf964464cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems">
+      <UniqueIdentifier>{b4916e5a-6141-44ba-8679-367946b5bfe4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Galaga.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GalagaScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRenderSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerInputSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="OnBulletContact.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Box2DDebugDraw.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="LimitPlayerToPlayArea.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="ShootableComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ReloadShooter.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Prefabs</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Prefabs</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateProjectile.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="BulletManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Zako.cpp">
+      <Filter>Prefabs</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Prefabs</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateParticle.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleSpriteOutOfWindow.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStateSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStateComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemySpawnerSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="LineDebugDraw.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="BezierPath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateFlyInPath.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyStateSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyPath.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="SpawnStages.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Goei.cpp">
+      <Filter>Prefabs</Filter>
+    </ClCompile>
+    <ClCompile Include="FormationWayPoints.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateFormationWayPoints.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Galagas.cpp">
+      <Filter>Prefabs</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GalagaScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyComponents.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteRenderSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerInputSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="OnBulletContact.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Box2DDebugDraw.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="LimitPlayerToPlayArea.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="ShootableComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ReloadShooter.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Prefabs</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Prefabs</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateProjectile.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="BulletManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Zako.h">
+      <Filter>Prefabs</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Prefabs</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateParticle.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleSpriteOutOfWindow.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaySystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemySpawnerSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="LineDebugDraw.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="BezierCurve.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="BezierPath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateFlyInPath.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyStateSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyPath.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnData.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnStages.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Goei.h">
+      <Filter>Prefabs</Filter>
+    </ClInclude>
+    <ClInclude Include="FormationWayPoints.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateFormationWayPoints.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnPaths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyVariable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Galagas.h">
+      <Filter>Prefabs</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

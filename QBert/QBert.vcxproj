@@ -129,6 +129,7 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)ExtDependencies\fmod\lib\x86\*.dll" "$(OutDir)" /y /D</Command>
@@ -173,6 +174,7 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <Profile>true</Profile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)ExtDependencies\fmod\lib\x64\*.dll" "$(OutDir)" /y /D</Command>

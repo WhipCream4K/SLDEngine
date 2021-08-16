@@ -23,8 +23,8 @@ public:
 
 	struct Platform
 	{
-		RefPtr<SLD::GameObject> gameObject{};
-		RefPtr<SLD::Tracker> spriteHandle{};
+		SharedPtr<SLD::GameObject> gameObject{};
+		SharedPtr<SLD::Tracker> spriteHandle{};
 		std::vector<Node> edges{};
 		uint32_t stepCount{};
 		int currentSpriteId{};
@@ -54,8 +54,8 @@ public:
 	void SetSpriteOrigin(const sf::IntRect& textureRect);
 	void SetSpriteTextureRectFromId(int id, const sf::IntRect& textureRect);
 	void ChangeAllPlatformSprite(int id);
-	void ChangeAllPlatformSprite(const RefPtr<sf::Sprite>& sprite);
-	void ChangePlatformSprite(const RefPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col);
+	void ChangeAllPlatformSprite(const SharedPtr<sf::Sprite>& sprite);
+	void ChangePlatformSprite(const SharedPtr<sf::Sprite>& sprite, uint32_t row, uint32_t col);
 	void ChangePlatformTextureRect(const sf::IntRect& textureRect, uint32_t row, uint32_t col);
 	void ChangeAllPlatformTextureRect(const sf::IntRect& textureRect);
 	rtm::float3f GetHexGridPos(int row, int col);
@@ -72,7 +72,7 @@ public:
 	
 	void ChangeLevelSprite(LevelState state);
 	bool IsFlyingDiscExist(const Node& check);
-	void UseFlyingDisc(const RefPtr<Player>& player,int row,int col);
+	void UseFlyingDisc(const SharedPtr<Player>& player,int row,int col);
 
 private:
 
@@ -90,8 +90,8 @@ private:
 	void PreInitializeFlyingDisc(SLDWorldEntity& world,int startAmount);
 
 	HexGrid m_HexPlatform;
-	std::vector<RefPtr<sf::Sprite>> m_SwapSprites;
-	std::vector<RefPtr<FlyingDisc>> m_FlyingDiscs;
+	std::vector<SharedPtr<sf::Sprite>> m_SwapSprites;
+	std::vector<SharedPtr<FlyingDisc>> m_FlyingDiscs;
 	std::string m_MapLayOutFile;
 	LevelState m_CurrentState;
 	int m_SpriteFlashCount{};

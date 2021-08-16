@@ -4,95 +4,94 @@
 
 #include "../../Inputs/InputManager.h"
 
-#include "MainSubSystem.h"
+//#include "MainSubSystem.h"
+namespace sf
+{
+	class RenderWindow;
+}
 
 namespace SLD
 {
-	// Viewport is pretty much window instance on each platform
-	// it knows the height width and can listen to user inputs
-	class Window final
+
+#if SLD_SUPPORT_SFML
+	using WindowHandle = SharedPtr<sf::RenderWindow>;
+#else
+	using WindowHandle = void*;
+#endif
+
+	class Window
 	{
-		
+
 	public:
+
+		struct WindowMessages
+		{
+			std::array<InputParams::MessageBus2, MinimumEventCnt> wndMessages;
+			uint8_t totalMessages = 0;
+		};
 
 		class ImplXInput;
 		using CurrentWindow = std::any;
-		
-		Window(
-			uint32_t width,
-			uint32_t height,
-			LLWindow&& subSystemWindow,
-			LLInputs&& subSystemInput,
-			const CurrentWindow& windowHandle,
-			const std::string& vpName);
-		~Window();
-		
-		//[[nodiscard]] InputManager& GetInputManager() { return m_InputManager; }
+
+		Window(uint32_t width, uint32_t height, const std::string& windowTitleName);
+		virtual ~Window();
 
 		[[nodiscard]] uint32_t GetWidth() const { return m_Width; }
 		[[nodiscard]] uint32_t GetHeight() const { return m_Height; }
-		[[nodiscard]] const std::string& GetViewPortName() const { return m_Name; }
-		
-		template<typename CastTo>
-		[[nodiscard]] constexpr CastTo GetWindowHandleToType() const;
+		[[nodiscard]] Vector2<uint32_t> GetCenter() const;
+		[[nodiscard]] const std::string& GetTitleName() const { return m_Name; }
 
-		[[nodiscard]] const std::any& GetAnyWindowHandle() const { return m_WindowHandle; }
-
-		template<typename WindowType>
-		[[nodiscard]] constexpr std::add_pointer_t<WindowType> GetWindowSubSystem() noexcept;
-		
-		//template<typename WindowType>
-		//[[nodiscard]] constexpr std::add_pointer_t<const WindowType> GetWindowSubsystem() const noexcept;
-
-
-		void Resize(uint32_t width, uint32_t height);
+		// Discard the use of std any because it's not good for run-time
+		[[nodiscard]] WindowHandle GetNativeWindowHandle() const { return m_WindowHandle; }
 
 		// Must Use at the start of the frame
-		bool PollUserInputs();
-		
-		EventQueueHandle GetInputData() const noexcept;
+		//bool PollUserInputs();
 
+		//EventQueueHandle GetInputData() const noexcept;
+		const WindowMessages& PollWindowMessages(bool& shouldEarlyExit);
+
+		virtual void OnResize(uint32_t, uint32_t) {}
+		virtual void OnGainFocus() {}
+		virtual void OnLostFocus() {}
+		virtual void OnWindowMove() {}
+
+		//TODO: Maybe send out a notification that any entities can subscribe on
+		void Resize(uint32_t width, uint32_t height);
+		void SetVSync(bool value);
 		void Present();
 		void ClearBackBuffer();
 
-	
+		Window(const Window&) = delete;
+		Window& operator=(const Window&) = delete;
+
 	private:
 
-		//bool QueryWindowEvents();
-		
-		// Low-Level window
-		LLWindow m_WindowSubSystem;
-		
+		void InternInitialize(uint32_t width, uint32_t height, const std::string& windowTitleName);
+		void InternDestroy() noexcept;
 
-		// TODO: Delete Input manager
-		
-		std::array<MessageBus, MinimumEventCnt> m_WindowEvents;
+		WindowMessages m_WndMessages;
 		OwnedPtr<ImplXInput> m_pImplXInput;
-		uint8_t m_EventCntThisFrame;
-		//InputManager m_InputManager;
 
-		
 		std::string m_Name;
+		float m_ClearColor[4];
 		uint32_t m_Height;
 		uint32_t m_Width;
-		std::any m_WindowHandle;
-		float m_ClearColor[4];
+		WindowHandle m_WindowHandle;
 		bool m_ShouldVSync{};
 	};
 
-	template <typename CastTo>
-	constexpr CastTo Window::GetWindowHandleToType() const
-	{
-		return std::any_cast<CastTo>(m_WindowHandle);
-	}
+	//template <typename CastTo>
+	//constexpr CastTo Window::GetWindowHandleToType() const
+	//{
+	//	return std::any_cast<CastTo>(m_WindowHandle);
+	//}
 
-	template <typename WindowType>
-	constexpr std::add_pointer_t<WindowType> Window::GetWindowSubSystem() noexcept
-	{
-		return std::get_if<WindowType>(&m_WindowSubSystem);
-	}
+	//template <typename WindowType>
+	//constexpr std::add_pointer_t<WindowType> Window::GetWindowSubSystem() noexcept
+	//{
+	//	return std::get_if<WindowType>(&m_WindowSubSystem);
+	//}
 }
-
 
 
 #endif

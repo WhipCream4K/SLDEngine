@@ -4,13 +4,16 @@
 
 #include "Core/Base.h"
 #include "Core/Core.h"
+#include "GameObject/Prefab.h"
+#include "GameObject/GameObject.h"
+#include "Inputs/InputParams.h"
 
 using SLDFramework = SLD::Core;
 using SLDWorldEntity = SLD::WorldEntity;
 
 //#ifdef SLD_APPLICATION_CLASS
 //
-//inline RefPtr<SLD_APPLICATION_CLASS> CreateApplication()
+//inline SharedPtr<SLD_APPLICATION_CLASS> CreateApplication()
 //{
 //	return std::make_shared<SLD_APPLICATION_CLASS>();
 //}

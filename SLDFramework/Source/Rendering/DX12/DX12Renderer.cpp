@@ -4,7 +4,7 @@
 #ifdef HAS_DX12
 
 void DX12Renderer::Render(const ComPtr<ID3D12GraphicsCommandList2>& directCommandList,
-	const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents) const
+	const std::vector<SharedPtr<SLD::RenderingComponent>>& renderingComponents) const
 {
 	// assume that render target is already in RENDER_TARGET state
 	// *** RENDER CODE HERE ***
@@ -43,7 +43,7 @@ void DX12Renderer::TransitionResource(const ComPtr<ID3D12GraphicsCommandList2>& 
 
 #endif
 
-//void DX12Renderer::Render(const std::vector<RefPtr<SLD::RenderingComponent>>& renderingComponents) const
+//void DX12Renderer::Render(const std::vector<SharedPtr<SLD::RenderingComponent>>& renderingComponents) const
 //{
 //	renderingComponents;
 //}
@@ -58,7 +58,7 @@ void DX12Renderer::TransitionResource(const ComPtr<ID3D12GraphicsCommandList2>& 
 //	renderWindow;
 //}
 //
-//void DX12Renderer::SetRenderTarget(const RefPtr<SLD::Window>& renderWindow)
+//void DX12Renderer::SetRenderTarget(const SharedPtr<SLD::Window>& renderWindow)
 //{
 //	renderWindow;
 //}

@@ -1,6 +1,22 @@
 #include "InputManager.h"
 
-#include "InputSetting.h"
+#include "InputSettings.h"
+
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include "../Miscellaneous/WinPrerequisite.h"
+#include "../Miscellaneous/WinXInput.h"
+#include "../Core/Window/Window.h"
+
+constexpr SHORT GAMEPAD_LEFT_THUMBSTICK_Y_DEADZONE{ 7849 };
+constexpr SHORT GAMEPAD_LEFT_THUMBSTICK_X_DEADZONE{ 7849 };
+constexpr SHORT GAMEPAD_RIGHT_THUMBSTICK_Y_DEADZONE{ 8689 };
+constexpr SHORT GAMEPAD_RIGHT_THUMBSTICK_X_DEADZONE{ 8689 };
+constexpr BYTE	GAMEPAD_LEFT_TRIGGER_DEADZONE{ 30 };
+constexpr BYTE	GAMEPAD_RIGHT_TRIGGER_DEADZONE{ 30 };
+
+std::array<SLD::InputParams::JoyStickEvent,
+	SLD::InputManager::MaxSupportedControllers> SLD::InputManager::m_MainJoyStickEvents{};
 
 uint32_t SLD::InputManager::CreateHashId(const std::string& str, InputEvent ie)
 {
@@ -11,137 +27,187 @@ uint32_t SLD::InputManager::CreateHashId(const std::string& str, InputEvent ie)
 	return hashName ^ (hashIE << 1);
 }
 
-//SLD::InputManager::InputManager(const CurrentWindow& handle)
-//	: m_EventBuses()
-//	, m_SubSystemInput(SFMLInputs{ handle })
-//	, m_EventCntThisFrame()
-//{
-//}
-
-SLD::InputManager::InputManager(LLInputs&& subSystem)
-	: m_EventBuses()
-	, m_SubSystemInput(std::move(subSystem))
-	, m_EventCntThisFrame()
+void SLD::InputManager::QueryUserInputsAsyncMaybe([[maybe_unused]] const SharedPtr<Window>& relativeWindow, KeyPool& keyPool)
 {
-}
+	using namespace InputParams;
 
-bool SLD::InputManager::TranslateWindowsMessages()
-{
-	auto callReadInputs{ [](auto& subSystem)
-	{
-		return subSystem.ReadInputs();
-	} };
-	
-	const auto readOut = std::visit(callReadInputs, m_SubSystemInput);
+#ifdef SLD_SUPPORT_SFML
 
-	if (!readOut.isExit)
+	const uint8_t activeGamepadCnt{ PollXInputJoyStickEvent() };
+
+	for (auto& [key, state] : keyPool)
 	{
-		m_EventCntThisFrame = readOut.eventCnt;
-		m_EventBuses = readOut.buses;
+		bool isPressed{};
+		float& valueFromDevice{ state.axisValue };
+		uint8_t& userIndex{ state.userIndex };
+
+		switch (key.inputDevice)
+		{
+		case InputDevice::D_Keyboard:
+
+			isPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key(key.keyCode));
+			valueFromDevice = isPressed ? 1.0f : 0.0f;
+
+			// keyboard only returned player index 0, for now
+			userIndex = 0;
+
+			break;
+		case InputDevice::D_Mouse: break;
+		case InputDevice::D_Gamepad:
+
+			for (uint8_t i = 0; i < activeGamepadCnt; ++i)
+			{
+				const auto& stickEvents{ m_MainJoyStickEvents[i] };
+
+				// process the float value of the Game pad
+				switch (GamePadKey(key.keyCode))
+				{
+				case GamePadKey::GPK_Left_Shoulder:		
+					valueFromDevice = stickEvents.leftTrigger;
+					isPressed = stickEvents.axisValueTriggered;
+					break;
+				case GamePadKey::GPK_Right_Shoulder:	
+					valueFromDevice = stickEvents.rightTrigger;
+					isPressed = stickEvents.axisValueTriggered;
+					break;
+				case GamePadKey::GPK_Right_AxisX:		
+					valueFromDevice = stickEvents.rightThumbX;
+					isPressed = stickEvents.axisValueTriggered;
+					break;
+				case GamePadKey::GPK_Right_AxisY:		
+					valueFromDevice = stickEvents.rightThumbY;
+					isPressed = stickEvents.axisValueTriggered;
+					break;
+				case GamePadKey::GPK_Left_AxisX:		
+					valueFromDevice = stickEvents.leftThumbX;
+					isPressed = stickEvents.axisValueTriggered;
+					break;
+				case GamePadKey::GPK_Left_AxisY:		
+					valueFromDevice = stickEvents.leftThumbY;
+					isPressed = stickEvents.axisValueTriggered;
+					break;
+				default:
+					isPressed = stickEvents.joyStickButton & key.keyCode;
+					break;
+				}
+
+				userIndex = stickEvents.joyStickId;
+			}
+
+			break;
+		}
+
+		// Change Input Event
+		InputEvent& currentKeyState{ state.keyEvent };
+
+		if (isPressed)
+		{
+			switch (currentKeyState)
+			{
+			case InputEvent::IE_Pressed:	currentKeyState = InputEvent::IE_Down;		break;
+			case InputEvent::IE_Released:
+			case InputEvent::IE_None:		currentKeyState = InputEvent::IE_Pressed;	break;
+			default: break;
+			}
+		}
+		else
+		{
+			switch (currentKeyState)
+			{
+			case InputEvent::IE_Pressed:
+			case InputEvent::IE_Down:		currentKeyState = InputEvent::IE_Released; break;
+			case InputEvent::IE_Released:	currentKeyState = InputEvent::IE_None;		break;
+			default: break;
+			}
+		}
 	}
 
-	return readOut.isExit;
-#pragma region InputSettingRegion
-
-	//const auto& actionKeyMappings{ inputSettingRef.GetAllActionMappings() };
-	//const auto& axisKeyMappings{ inputSettingRef.GetAllAxisMappings() };
-	//
-	//while (m_SFMLWindowHandle.pollEvent(ev))
-	//{
-	//	switch (ev.type)
-	//	{
-	//	case sf::Event::KeyPressed:
-
-	//		const Key key{ InputDevice::D_Keyboard,uint16_t(ev.key.code) };
-	//		const InputEvent inEv{ InputEvent::IE_Pressed };
-	//		
-	//		for (const auto& mapping : actionKeyMappings)
-	//		{
-	//			const auto& actionMap{ mapping.second };
-	//			const auto& keyPool{ actionMap.keyPool };
-	//			const auto& commands{ actionMap.commands };
-
-	//			// check if key is exist
-	//			if(keyPool.find(key) != keyPool.end())
-	//			{
-	//				// HOT ZONE
-	//				for (const auto& cm : commands)
-	//				{
-	//					if(cm.iEvent == inEv)
-	//					{
-	//						cm.callback->Invoke();
-	//					}
-	//				}
-	//			}
-	//		}
-
-	//		break;
-	//	}
-	//}
-
-#pragma endregion 
+#endif
 }
 
-SLD::EventQueueHandle SLD::InputManager::GetEventQueueHandle() const noexcept
+uint8_t SLD::InputManager::PollXInputJoyStickEvent()
 {
-	return { m_EventBuses,m_EventCntThisFrame };
+	uint8_t activeCnt{};
+
+#ifdef _WIN32
+
+	for (DWORD i = 0; i < DWORD(MaxSupportedControllers); ++i)
+	{
+		XINPUT_STATE state{};
+		auto result{ XInputGetState(i,&state) };
+		if (result == ERROR_SUCCESS)
+		{
+			// success
+			InputParams::JoyStickEvent joyStick{};
+			joyStick.joyStickId = uint8_t(i);
+			joyStick.joyStickButton = uint16_t(state.Gamepad.wButtons);
+
+			bool isOutsideDeadZone{ true };
+			uint8_t isAxisTriggeredCnt{};
+			uint8_t isAxisTriggered{};
+
+			// Left Trigger Dead zone
+			isOutsideDeadZone = state.Gamepad.bLeftTrigger > GAMEPAD_LEFT_TRIGGER_DEADZONE;
+			isAxisTriggered += uint8_t((isOutsideDeadZone) << isAxisTriggeredCnt++);
+			state.Gamepad.bLeftTrigger = isOutsideDeadZone ? state.Gamepad.bLeftTrigger - GAMEPAD_LEFT_TRIGGER_DEADZONE : 0;
+
+			joyStick.leftTrigger = float(state.Gamepad.bLeftTrigger) / (UCHAR_MAX - GAMEPAD_LEFT_TRIGGER_DEADZONE);
+
+			// Right Trigger Dead zone
+			isOutsideDeadZone = state.Gamepad.bRightTrigger > GAMEPAD_RIGHT_TRIGGER_DEADZONE;
+			isAxisTriggered = uint8_t(isOutsideDeadZone << isAxisTriggeredCnt++);
+			state.Gamepad.bRightTrigger = isOutsideDeadZone ? state.Gamepad.bRightTrigger - GAMEPAD_RIGHT_TRIGGER_DEADZONE : 0;
+
+			joyStick.rightTrigger = float(state.Gamepad.bRightTrigger) / (UCHAR_MAX - GAMEPAD_RIGHT_TRIGGER_DEADZONE);
+
+			// Left Thumb X Dead zone
+			SHORT& leftThumbX{ state.Gamepad.sThumbLX };
+			float sign{ leftThumbX < 0 ? -1.0f : 1.0f };
+			const int absLeftThumb{ abs(int(leftThumbX)) };
+			isOutsideDeadZone = absLeftThumb > GAMEPAD_LEFT_THUMBSTICK_X_DEADZONE;
+			isAxisTriggered += uint8_t(isOutsideDeadZone << isAxisTriggeredCnt++);
+			leftThumbX = (isOutsideDeadZone ? (SHORT)(absLeftThumb)-GAMEPAD_LEFT_THUMBSTICK_X_DEADZONE : 0);
+
+			joyStick.leftThumbX = float(leftThumbX) * sign / (SHRT_MAX - GAMEPAD_LEFT_THUMBSTICK_X_DEADZONE);
+
+			// Left Thumb Y Dead zone
+			SHORT& leftThumbY{ state.Gamepad.sThumbLY };
+			const int absLeftThumbY{ abs(int(leftThumbY)) };
+			sign = leftThumbY < 0 ? -1.0f : 1.0f;
+			isOutsideDeadZone = absLeftThumbY > GAMEPAD_LEFT_THUMBSTICK_Y_DEADZONE;
+			isAxisTriggered += uint8_t(isOutsideDeadZone << isAxisTriggeredCnt++);
+			leftThumbY = isOutsideDeadZone ? (SHORT)absLeftThumbY - GAMEPAD_LEFT_THUMBSTICK_Y_DEADZONE : 0;
+
+			joyStick.leftThumbY = float(leftThumbY) * sign / (SHRT_MAX - GAMEPAD_LEFT_THUMBSTICK_Y_DEADZONE);
+
+			// Right Thumb X Dead zone
+			SHORT& rightThumbX{ state.Gamepad.sThumbRX };
+			sign = rightThumbX < 0 ? -1.0f : 1.0f;
+			const int absRightThumbX{ abs(int(rightThumbX)) };
+			isOutsideDeadZone = absRightThumbX > GAMEPAD_RIGHT_THUMBSTICK_X_DEADZONE;
+			isAxisTriggered += uint8_t(isOutsideDeadZone << isAxisTriggeredCnt++);
+			rightThumbX = isOutsideDeadZone ? (SHORT)absRightThumbX - GAMEPAD_RIGHT_THUMBSTICK_X_DEADZONE : 0;
+
+			joyStick.rightThumbX = float(rightThumbX) * sign / (SHRT_MAX - GAMEPAD_RIGHT_THUMBSTICK_X_DEADZONE);
+
+			// Right Thumb Y Dead zone
+			SHORT& rightThumbY{ state.Gamepad.sThumbRY };
+			sign = rightThumbX < 0 ? -1.0f : 1.0f;
+			const int absRightThumbY{ abs(int(rightThumbX)) };
+			isOutsideDeadZone = absRightThumbY > GAMEPAD_RIGHT_THUMBSTICK_Y_DEADZONE;
+			isAxisTriggered += uint8_t(isOutsideDeadZone << isAxisTriggeredCnt++);
+			rightThumbY = isOutsideDeadZone ? (SHORT)absRightThumbY - GAMEPAD_RIGHT_THUMBSTICK_Y_DEADZONE : 0;
+
+			joyStick.rightThumbY = float(rightThumbY) * sign / (SHRT_MAX - GAMEPAD_RIGHT_THUMBSTICK_Y_DEADZONE);
+
+			joyStick.axisValueTriggered = isAxisTriggered ^ 0;
+
+			m_MainJoyStickEvents[activeCnt] = joyStick;
+			++activeCnt;
+		}
+	}
+
+#endif
+
+	return activeCnt;
 }
-
-//std::optional<const sf::Event*> SLD::InputManager::QuerySingleEvent(sf::Event::EventType evType) const noexcept
-//{
-//	for (uint8_t i = 0; i < m_EventCntThisFrame; ++i)
-//	{
-//		if (m_EventStack[i].type == evType)
-//			return &m_EventStack[i];
-//	}
-//
-//	return std::nullopt;
-//}
-
-//std::optional<std::vector<const sf::Event*>> SLD::InputManager::QueryMultipleEvent(
-//	std::initializer_list<sf::Event::EventType> evTypes) const
-//{
-//	if (m_EventCntThisFrame)
-//		return std::nullopt;
-//
-//	std::vector<const sf::Event*> outEvStack{};
-//
-//	for (uint8_t i = 0; i < m_EventCntThisFrame; ++i)
-//	{
-//		for (const auto& evType : evTypes)
-//		{
-//			const auto& temp{ m_EventStack[i] };
-//			if (temp.type == evType)
-//				outEvStack.emplace_back(&temp);
-//		}
-//	}
-//
-//	return { outEvStack };
-//}
-
-//SLD::EventQueueHandle SLD::InputManager::GetEventQueueHandle() const noexcept
-//{
-//	return EventQueueHandle{ m_EventStack,m_EventCntThisFrame };
-//}
-//
-//SLD::InputManager::InputManager(InputManager&& other) noexcept
-//	: m_EventStack(other.m_EventStack)
-//	, m_SFMLWindowHandle(other.m_SFMLWindowHandle.getSystemHandle())
-//	, m_EventCntThisFrame(other.m_EventCntThisFrame)
-//{
-//	other.m_SFMLWindowHandle.close();
-//}
-//
-//SLD::InputManager& SLD::InputManager::operator=(InputManager&& other) noexcept
-//{
-//	if (this != &other)
-//	{
-//		m_EventStack = std::move(other.m_EventStack);
-//		m_SFMLWindowHandle.create(other.m_SFMLWindowHandle.getSystemHandle());
-//		other.m_SFMLWindowHandle.close();
-//		m_EventCntThisFrame = other.m_EventCntThisFrame;
-//		other.m_EventCntThisFrame = 0;
-//	}
-//
-//	return *this;
-//}

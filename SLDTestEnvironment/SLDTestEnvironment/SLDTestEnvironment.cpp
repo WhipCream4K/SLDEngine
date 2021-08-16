@@ -33,11 +33,12 @@ TEST_CASE("Test Event System")
 		}
 	};
 
-	RefPtr<UserClass> subject{ std::make_shared<UserClass>() };
+	SharedPtr<UserClass> subject{ std::make_shared<UserClass>() };
 	
-	RefPtr<EventHandler> ev1{ std::make_shared<Event<decltype(&UserClass::Update)>>(&UserClass::Update,subject) };
-
-	ev1->Invoke();
+	//SharedPtr<EventHandler> ev1{ std::make_shared<Event<decltype(&UserClass::Update)>>(&UserClass::Update,subject) };
+	//SharedPtr<EventHandler> ev1{ std:: };
+	
+	//ev1->Invoke();
 	//int p1{ 2 }, p2{ 3 };
 	//EventHandler ev1 = Event<int(int, int)>::Create(&mul, p1, p2);
 	//
@@ -209,7 +210,7 @@ TEST_CASE("RenderComponent Test")
 	class UserClass
 	{
 	public:
-		void OnDraw(const RefPtr<RendererInterface>&) const
+		void OnDraw(const SharedPtr<RendererInterface>&) const
 		{
 			std::cout << "Hello OnDraw\n";
 		}
@@ -279,7 +280,7 @@ private:
 template<size_t Count>
 auto Scope()
 {
-	RefPtr<TestSubject[]> stack{ new TestSubject[Count] };
+	SharedPtr<TestSubject[]> stack{ new TestSubject[Count] };
 	return CustomStaticArray{ stack, Count, Count };
 }
 
@@ -355,7 +356,7 @@ TEST_CASE("InputComponent")
 	//	}
 	//};
 
-	//RefPtr<UserClass> obj{ std::make_shared<UserClass>() };
+	//SharedPtr<UserClass> obj{ std::make_shared<UserClass>() };
 	//InputComponent subject{};
 	//subject.BindAction("Jump", InputEvent::IE_Pressed,&UserClass::Jump,obj);
 	//subject.BindAxis("Horizontal", &UserClass::Update, obj);

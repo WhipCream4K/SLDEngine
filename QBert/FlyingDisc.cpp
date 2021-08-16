@@ -80,7 +80,7 @@ void FlyingDisc::Update(float deltaTime)
 	PlayNaiveAnim(deltaTime);
 }
 
-void FlyingDisc::AttachToPlayer(const RefPtr<Player>& player)
+void FlyingDisc::AttachToPlayer(const SharedPtr<Player>& player)
 {
 	m_Parent = player;
 }
