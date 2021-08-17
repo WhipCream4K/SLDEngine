@@ -194,6 +194,7 @@
     <ClCompile Include="UpdateParticle.cpp" />
     <ClCompile Include="UpdateProjectile.cpp" />
     <ClCompile Include="Zako.cpp" />
+    <ClCompile Include="ZakoDiveSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SLDFramework\Source\SLDFramework.vcxproj">
@@ -240,6 +241,7 @@
     <ClInclude Include="UpdateParticle.h" />
     <ClInclude Include="UpdateProjectile.h" />
     <ClInclude Include="Zako.h" />
+    <ClInclude Include="ZakoDiveSystem.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

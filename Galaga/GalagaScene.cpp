@@ -53,8 +53,6 @@ void GalagaScene::WorldCreation()
 		//const auto testLine{ GameObject::Create(world) };
 		//testLine->AddComponent<LineComponent>({ {-100.0f,0.0f},{100.0f,0.0f} });
 
-		
-		
 		world.AddSystem<SpriteRenderSystem>(world);
 		world.AddSystem<HandleSpriteOutOfWindow>({ world,{1280,720} });
 		world.AddSystem<GameStateSystem>({ world });

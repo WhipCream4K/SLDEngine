@@ -63,6 +63,11 @@ SLD::Box2DComponent::Box2DComponent(WorldEntity& world, const b2BodyDef& bodyDef
 		}
 	} };
 
+	const auto& [x, y] = m_PhysicsBody->GetPosition();
+
+	m_Position.x = x;
+	m_Position.y = y;
+	
 	b2Fixture* fixture{ m_PhysicsBody->CreateFixture(&fixtureDef) };
 	fixture->GetUserData().pointer = bodyDef.userData.pointer;
 }
@@ -78,6 +83,11 @@ SLD::Box2DComponent::Box2DComponent(WorldEntity& world, const b2BodyDef& bodyDef
 	data.bodyDef = bodyDef;
 	data.shape = shape;
 
+	const auto& [x, y] = m_PhysicsBody->GetPosition();
+
+	m_Position.x = x;
+	m_Position.y = y;
+	
 	world.AddPhysiscsBodyDef(data);
 }
 
@@ -114,7 +124,10 @@ SLD::Box2DComponent::Box2DComponent(WorldEntity& world, b2BodyDef& bodyDef, floa
 		}
 	} };
 
+	const auto& [x, y] = m_PhysicsBody->GetPosition();
 
+	m_Position.x = x;
+	m_Position.y = y;
 	
 	b2Fixture* fixture{ m_PhysicsBody->CreateFixture(&shape, density) };
 	fixture->GetUserData().pointer = bodyDef.userData.pointer;
@@ -126,6 +139,30 @@ SLD::Box2DComponent::Box2DComponent(WorldEntity& world, b2BodyDef& bodyDef, floa
 //data.bodyDef = bodyDef;
 
 //world.AddPhysiscsBodyDef(data);
+}
+
+void SLD::Box2DComponent::SetPosition(const rtm::float2f& pos)
+{
+	m_Position = pos;
+	m_RigidBodyState = State::Teleport;
+}
+
+void SLD::Box2DComponent::SetVelocity(const rtm::float2f& velocity)
+{
+	m_Velocity = velocity;
+
+	m_RigidBodyState = State::Sweep;
+	m_PhysicsBody->SetLinearVelocity({velocity.x,velocity.y});
+}
+
+const rtm::float2f& SLD::Box2DComponent::GetPosition() const
+{
+	return m_Position;
+}
+
+const rtm::float2f& SLD::Box2DComponent::GetVelocity() const
+{
+	return m_Velocity;
 }
 
 const b2Filter& SLD::Box2DComponent::GetContactFilter() const
@@ -152,4 +189,9 @@ const SharedPtr<b2Body>& SLD::Box2DComponent::GetBody() const
 void SLD::Box2DComponent::SetPhysicsBody(const SharedPtr<b2Body>& body)
 {
 	m_PhysicsBody = body;
+}
+
+SLD::Box2DComponent::State SLD::Box2DComponent::GetState() const
+{
+	return m_RigidBodyState;
 }

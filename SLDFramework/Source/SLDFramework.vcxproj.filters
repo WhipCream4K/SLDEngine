@@ -345,9 +345,6 @@
     <ClInclude Include="Physics\System\PhysicsCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="System\AsyncTransformUpdate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\System\PhysicsToTransformUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -364,6 +361,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tracer\minitrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System\AsyncSystemT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\System\WorldToPhysicsUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -500,9 +503,6 @@
     <ClCompile Include="Physics\System\PhysicsCallback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="System\AsyncTransformUpdate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\System\PhysicsToTransformUpdate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -513,6 +513,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tracer\minitrace.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System\AsyncSystemT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\System\WorldToPhysicsUpdate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

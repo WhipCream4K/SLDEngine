@@ -78,7 +78,7 @@ void GameStateSystem::HandlePlayState(GameStateComponent*)
 		systems.push_back(m_World.AddSystem<UpdateFormationWayPoints>({ m_World,hopInterval }));
 		
 		
-		const rtm::float3f playerSpawnPoint{ 0.0f,-200.0f,float(size_t(GalagaScene::Layer::Player)) };
+		const rtm::float3f playerSpawnPoint{ 0.0f,-260.0f,float(size_t(GalagaScene::Layer::Player)) };
 		for (size_t i = 0; i < m_PlayerCount; ++i)
 		{
 			InstantiatePrefab<Player>(m_World, {i}, {playerSpawnPoint});

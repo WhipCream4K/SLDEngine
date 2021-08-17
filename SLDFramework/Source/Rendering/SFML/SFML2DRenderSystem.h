@@ -17,7 +17,6 @@ namespace SLD
 		virtual ~SFML2DRenderSystem() override = default;
 
 		virtual void OnRender(const SharedPtr<Window>& renderWindow, GameObjectId id, const TransformComponent*, Args*...) override = 0;
-		virtual void InternalRender(const SharedPtr<Window>& renderWindow, std::vector<GameObjectId>& validGameObjectIds) override;
 		virtual void InternalRender(const SharedPtr<Window>& renderWindow,  std::vector<RenderObject>& validRenderObjects) override;
 	
 	protected:
@@ -58,58 +57,58 @@ namespace SLD
 		}
 	}
 
-	template <typename ... Args>
-	void SFML2DRenderSystem<Args...>::InternalRender(const SharedPtr<Window>& renderWindow,
-		std::vector<GameObjectId>& validGameObjectIds)
-	{
-		WorldEntity& world{ this->m_World };
+	//template <typename ... Args>
+	//void SFML2DRenderSystem<Args...>::InternalRender(const SharedPtr<Window>& renderWindow,
+	//	std::vector<GameObjectId>& validGameObjectIds)
+	//{
+	//	WorldEntity& world{ this->m_World };
 
-		if (validGameObjectIds.size() > 1)
-		{
-			std::sort(validGameObjectIds.begin(), validGameObjectIds.end(), [&world](const GameObjectId left,const GameObjectId right)
-				{
-					TransformComponent* transformLeft = world.GetComponent<TransformComponent>(left);
-					TransformComponent* transformRight = world.GetComponent<TransformComponent>(right);
+	//	if (validGameObjectIds.size() > 1)
+	//	{
+	//		std::sort(validGameObjectIds.begin(), validGameObjectIds.end(), [&world](const GameObjectId left,const GameObjectId right)
+	//			{
+	//				TransformComponent* transformLeft = world.GetComponent<TransformComponent>(left);
+	//				TransformComponent* transformRight = world.GetComponent<TransformComponent>(right);
 
-					return transformLeft->GetWorldPos().z < transformRight->GetWorldPos().z;
-				});
-		}
+	//				return transformLeft->GetWorldPos().z < transformRight->GetWorldPos().z;
+	//			});
+	//	}
 
-		
-		for (const auto& id : validGameObjectIds)
-		{
-			Record& rec{ world.GetGameObjectRecord(id) };
+	//	
+	//	for (const auto& id : validGameObjectIds)
+	//	{
+	//		Record& rec{ world.GetGameObjectRecord(id) };
 
-			// TODO: This is the archetype from write buffer which is still in work
-			// FIX THIS!  
-			const SharedPtr<Archetype> archetype{ rec.restedArchetype.lock() };
-			
-			uint8_t* componentAddress{&archetype->componentData[
-				size_t(rec.componentStructIdx) * archetype->sizeOfStruct]};
+	//		// TODO: This is the archetype from write buffer which is still in work
+	//		// FIX THIS!  
+	//		const SharedPtr<Archetype> archetype{ rec.restedArchetype.lock() };
+	//		
+	//		uint8_t* componentAddress{&archetype->componentData[
+	//			size_t(rec.componentStructIdx) * archetype->sizeOfStruct]};
 
 
-			std::vector<size_t> strideOffsets{};
+	//		std::vector<size_t> strideOffsets{};
 
-			int nextKey{};
-			size_t offset{};
-			for (const auto& compId : archetype->types)
-			{
-				if (compId == m_NumKeys[nextKey])
-				{
-					strideOffsets.push_back(offset);
-					++nextKey;
-					if(nextKey == int(m_NumKeys.size()))
-						break;
-				}
+	//		int nextKey{};
+	//		size_t offset{};
+	//		for (const auto& compId : archetype->types)
+	//		{
+	//			if (compId == m_NumKeys[nextKey])
+	//			{
+	//				strideOffsets.push_back(offset);
+	//				++nextKey;
+	//				if(nextKey == int(m_NumKeys.size()))
+	//					break;
+	//			}
 
-				offset += world.GetComponentSizeById(compId);
-			}
+	//			offset += world.GetComponentSizeById(compId);
+	//		}
 
-			this->ApplyPack(id, strideOffsets, renderWindow, componentAddress, std::index_sequence_for<Args...>{});
+	//		this->ApplyPack(id, strideOffsets, renderWindow, componentAddress, std::index_sequence_for<Args...>{});
 
-		}
-		
-	}
+	//	}
+	//	
+	//}
 
 	template <typename ... Args>
 	void SFML2DRenderSystem<Args...>::InternalRender(const SharedPtr<Window>& renderWindow,

@@ -126,6 +126,9 @@
     <ClCompile Include="Galagas.cpp">
       <Filter>Prefabs</Filter>
     </ClCompile>
+    <ClCompile Include="ZakoDiveSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GalagaScene.h">
@@ -244,6 +247,9 @@
     </ClInclude>
     <ClInclude Include="Galagas.h">
       <Filter>Prefabs</Filter>
+    </ClInclude>
+    <ClInclude Include="ZakoDiveSystem.h">
+      <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

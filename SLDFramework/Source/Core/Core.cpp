@@ -243,6 +243,8 @@ void SLD::Core::Step()
 	
 	m_WorldEntity.OnPreAsyncUpdate(dt);
 
+	m_WorldEntity.OnAsyncUpdate(dt);
+
 	m_WorldEntity.OnPhysicsValidation(m_WorldClock.GetFixedDeltaTime());
 	
 	m_WorldEntity.OnPreRenderUpdate(dt);

@@ -17,9 +17,15 @@ namespace SLD
 	class WorldEntity;
 	class Box2DComponent : public ComponentT<Box2DComponent>
 	{
-		
+
 	public:
-		
+
+		enum class State
+		{
+			Sweep,
+			Teleport
+		};
+
 		Box2DComponent(
 			WorldEntity& world,
 			const b2BodyDef& bodyDef,
@@ -42,7 +48,7 @@ namespace SLD
 			float width,
 			float height
 		);
-		
+
 		Box2DComponent(
 			WorldEntity& world,
 			b2BodyDef& bodyDef,
@@ -51,20 +57,30 @@ namespace SLD
 			float density = 1.0f
 		);
 
+		void SetPosition(const rtm::float2f& pos);
+		void SetVelocity(const rtm::float2f& velocity);
+
+		const rtm::float2f& GetPosition() const;
+		const rtm::float2f& GetVelocity() const;
+
 		const b2Filter& GetContactFilter() const;
 		void SetContactFilter(const b2Filter& filter);
 
 		const rtm::float2f& GetDimension() const;
 		[[nodiscard]] const SharedPtr<b2Body>& GetBody() const;
 		void SetPhysicsBody(const SharedPtr<b2Body>& body);
-	
+		State GetState() const;
+
 	private:
 
 		SharedPtr<b2Body> m_PhysicsBody;
 		rtm::float2f m_Dimension;
-		
+		rtm::float2f m_Velocity{};
+		rtm::float2f m_Position{};
+
 		// NOTE: Box2d supports 16 bits mask
 		uint16_t m_ContactFilter{};
+		State m_RigidBodyState{ State::Sweep };
 	};
 }
 

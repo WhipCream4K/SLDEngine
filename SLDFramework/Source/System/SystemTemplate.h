@@ -22,6 +22,13 @@ namespace SLD
 		virtual void InternalUpdate(float deltaTime, const SharedPtr<Archetype>& archetype) override;
 		virtual void InternalRender(const SharedPtr<Window>&, const SharedPtr<Archetype>&) override final {}
 
+		virtual void CallUpdate(
+			const std::vector<GameObjectId>& gameObjectsIds,
+			std::array<size_t, sizeof...(ComponentTypes)>& strideOffsets,
+			float deltaTime,
+			uint8_t* componentAddress,
+			int componentStructSize);
+
 		template<size_t Idx, size_t N>
 		EnableIf<Idx != sizeof...(ComponentTypes)> DoTypeCheck(
 			const std::vector<GameObjectId>& gameObjectsIds,
@@ -77,6 +84,18 @@ namespace SLD
 	}
 
 	template <typename ... ComponentTypes>
+	void SystemTemplate<ComponentTypes...>::CallUpdate(const std::vector<GameObjectId>& gameObjectsIds,
+		std::array<size_t, sizeof...(ComponentTypes)>& strideOffsets, float deltaTime, uint8_t* componentAddress,
+		int componentStructSize)
+	{
+		for (const auto& id : gameObjectsIds)
+		{
+			ApplyPack(id, deltaTime, strideOffsets, componentAddress, std::index_sequence_for<ComponentTypes...>());
+			componentAddress += componentStructSize;
+		}
+	}
+
+	template <typename ... ComponentTypes>
 	template <size_t Idx, size_t N>
 	EnableIf<Idx != sizeof...(ComponentTypes)> SystemTemplate<ComponentTypes...>::DoTypeCheck(
 		const std::vector<GameObjectId>& gameObjectsIds,
@@ -122,11 +141,12 @@ namespace SLD
 		float deltaTime, uint8_t* componentAddress,
 		int componentStructSize)
 	{
-		for (const auto& id : gameObjectsIds)
-		{
-			ApplyPack(id, deltaTime, strideOffsets, componentAddress, std::index_sequence_for<ComponentTypes...>());
-			componentAddress += componentStructSize;
-		}
+		//for (const auto& id : gameObjectsIds)
+		//{
+		//	ApplyPack(id, deltaTime, strideOffsets, componentAddress, std::index_sequence_for<ComponentTypes...>());
+		//	componentAddress += componentStructSize;
+		//}
+		CallUpdate(gameObjectsIds, strideOffsets, deltaTime, componentAddress, componentStructSize);
 	}
 
 	template <typename ... ComponentTypes>

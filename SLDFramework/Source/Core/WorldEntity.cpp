@@ -4,6 +4,7 @@
 #include "IdGenerator/UniqueIdGenerator.h"
 #include "../Physics/System/PhysicsToTransformUpdate.h"
 #include "../Physics/System/ContactFilter.h"
+#include "../Physics/System/WorldToPhysicsUpdate.h"
 #include "../Helpers/utils.h"
 #include "../Rendering/System/RenderObject.h"
 #include <iostream>
@@ -28,6 +29,7 @@ SLD::WorldEntity::WorldEntity()
 	CreatePhysicsWorld();
 
 	AddSystem<PhysicsToTransformUpdate>(*this);
+	AddSystem<WorldToPhysicsUpdate>(*this);
 	//AddSystem<AsyncTransformUpdate>(*this);
 
 	m_CopyObjectBufferThread.Start();
@@ -313,11 +315,33 @@ void SLD::WorldEntity::OnPreAsyncUpdate(float dt)
 	UpdatePipeline(PipelineLayer::OnPreAsync, dt);
 }
 
+void SLD::WorldEntity::OnAsyncUpdate(float dt)
+{
+	UpdatePipeline(PipelineLayer::OnAsync,dt);
+
+	// Fetch future result
+	for (const auto& system : 
+		m_SystemMap[size_t(PipelineLayer::OnAsync)])
+	{
+		system->FetchFutureResults();
+	}
+}
+
 void SLD::WorldEntity::OnPhysicsValidation(float dt)
 {
 	//MTR_SCOPE("main", "OnPhysicsValidation");
 	UpdatePipeline(PipelineLayer::OnFixedUpdate, dt);
 
+	UpdatePipeline(PipelineLayer::OnFixedUpdateAsync, dt);
+
+	for (const auto& system : 
+		m_SystemMap[size_t(PipelineLayer::OnFixedUpdateAsync)])
+	{
+		system->FetchFutureResults();
+	}
+
+	UpdatePipeline(PipelineLayer::OnPrePhysicsStep, dt);
+	
 	m_PhysicsWorld->Step(dt, 6, 2);
 
 	UpdatePipeline(PipelineLayer::OnPostPhysicsStep, dt);

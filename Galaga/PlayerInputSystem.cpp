@@ -30,6 +30,10 @@ void PlayerInputSystem::OnUpdate(SLD::GameObjectId gameObjectId, float deltaTime
 			shooter->Shoot(m_World, barrelPoint,{0.0f,1.0f});
 	}
 
-	box2d->GetBody()->SetLinearVelocity({ speed->value * deltaTime * axisX,speed->value * deltaTime * axisY });
+	box2d->SetVelocity({ speed->value * deltaTime * axisX,speed->value * deltaTime * axisY });
+
+//#ifdef _DEBUG
+//	std::cout << "y : " << transform->GetWorldPos().y << std::endl;
+//#endif
 }
 

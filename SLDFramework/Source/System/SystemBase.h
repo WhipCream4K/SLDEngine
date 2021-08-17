@@ -27,6 +27,8 @@ namespace SLD
 		virtual void InternalUpdate(float deltaTime, const SharedPtr<Archetype>& archetype) = 0;
 		virtual void InternalRender(const SharedPtr<Window>& winHandle, const SharedPtr<Archetype>& archetype) = 0;
 		virtual void InternalRender(const SharedPtr<Window>&, std::vector<RenderObject>&) {}
+
+		virtual void FetchFutureResults() {}
 		
 		const std::string& GetKey() const;
 		PipelineLayer GetLayer() const;

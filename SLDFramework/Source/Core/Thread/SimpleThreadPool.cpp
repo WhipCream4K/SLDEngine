@@ -45,6 +45,8 @@ void SLD::SimpleThreadPool::Run()
 
 		if (!task.valid()) return;
 
+		const size_t x{ m_Tasks.size() };
+		x;
 		task();
 	}
 }

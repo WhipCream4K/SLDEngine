@@ -1,6 +1,7 @@
 #pragma once
 
 #include <System/SystemTemplate.h>
+#include <System/AsyncSystemT.h>
 #include <Physics/Components/Box2DComponent.h>
 #include "MyComponents.h"
 #include "EnemyPath.h"
@@ -8,7 +9,7 @@
 class FormationWayPoints;
 
 class EnemyStateSystem :
-	public SLD::SystemTemplate<
+	public SLD::AsyncSystemT<
 	SLD::TransformComponent,
 	SLD::Box2DComponent,
 	SpeedComponent,
@@ -50,7 +51,13 @@ private:
 		SpeedComponent* speed,
 		EnemyTag* tag);
 
-	void HandleDiveState();
+	//void HandleDiveState(
+	//	float dt,
+	//	SLD::TransformComponent* transform,
+	//	SLD::Box2DComponent* box2d,
+	//	FormationComponent* formation,
+	//	SpeedComponent* speed,
+	//	EnemyTag* tag);
 	
 	// Position in formation
 	std::vector<std::vector<rtm::float2f>> m_LineFormationWayPoints;

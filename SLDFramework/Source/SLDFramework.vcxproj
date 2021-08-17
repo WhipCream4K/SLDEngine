@@ -210,12 +210,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="System\AsyncSystemT.h" />
     <ClInclude Include="Physics\Components\PhysicsUserData.h" />
     <ClInclude Include="Physics\System\ContactFilter.h" />
     <ClInclude Include="Physics\System\PhysicsToTransformUpdate.h" />
     <ClInclude Include="Rendering\System\RenderObject.h" />
     <ClInclude Include="System\SystemTemplate.h" />
-    <ClInclude Include="System\AsyncTransformUpdate.h" />
     <ClInclude Include="Core\Application\Application.h" />
     <ClInclude Include="Components\BaseComponent.h" />
     <ClInclude Include="Core\Application\EntryPoint\ApplicationEntryPoint.h" />
@@ -327,12 +327,13 @@
     <ClInclude Include="Core\Clock\WorldClock.h" />
     <ClInclude Include="Core\Thread\SimpleThreadPool.h" />
     <ClInclude Include="Tracer\minitrace.h" />
+    <ClInclude Include="Physics\System\WorldToPhysicsUpdate.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="System\AsyncSystemT.cpp" />
     <ClCompile Include="Physics\System\ContactFilter.cpp" />
     <ClCompile Include="Physics\System\PhysicsToTransformUpdate.cpp" />
     <ClCompile Include="System\SystemTemplate.cpp" />
-    <ClCompile Include="System\AsyncTransformUpdate.cpp" />
     <ClCompile Include="Core\Application\Application.cpp" />
     <ClCompile Include="Components\BaseComponent.cpp" />
     <ClCompile Include="Core\Base.cpp" />
@@ -378,6 +379,7 @@
     <ClCompile Include="Core\Clock\WorldClock.cpp" />
     <ClCompile Include="Core\Thread\SimpleThreadPool.cpp" />
     <ClCompile Include="Tracer\minitrace.c" />
+    <ClCompile Include="Physics\System\WorldToPhysicsUpdate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IMGUI\IMGUI.vcxproj">

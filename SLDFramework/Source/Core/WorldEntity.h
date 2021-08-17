@@ -113,6 +113,7 @@ namespace SLD
 		void OnStartFrame();
 		void OnInputValidation(const SharedPtr<Window>& window);
 		void OnPreAsyncUpdate(float dt);
+		void OnAsyncUpdate(float dt);
 		void OnPhysicsValidation(float dt);
 		void OnValidation();
 		void OnPreRenderUpdate(float dt);

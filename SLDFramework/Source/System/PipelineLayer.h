@@ -8,6 +8,8 @@ namespace SLD
 		OnAsync,
 		OnPostAsync,
 		OnFixedUpdate,
+		OnFixedUpdateAsync,
+		OnPrePhysicsStep,
 		OnPostPhysicsStep,
 		OnPreRender,
 		OnRender,

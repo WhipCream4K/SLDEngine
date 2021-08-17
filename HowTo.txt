@@ -1,0 +1,9 @@
+Press P to play
+
+There's only one stage and the bullet seem to shoot multiple enemies.
+Don't worry about the speed of the enemies or bullets yet that can be adjusted.
+There's no win/lose stage yet.
+
+
+W,D or Left stick to move
+Spacebar or A to shoot
