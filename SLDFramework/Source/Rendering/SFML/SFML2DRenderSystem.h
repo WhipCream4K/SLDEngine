@@ -19,15 +19,6 @@ namespace SLD
 		virtual void OnRender(const SharedPtr<Window>& renderWindow, GameObjectId id, const TransformComponent*, Args*...) override = 0;
 		virtual void InternalRender(const SharedPtr<Window>& renderWindow,  std::vector<RenderObject>& validRenderObjects) override;
 	
-	protected:
-
-		//virtual void CallSystemRenderLoop(
-		//	std::vector<ComponentTypeId>& gameObjectIds,
-		//	const SharedPtr<Window>& winHandle,
-		//	const std::vector<size_t>& strideOffsets,
-		//	uint8_t* componentAddress,
-		//	int componentStructSize) override;
-
 	private:
 
 		int m_ResourceSize{};

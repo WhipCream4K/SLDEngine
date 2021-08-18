@@ -3,6 +3,7 @@
 #define SLDFRAMEWORK_ASYNCSYSTEMT_H
 
 #include "SystemTemplate.h"
+#include "../Tracer/minitrace.h"
 
 namespace SLD
 {
@@ -52,11 +53,6 @@ namespace SLD
 		size_t activeFuture{};
 		for (const auto& id : gameObjectsIds)
 		{
-			//m_FutureResults.emplace_back(world.PushAsyncTask([this,&deltaTime,strideOffsets,componentAddress,&id]()
-			//{
-			//		this->ApplyPack(id, deltaTime, strideOffsets, componentAddress, std::index_sequence_for<Args...>());
-			//}));
-
 			m_FutureResults[activeFuture++] = std::move(world.PushAsyncTask([this, &deltaTime, strideOffsets, componentAddress, &id]()
 				{
 					this->ApplyPack(id, deltaTime, strideOffsets, componentAddress, std::index_sequence_for<Args...>());
@@ -70,6 +66,8 @@ namespace SLD
 	template <typename ... Args>
 	void AsyncSystemT<Args...>::FetchFutureResults()
 	{
+		MTR_SCOPE("main", "fetch future");
+		
 		for (auto& future : m_FutureResults)
 		{
 			if (future.valid())

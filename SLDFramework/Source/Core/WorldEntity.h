@@ -1,7 +1,9 @@
 #ifndef SLDFRAMEWORK_WORLDENTITY_H
 #define SLDFRAMEWORK_WORLDENTITY_H
 
+#include <box2d/box2d.h>
 #include "Base.h"
+
 #include "PMR_Resource/LoggingResource.h"
 #include "PMR_Resource/PoolResource.h"
 #include "../Inputs/InputSettings.h"
@@ -11,7 +13,6 @@
 #include "../Rendering/RenderBuffer.h"
 #include "../System/SystemBase.h"
 #include "Thread/SimpleThreadPool.h"
-#include <box2d/box2d.h>
 #include "../Physics/Components/PhysicsUserData.h"
 
 class b2World;
@@ -174,6 +175,9 @@ namespace SLD
 		const SharedPtr<b2World>& GetPhysicsWorld() const;
 		void AddPhysiscsBodyDef(const PhysicsUserData& data);
 		size_t GetOffsetOfComponent(const SharedPtr<Archetype>& archetype, size_t componentIdx);
+
+		template<typename T>
+		EnableIsBasedOf<BaseComponent, T,T>* CallInterface();
 
 	private:
 

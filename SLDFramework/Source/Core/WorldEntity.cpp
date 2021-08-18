@@ -9,7 +9,7 @@
 #include "../Rendering/System/RenderObject.h"
 #include <iostream>
 #include <box2d/box2d.h>
-//#include "../Tracer/minitrace.h"
+#include "../Tracer/minitrace.h"
 
 
 SLD::WorldEntity::WorldEntity()
@@ -234,19 +234,19 @@ std::pair<bool, WeakPtr<SLD::Archetype>> SLD::WorldEntity::GetArchetype(const st
 
 void SLD::WorldEntity::OnStartFrame()
 {
-	//MTR_SCOPE("main", "OnStartFrame");
+	MTR_SCOPE("main", "OnStartFrame");
 	m_CopyObjectBufferThread.WaitTillFinished();
 }
 
 void SLD::WorldEntity::OnInputValidation(const SharedPtr<Window>& window)
 {
-	//MTR_SCOPE("main", "OnInputValidation");
+	MTR_SCOPE("main", "OnInputValidation");
 	InputManager::QueryUserInputsAsyncMaybe(window, m_InputSetting.m_MainKeyPool);
 }
 
 void SLD::WorldEntity::OnValidation()
 {
-	//MTR_SCOPE("main", "OnValidation");
+	MTR_SCOPE("main", "OnValidation");
 	if (m_ShouldUpdateArchetypeList)
 		m_CopyObjectBufferThread.Wake();
 
@@ -305,13 +305,13 @@ void SLD::WorldEntity::OnValidation()
 
 void SLD::WorldEntity::OnPreRenderUpdate(float dt)
 {
-	//MTR_SCOPE("main", "OnPreRenderUpdate");
+	MTR_SCOPE("main", "OnPreRenderUpdate");
 	UpdatePipeline(PipelineLayer::OnPreRender, dt);
 }
 
 void SLD::WorldEntity::OnPreAsyncUpdate(float dt)
 {
-	//MTR_SCOPE("main", "OnPreAsyncUpdate");
+	MTR_SCOPE("main", "OnPreAsyncUpdate");
 	UpdatePipeline(PipelineLayer::OnPreAsync, dt);
 }
 
@@ -329,7 +329,8 @@ void SLD::WorldEntity::OnAsyncUpdate(float dt)
 
 void SLD::WorldEntity::OnPhysicsValidation(float dt)
 {
-	//MTR_SCOPE("main", "OnPhysicsValidation");
+	MTR_SCOPE("main", "OnPhysicsValidation");
+	
 	UpdatePipeline(PipelineLayer::OnFixedUpdate, dt);
 
 	UpdatePipeline(PipelineLayer::OnFixedUpdateAsync, dt);
@@ -349,7 +350,7 @@ void SLD::WorldEntity::OnPhysicsValidation(float dt)
 
 void SLD::WorldEntity::OnRenderSystem(const SharedPtr<Window>& winHandle)
 {
-	//MTR_SCOPE("main", "OnRenderSystem");
+	MTR_SCOPE("main", "OnRenderSystem");
 	RenderPipeline(winHandle, PipelineLayer::OnRender);
 }
 
@@ -972,9 +973,10 @@ void SLD::WorldEntity::CopyFromWriteBufferToCopyBuffer()
 	//		++count;
 	//	}
 	//}
-#pragma endregion 
-	//int trace{};
-	//MTR_START("Async", "CopyFromWriteBufferToCopyBuffer", &trace);
+#pragma endregion
+	
+	int trace{};
+	MTR_START("Async", "CopyFromWriteBufferToCopyBuffer", &trace);
 	
 	ValidateSystems();
 	//ValidateArchetype();
@@ -1008,7 +1010,8 @@ void SLD::WorldEntity::CopyFromWriteBufferToCopyBuffer()
 		copyBuffer[type] = archetype->Clone();
 	}
 
-	//MTR_FINISH("Async", "CopyFromWriteBufferToCopyBuffer", &trace);
+	MTR_FINISH("Async", "CopyFromWriteBufferToCopyBuffer", &trace);
+	trace;
 
 }
 

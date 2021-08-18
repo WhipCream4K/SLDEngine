@@ -2,14 +2,29 @@
 //
 
 #include "GalagaScene.h"
+#include <Tracer/minitrace.h>
 
 int main()
 {
 	GalagaScene sc{};
+
+#ifdef MTR_ENABLED
+	
+	mtr_init("./tracer.json");
+
+	MTR_META_PROCESS_NAME("gameloop test");
+	MTR_META_THREAD_NAME("main thread");
+
+#endif
+	
 	sc.WorldCreation();
 
 	sc.Run();
 
+#ifdef MTR_ENABLED
+	mtr_flush();
+	mtr_shutdown();
+#endif
 	return 0;
 }
 

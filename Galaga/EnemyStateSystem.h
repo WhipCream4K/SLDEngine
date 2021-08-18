@@ -7,9 +7,9 @@
 #include "EnemyPath.h"
 
 class FormationWayPoints;
-
+class EnemyState;
 class EnemyStateSystem :
-	public SLD::AsyncSystemT<
+	public SLD::SystemTemplate<
 	SLD::TransformComponent,
 	SLD::Box2DComponent,
 	SpeedComponent,
@@ -58,9 +58,12 @@ private:
 	//	FormationComponent* formation,
 	//	SpeedComponent* speed,
 	//	EnemyTag* tag);
+
+	SharedPtr<EnemyState> m_EnemyState;
 	
 	// Position in formation
 	std::vector<std::vector<rtm::float2f>> m_LineFormationWayPoints;
 	SLD::GameObjectId m_FormationWayPointObjectId;
+	std::future<int> m_FutureWayPoint;
 };
 

@@ -141,29 +141,30 @@ void GalagaScene::WorldCreation()
 void GalagaScene::Run()
 {
 	using namespace SLD;
-	bool passFirstFrame{};
-	float timePassed{};
+	//bool passFirstFrame{};
+	//float timePassed{};
 
-	WorldClock& clock{ m_Framework->GetClock() };
-	WorldEntity& world{ m_Framework->GetDefaultWorldEntity() };
+	//WorldClock& clock{ m_Framework->GetClock() };
+	//WorldEntity& world{ m_Framework->GetDefaultWorldEntity() };
 
-	const float dt = clock.GetDeltaTime();
+	//const float dt = clock.GetDeltaTime();
 
-	if (passFirstFrame)
-	{
-		timePassed += dt;
-		world;
-		//if(timePassed > 3.0f)
-		//	world.DestroyGameObject(m_GIdTest);
-	}
-	
-		passFirstFrame = true;
+	MTR_BEGIN("main", "Loop");
+
 	while (m_Framework->TranslateUserInputs())
 	{
-		/*
-		 * a bunch of code here
-		 */
 
+		//if (passFirstFrame)
+		//{
+		//	timePassed += dt;
+		//	world;
+		//	//if(timePassed > 3.0f)
+		//	//	world.DestroyGameObject(m_GIdTest);
+		//}
+
+		//passFirstFrame = true;
 		m_Framework->Step();
 	}
+
+	MTR_END("main", "Loop");
 }

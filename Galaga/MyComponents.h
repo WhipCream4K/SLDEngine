@@ -135,7 +135,7 @@ enum class EnemyType
 	Galagas
 };
 
-enum class EnemyState
+enum class EnemyStateNums
 {
 	FlyIn,
 	Formation,
@@ -155,16 +155,26 @@ struct ParticleComponent : SLD::ComponentT<ParticleComponent>
 	bool isActive{};
 };
 
+struct BreakawayTendency
+{
+	BreakawayTendency(float breakPercent)
+		: percent(breakPercent)
+	{
+	}
+	
+	float percent;
+};
+
 struct EnemyTag : SLD::ComponentT<EnemyTag>
 {
 	EnemyTag(EnemyType setType)
 		: type(setType)
-		, state(EnemyState::FlyIn)
+		, state(EnemyStateNums::FlyIn)
 	{
 	}
 
 	EnemyType type;
-	EnemyState state;
+	EnemyStateNums state;
 };
 
 struct PlayerTag : SLD::ComponentT<PlayerTag>

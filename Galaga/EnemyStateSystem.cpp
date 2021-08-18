@@ -1,39 +1,60 @@
 #include "EnemyStateSystem.h"
 #include <Components/TransformComponent.h>
+#include <Tracer/minitrace.h>
 #include "FormationWayPoints.h"
+#include "EnemyState.h"
+
 
 EnemyStateSystem::EnemyStateSystem(SLD::WorldEntity& world)
-	: AsyncSystemT(world, SLD::PipelineLayer::OnFixedUpdateAsync)
+	: SystemTemplate(world, SLD::PipelineLayer::OnFixedUpdate)
 {
 	m_LineFormationWayPoints.reserve(4);
 }
 
 EnemyStateSystem::EnemyStateSystem(SLD::WorldEntity& world, SLD::GameObjectId pathId)
-	: AsyncSystemT(world, SLD::PipelineLayer::OnFixedUpdateAsync)
+	: SystemTemplate(world, SLD::PipelineLayer::OnFixedUpdate)
 	, m_FormationWayPointObjectId(pathId)
 {
 }
 
-void EnemyStateSystem::OnUpdate(SLD::GameObjectId, float deltaTime, SLD::TransformComponent* transform,
+void EnemyStateSystem::OnUpdate(SLD::GameObjectId gId , float deltaTime, SLD::TransformComponent* transform,
 	SLD::Box2DComponent* box2d, SpeedComponent* speed, FlyInComponent* flyIn, FormationComponent* formation, EnemyTag* tag)
 {
-	switch (tag->state)
+	//int trace{ int(gId) };
+	//MTR_SCOPE("inner", "AIUpdate");
+
+	const auto& oldState{ m_EnemyState };
+	if(const auto newState{ oldState->Update(m_World,gId,tag) }; newState)
 	{
-	case EnemyState::FlyIn:
+		oldState->Exit(m_World,gId);
+		newState->Enter(m_World, gId);
 
-		HandleFlyInState(deltaTime, transform, box2d, flyIn, speed, tag);
-		break;
-
-	case EnemyState::Formation:
-
-		HandleFormationState(deltaTime, transform, box2d, formation, speed, tag);
-
-	case EnemyState::Dive:
-
-		
-
-		break;
+		m_EnemyState = newState;
 	}
+	
+	//if(const auto newState{ m_EnemyState->Update(m_World, gId, tag) }; 
+	//	newState)
+	//{
+	//	
+	//	newState->Enter();
+	//}
+	
+	//switch (tag->state)
+	//{
+	//case EnemyStateNums::FlyIn:
+
+	//	HandleFlyInState(deltaTime, transform, box2d, flyIn, speed, tag);
+	//	
+	//	break;
+
+	//case EnemyStateNums::Formation:
+
+	//	HandleFormationState(deltaTime, transform, box2d, formation, speed, tag);
+
+	//case EnemyStateNums::Dive:
+	//		
+	//	break;
+	//}
 }
 
 void EnemyStateSystem::HandleFlyInState(float dt, SLD::TransformComponent* transform, SLD::Box2DComponent* box2d,
@@ -44,6 +65,7 @@ void EnemyStateSystem::HandleFlyInState(float dt, SLD::TransformComponent* trans
 
 	const auto& travelPath{ flyIn->carryPath };
 
+	
 	if (size_t(flyIn->currentWayPoint) < travelPath.size())
 	{
 		const auto& worldPos{ transform->GetWorldPos() };
@@ -51,7 +73,7 @@ void EnemyStateSystem::HandleFlyInState(float dt, SLD::TransformComponent* trans
 
 		auto startP{ vector_load2(&path[flyIn->currentWayPoint].x) };
 		const auto currentP{ vector_load2(&worldPos.x) };
-
+		
 		if (vector_length_squared(vector_sub(startP, currentP)) <= 5.0f)
 		{
 			flyIn->currentWayPoint++;
@@ -71,7 +93,7 @@ void EnemyStateSystem::HandleFlyInState(float dt, SLD::TransformComponent* trans
 		else
 		{
 			box2d->SetVelocity({ 0.0f,0.0f });
-			tag->state = EnemyState::Formation;
+			tag->state = EnemyStateNums::Formation;
 		}
 
 	}
