@@ -62,6 +62,9 @@ typedef struct raw_event {
 
 #pragma warning(pop)
 
+#pragma warning(push)
+#pragma warning(disable : 4702)
+
 static raw_event_t *event_buffer;
 static raw_event_t *flush_buffer;
 static volatile int event_count;
@@ -491,3 +494,4 @@ void internal_mtr_raw_event_arg(const char *category, const char *name, char ph,
 	pthread_mutex_unlock(&event_mutex);
 }
 
+#pragma warning(pop)

@@ -3,8 +3,9 @@
 //#include <SLDFramework.h>
 //#include "../SLDFramework/Source/Components/BaseComponent.h"
 #include <Components/BaseComponent.h>
+#include "MenuState.h"
 
-enum class GameState
+enum class GameStateNum
 {
 	Menu,
 	Play,
@@ -13,27 +14,35 @@ enum class GameState
 	Count
 };
 
-struct GameStateComponent : SLD::ComponentT<GameStateComponent>
+enum class PlayStyle
 {
-	GameStateComponent(GameState startState)
-		: currentState(startState)
-		, playStage()
-		, shouldSpawn(true)
-	{
-	}
-
-	GameState currentState;
-	size_t playStage;
-	bool shouldSpawn;
+	Solo,
+	Coop
 };
 
-struct StateTag : SLD::ComponentT<StateTag>
+class GameState;
+struct GameStateComponent : SLD::ComponentT<GameStateComponent>
 {
-	StateTag(GameState startState)
-		: spawnState(startState)
+	GameStateComponent(int maxEnemy,int maxStageCnt)
+		: state()
+		, currentEnemyCount()
+		, maxEnemyCount(maxEnemy)
+		, currentStageCnt()
+		, maxStage(maxStageCnt)
+		, playStyle()
 	{
 	}
 
-	GameState spawnState;
+	SharedPtr<GameState> state;
+	int currentEnemyCount;
+	int maxEnemyCount;
+	int currentStageCnt;
+	int maxStage;
+	PlayStyle playStyle;
+	bool m_PlayerAlreadySpawn;
+
+	//GameStateNum state;
+	//size_t playStage;
+	//bool shouldSpawn;
 };
 

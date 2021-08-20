@@ -115,3 +115,13 @@ const EnemyPath::FormationWayPoints& EnemyPath::GetFormationWayPoints() const
 {
 	return m_LineFormationWayPoints;
 }
+
+void EnemyPath::SetFormationTracker(SLD::GameObjectId id)
+{
+	m_FormationHolder = id;
+}
+
+SLD::GameObjectId EnemyPath::GetFormationTracker() const
+{
+	return m_FormationHolder;
+}

@@ -15,5 +15,6 @@ private:
 
 	LineWayPoints m_WayPoints;
 	std::future<void> m_UpdateWayPointsFinished;
+	bool m_IsLocked;
 };
 

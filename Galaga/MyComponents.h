@@ -39,6 +39,21 @@ struct SpriteRenderComponent : SLD::ComponentT<SpriteRenderComponent>
 	bool shouldRender{ true };
 };
 
+struct TextRenderComponent : SLD::ComponentT<TextRenderComponent>
+{
+	TextRenderComponent(const SharedPtr<sf::Font>& font, const std::string& string,size_t fontSizePixel)
+		: text(string,*font, unsigned(fontSizePixel))
+	{
+	}
+
+	TextRenderComponent(const sf::Font& font,const std::string& string,size_t fontSizePixel)
+		: text(string,font,unsigned(fontSizePixel))
+	{
+	}
+
+	sf::Text text;
+};
+
 struct InputListener : SLD::ComponentT<InputListener>
 {
 	InputListener(size_t index)

@@ -131,6 +131,8 @@ namespace SLD
 
 		template<typename SystemType>
 		EnableIsBasedOf<SystemBase, SystemType,WeakPtr<SystemBase>> AddSystem(SystemType&& system);
+
+		void RemoveSystem(const SharedPtr<SystemBase>& system);
 		
 		void DestroyGameObject(GameObjectId id);
 

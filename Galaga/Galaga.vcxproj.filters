@@ -87,9 +87,6 @@
     <ClCompile Include="HandleSpriteOutOfWindow.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="GameStateSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="GameStateComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -132,10 +129,22 @@
     <ClCompile Include="EnemyFlyInSystem.cpp">
       <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="OnDead.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="GameStateSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
-    <ClCompile Include="EnemyState.cpp">
+    <ClCompile Include="GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRenderSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IntervalState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -263,13 +272,25 @@
     <ClInclude Include="EnemyFlyInSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="OnDead.h">
+    <ClInclude Include="EventQueue.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEvent.h">
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRenderSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="EnemyState.h">
+    <ClInclude Include="PlayState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntervalState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

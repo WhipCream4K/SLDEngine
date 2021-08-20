@@ -17,10 +17,10 @@ UpdateFormationWayPoints::UpdateFormationWayPoints(SLD::WorldEntity& world, floa
 	, m_LeftRightLimits()
 	, m_HopInterval(hopTime)
 	, m_Timer()
+	, m_Step(15.0f)
 	, m_HopCount()
 	, m_HopMax(3)
 	, m_Swap(1)
-	, m_Step(15.0f)
 {
 }
 

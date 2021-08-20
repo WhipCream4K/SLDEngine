@@ -29,32 +29,35 @@ void EnemySpawnerSystem::OnUpdate(SLD::GameObjectId, float dt, SLD::TransformCom
 	GameStateComponent* gameState)
 {
 	using namespace SLD;
-	constexpr float enemyLayer{ float(GalagaScene::Layer::Enemy) };
+	dt;
+	gameState;
+	//constexpr float enemyLayer{ float(GalagaScene::Layer::Enemy) };
 
 	// Spawn enemy at somewhat interval
 
-	if (gameState->currentState == GameState::Play)
-	{
-		if (gameState->shouldSpawn)
-		{
-			if (gameState->playStage < m_pSpawnData->size())
-			{
-				const auto& spawnData{ m_pSpawnData->at(gameState->playStage) };
+	//if (gameState->state == GameStateNum::Play)
+	//{
+	//	if (gameState->shouldSpawn)
+	//	{
+	//		if (gameState->playStage < m_pSpawnData->size())
+	//		{
+	//			const auto& spawnData{ m_pSpawnData->at(gameState->playStage) };
 
-				if (m_SectionCounter < spawnData.size())
-				{
-					SpawnEnemySection(dt, spawnData[m_SectionCounter]);
-				}
-				else
-				{
-					// the whole wave has finished
-					// trigger should not spawn
-					gameState->shouldSpawn = false;
-					m_SectionCounter = 0;
-				}
-			}
-		}
-	}
+	//			if (m_SectionCounter < spawnData.size())
+	//			{
+	//				SpawnEnemySection(dt, spawnData[m_SectionCounter]);
+	//			}
+	//			else
+	//			{
+	//				// the whole wave has finished
+	//				// trigger should not spawn
+	//				gameState->shouldSpawn = false;
+	//				m_SectionCounter = 0;
+	//				// signal that formation should lock
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 void EnemySpawnerSystem::SpawnEnemySection(float dt, const SpawnData& section)

@@ -6,7 +6,7 @@ ZakoDiveSystem::ZakoDiveSystem(SLD::WorldEntity& world)
 }
 
 void ZakoDiveSystem::OnUpdate(SLD::GameObjectId , float , SLD::TransformComponent*,
-	SLD::Box2DComponent*, EnemyTag* tag, ShootableComponent*)
+	SLD::Box2DComponent*, EnemyTag*, ShootableComponent*)
 {
 	
 }

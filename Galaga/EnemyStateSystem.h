@@ -59,7 +59,6 @@ private:
 	//	SpeedComponent* speed,
 	//	EnemyTag* tag);
 
-	SharedPtr<EnemyState> m_EnemyState;
 	
 	// Position in formation
 	std::vector<std::vector<rtm::float2f>> m_LineFormationWayPoints;

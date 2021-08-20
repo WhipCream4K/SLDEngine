@@ -11,6 +11,7 @@ namespace SLD {
 
 namespace sf
 {
+	class Font;
 	class Texture;
 }
 
@@ -35,12 +36,15 @@ public:
 	inline static constexpr rtm::float2f GlobalScale{ 3.0f,3.0f };
 	
 	static constexpr const char* MainSpriteSheet{ "GalagaSprite" };
+	static constexpr const char* MainFont{ "MainFont" };
+	static constexpr size_t MaxEnemyCount{40};
 
 private:
 
 	SharedPtr<SLD::Core> m_Framework;
 	SharedPtr<Player> m_Player;
 	SharedPtr<sf::Texture> m_MainSpriteSheet;
+	SharedPtr<sf::Font> m_MainFont;
 	size_t m_GIdTest;
 };
 

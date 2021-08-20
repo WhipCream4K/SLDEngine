@@ -21,12 +21,14 @@ public:
 	[[nodiscard]] const std::vector<rtm::float2f>& GetPath(SpawnDirection dir);
 	[[nodiscard]] const SpawnPaths& GetAllSpawnPaths() const;
 	const FormationWayPoints& GetFormationWayPoints() const;
+	void SetFormationTracker(SLD::GameObjectId id);
+	[[nodiscard]] SLD::GameObjectId GetFormationTracker() const;
 
 private:
 
-	
 	SpawnPaths m_Paths;
 	FormationWayPoints m_LineFormationWayPoints;
+	SLD::GameObjectId m_FormationHolder;
 	std::future<void> m_UpdateWayPointsFinished;
 	size_t m_HopStep;
 };

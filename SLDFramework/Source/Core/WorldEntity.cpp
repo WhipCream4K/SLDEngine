@@ -249,7 +249,6 @@ void SLD::WorldEntity::OnValidation()
 	MTR_SCOPE("main", "OnValidation");
 	if (m_ShouldUpdateArchetypeList)
 		m_CopyObjectBufferThread.Wake();
-
 #pragma region OLD
 
 	//for (auto& [archetypeIds, gameObjects] : m_PendingValidateGameObjs)
@@ -341,17 +340,23 @@ void SLD::WorldEntity::OnPhysicsValidation(float dt)
 		system->FetchFutureResults();
 	}
 
-	UpdatePipeline(PipelineLayer::OnPrePhysicsStep, dt);
 	
 	m_PhysicsWorld->Step(dt, 6, 2);
 
 	UpdatePipeline(PipelineLayer::OnPostPhysicsStep, dt);
 }
 
+	//UpdatePipeline(PipelineLayer::OnPrePhysicsStep, dt);
+
 void SLD::WorldEntity::OnRenderSystem(const SharedPtr<Window>& winHandle)
 {
 	MTR_SCOPE("main", "OnRenderSystem");
 	RenderPipeline(winHandle, PipelineLayer::OnRender);
+}
+
+void SLD::WorldEntity::RemoveSystem(const SharedPtr<SystemBase>& system)
+{
+	m_PendingDeleteSystem.emplace_back(std::make_pair(system->GetLayer(), system));
 }
 
 void SLD::WorldEntity::DestroyGameObject(GameObjectId id)

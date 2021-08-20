@@ -15,6 +15,7 @@
 #include "LineDebugDraw.h"
 #include "EnemyPath.h"
 #include "SpawnStages.h"
+#include "TextRenderSystem.h"
 #include "Tracer/minitrace.h"
 
 
@@ -35,76 +36,69 @@ void GalagaScene::WorldCreation()
 
 	sf::Texture* mainTexture{ SLD::Instance<ResourceManager>()->Add<sf::Texture>(MainSpriteSheet,{}) };
 	sf::Texture* background{ SLD::Instance<ResourceManager>()->Add<sf::Texture>("Background",{}) };
-	
+
+	sf::Font* font{ Instance<ResourceManager>()->Add<sf::Font>(MainFont, {}) };
+
 	loadFileSuccess = mainTexture->loadFromFile("./Resources/SpriteSheet/GeneralSprite.png");
 	loadFileSuccess = background->loadFromFile("./Resources/SpriteSheet/BG.png");
+	loadFileSuccess = font->loadFromFile("./Resources/Fonts/VCR_OSD_MONO_1.001.ttf");
 
 	if (loadFileSuccess)
 	{
-
 		const auto stateObject{ GameObject::Create(world) };
 		stateObject->AddComponent<InputListener>({ 0 });
-		stateObject->AddComponent<GameStateComponent>({ GameState::Menu });
+		GameStateComponent* gameState = stateObject->AddComponent<GameStateComponent>({ int(MaxEnemyCount),3 });
+
+		gameState->state = std::make_shared<MenuState>();
+		gameState->state->Enter(world,gameState);
 
 		const auto bg{ GameObject::Create(world) };
 		bg->GetComponent<TransformComponent>()->Translate(0.0f, 0.0f, float(Layer::Background));
 		bg->AddComponent<SpriteRenderComponent>({ *background,{0,0,200,256},GlobalScale });
 
-		//const auto testLine{ GameObject::Create(world) };
-		//testLine->AddComponent<LineComponent>({ {-100.0f,0.0f},{100.0f,0.0f} });
 
 		world.AddSystem<SpriteRenderSystem>(world);
 		world.AddSystem<HandleSpriteOutOfWindow>({ world,{1280,720} });
 		world.AddSystem<GameStateSystem>({ world });
+		world.AddSystem<TextRenderSystem>(world);
 
 		Instance<EnemyPath>()->Initialize();
 		Instance<SpawnStages>()->Initialize();
 
+#ifdef  _DEBUG
+
 		const auto& enemyPath{ Instance<EnemyPath>() };
-		
+
 		const auto testLine{ GameObject::Create(world) };
 		LineComponent* line{ testLine->AddComponent<LineComponent>() };
-		
+
 		line->points = enemyPath->GetPath(SpawnDirection::TopLeft);
-		
+
 		const auto& topRight{ enemyPath->GetPath(SpawnDirection::TopRight) };
 		const auto& bottomLeft{ enemyPath->GetPath(SpawnDirection::BottomLeft) };
-		
-		line->points.insert(line->points.end(),topRight.begin(),topRight.end());
+
+		line->points.insert(line->points.end(), topRight.begin(), topRight.end());
 
 		const auto test2{ GameObject::Create(world) };
 		line = test2->AddComponent<LineComponent>();
 		line->points.insert(line->points.end(), bottomLeft.begin(), bottomLeft.end());
 
 		const auto& bottomRight{ enemyPath->GetPath(SpawnDirection::BottomRight) };
-		
+
 		const auto test3{ GameObject::Create(world) };
 		line = test3->AddComponent<LineComponent>();
-		
+
 		line->points.insert(line->points.end(), bottomRight.begin(), bottomRight.end());
 
 		const auto test4{ GameObject::Create(world) };
 		line = test4->AddComponent<LineComponent>();
 
 		const auto& firstFormation{ enemyPath->GetFormationWayPoints()[4] };
-		line->points.insert(line->points.end(),firstFormation.begin(),firstFormation.end());
+		line->points.insert(line->points.end(), firstFormation.begin(), firstFormation.end());
 		
-		//InstantiatePrefab<Player>(world, { 0 }, {-200,0.0f,float(Layer::Player)});
-		//InstantiatePrefab<Player>(world, { 0 }, {-140.0f,0.0f,float(Layer::Player)});
-		//InstantiatePrefab<Player>(world, { 0 }, {0.0f,0.0f,float(Layer::Player)});
-		//m_GIdTest = InstantiatePrefab<Player>(world, { 0 }, {140.0f,0.0f,float(Layer::Player)});
-		//InstantiatePrefab<Player>(world, { 0 }, {200.0f,0.0f,float(Layer::Player)});
-		
-		//world.AddSystem<PlayerInputSystem>(world);
-		//world.AddSystem<OnBulletContact>(world);
-		//world.AddSystem<LimitPlayerToPlayArea>({world,playArea});
-		//world.AddSystem<UpdateProjectile>({world,370.0f});
-		//world.AddSystem<ReloadShooter>({world});
-		//world.AddSystem<UpdateParticle>({ world });
-
-#ifdef  _DEBUG
 		world.AddSystem<LineDebugDraw>(world);
 		world.AddSystem<Box2DDebugDraw>(world);
+		
 #endif
 
 		// Set World input
@@ -134,6 +128,10 @@ void GalagaScene::WorldCreation()
 				{Key{InputDevice::D_Keyboard,sf::Keyboard::P}}
 			});
 
+		inputSettings.AddActionMapping("UI",
+			{
+				{Key{InputDevice::D_Keyboard,sf::Keyboard::Up}}
+			});
 
 	}
 }

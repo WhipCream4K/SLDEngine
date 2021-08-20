@@ -22,8 +22,8 @@ private:
 	void HandlePlayState(GameStateComponent* game);
 
 	
-	std::array<bool, size_t(GameState::Count)> m_StateBits;
-	std::array<std::vector<WeakPtr<SystemBase>>, size_t(GameState::Count)> m_SystemStateArray;
+	std::array<bool, size_t(GameStateNum::Count)> m_StateBits;
+	std::array<std::vector<WeakPtr<SystemBase>>, size_t(GameStateNum::Count)> m_SystemStateArray;
 	size_t m_PlayerCount;
 };
 

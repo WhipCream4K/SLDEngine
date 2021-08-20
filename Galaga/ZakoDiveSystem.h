@@ -17,5 +17,9 @@ public:
 	ZakoDiveSystem(SLD::WorldEntity&);
 
 	void OnUpdate(SLD::GameObjectId gameObjectId, float deltaTime, SLD::TransformComponent*, SLD::Box2DComponent*, EnemyTag*, ShootableComponent*) override;
+
+private:
+
+	
 };
 

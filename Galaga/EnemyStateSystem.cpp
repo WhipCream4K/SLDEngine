@@ -2,7 +2,6 @@
 #include <Components/TransformComponent.h>
 #include <Tracer/minitrace.h>
 #include "FormationWayPoints.h"
-#include "EnemyState.h"
 
 
 EnemyStateSystem::EnemyStateSystem(SLD::WorldEntity& world)
@@ -17,44 +16,25 @@ EnemyStateSystem::EnemyStateSystem(SLD::WorldEntity& world, SLD::GameObjectId pa
 {
 }
 
-void EnemyStateSystem::OnUpdate(SLD::GameObjectId gId , float deltaTime, SLD::TransformComponent* transform,
+void EnemyStateSystem::OnUpdate(SLD::GameObjectId  , float deltaTime, SLD::TransformComponent* transform,
 	SLD::Box2DComponent* box2d, SpeedComponent* speed, FlyInComponent* flyIn, FormationComponent* formation, EnemyTag* tag)
 {
-	//int trace{ int(gId) };
-	//MTR_SCOPE("inner", "AIUpdate");
-
-	const auto& oldState{ m_EnemyState };
-	if(const auto newState{ oldState->Update(m_World,gId,tag) }; newState)
+	switch (tag->state)
 	{
-		oldState->Exit(m_World,gId);
-		newState->Enter(m_World, gId);
+	case EnemyStateNums::FlyIn:
 
-		m_EnemyState = newState;
+		HandleFlyInState(deltaTime, transform, box2d, flyIn, speed, tag);
+		
+		break;
+
+	case EnemyStateNums::Formation:
+
+		HandleFormationState(deltaTime, transform, box2d, formation, speed, tag);
+
+	case EnemyStateNums::Dive:
+			
+		break;
 	}
-	
-	//if(const auto newState{ m_EnemyState->Update(m_World, gId, tag) }; 
-	//	newState)
-	//{
-	//	
-	//	newState->Enter();
-	//}
-	
-	//switch (tag->state)
-	//{
-	//case EnemyStateNums::FlyIn:
-
-	//	HandleFlyInState(deltaTime, transform, box2d, flyIn, speed, tag);
-	//	
-	//	break;
-
-	//case EnemyStateNums::Formation:
-
-	//	HandleFormationState(deltaTime, transform, box2d, formation, speed, tag);
-
-	//case EnemyStateNums::Dive:
-	//		
-	//	break;
-	//}
 }
 
 void EnemyStateSystem::HandleFlyInState(float dt, SLD::TransformComponent* transform, SLD::Box2DComponent* box2d,

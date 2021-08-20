@@ -14,36 +14,48 @@ GameStateSystem::GameStateSystem(SLDWorldEntity& world)
 {
 }
 
-void GameStateSystem::OnUpdate(SLD::GameObjectId , float , GameStateComponent* game, InputListener*)
+void GameStateSystem::OnUpdate(SLD::GameObjectId , float dt, GameStateComponent* game, InputListener*)
 {
-	switch (game->currentState)
+	const auto& oldState{ game->state };
+	const auto newState{ game->state->HandleInput(m_World,game) };
+
+	if(newState)
 	{
-	case GameState::Menu:
+		oldState->Exit(m_World,game);
+		newState->Enter(m_World,game);
 
-		HandleMenuState(game);
-
-		break;
-	case GameState::Play:
-
-		HandlePlayState(game);
-
-		break;
-	case GameState::End: break;
-	case GameState::Count: break;
-	default: break;
+		game->state = newState;
 	}
+
+	game->state->Update(m_World, dt, game);
+	
+	//switch (game->state)
+	//{
+	//case GameStateNum::Menu:
+
+	//	HandleMenuState(game);
+
+	//	break;
+	//case GameStateNum::Play:
+
+	//	HandlePlayState(game);
+
+	//	break;
+	//case GameStateNum::End: break;
+	//case GameStateNum::Count: break;
+	//default: break;
+	//}
 }
 void GameStateSystem::HandleMenuState(GameStateComponent* game)
 {
 	// Spawn UI, background
 	using namespace SLD;
-
-	InputSettings& input{ m_World.GetWorldInputSetting() };
-
-	if (input.GetInputState("Enter") == InputEvent::IE_Pressed)
-	{
-		game->currentState = GameState::Play;
-	}
+	game;
+	//InputSettings& input{ m_World.GetWorldInputSetting() };
+	//if (input.GetInputState("Enter") == InputEvent::IE_Pressed)
+	//{
+	//	game->state = GameStateNum::Play;
+	//}
 }
 
 void GameStateSystem::HandlePlayState(GameStateComponent*)
@@ -51,14 +63,16 @@ void GameStateSystem::HandlePlayState(GameStateComponent*)
 	// Spawn player, enemy and etc...
 	using namespace SLD;
 
-	bool& isSpawn{ m_StateBits[size_t(GameState::Play)] };
+	bool& isSpawn{ m_StateBits[size_t(GameStateNum::Play)] };
 	if (!isSpawn)
 	{
 		isSpawn = true;
 
-		auto& systems{ m_SystemStateArray[size_t(GameState::Play)] };
+		auto& systems{ m_SystemStateArray[size_t(GameStateNum::Play)] };
 
+		const auto& enemyPath{ Instance<EnemyPath>() };
 		const auto formationTracker{ SLD::GameObject::Create(m_World) };
+		enemyPath->SetFormationTracker(formationTracker->GetId());
 		formationTracker->AddComponent<FormationWayPoints>({ Instance<EnemyPath>()->GetFormationWayPoints() });
 		
 		systems.push_back(m_World.AddSystem<PlayerInputSystem>({ m_World }));

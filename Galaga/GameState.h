@@ -2,10 +2,24 @@
 
 #include <SLDFramework.h>
 
+struct GameStateComponent;
+class PlayState;
+class IntervalState;
 class GameState
 {
 public:
 
-	virtual void HandleInput(SLD::InputSettings& input) = 0;
-	virtual void Update(SLD::WorldEntity& world) = 0;
+	static SharedPtr<PlayState> Play;
+	static SharedPtr<IntervalState> Interval;
+
+	virtual ~GameState() = default;
+	virtual SharedPtr<GameState> HandleInput(SLDWorldEntity&,GameStateComponent*) { return {}; }
+	virtual void Update(SLDWorldEntity&,float, GameStateComponent*) {}
+	virtual void Enter(SLDWorldEntity&, GameStateComponent*) {}
+	virtual void Exit(SLDWorldEntity&, GameStateComponent*) {}
+
+protected:
+
+	std::vector<WeakPtr<SLD::SystemBase>> m_ExistSystem;
 };
+

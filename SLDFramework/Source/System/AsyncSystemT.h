@@ -73,9 +73,6 @@ namespace SLD
 			if (future.valid())
 				future.get();
 		}
-
-		//if(!m_FutureResults.empty())
-		//	m_FutureResults.clear();
 	}
 }
 
