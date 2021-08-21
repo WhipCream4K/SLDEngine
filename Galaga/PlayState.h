@@ -19,15 +19,16 @@ public:
 
 private:
 
-	//void DisplayInterval(SLDWorldEntity& world,float dt,int stageDisplay);
 	void SpawnEnemy(SLD::WorldEntity& world, float dt,int stage);
 	void SpawnEnemySection(SLD::WorldEntity& ,float dt, const SpawnData& section);
+	void SignalEnemyLockedFormation(SLD::WorldEntity& world);
 
+	std::vector<SLD::GameObjectId> m_SpawnEnemies;
 
-	const StageSpawnData* m_pSpawnData;
-	const SpawnPaths* m_pSpawnPaths;
+	const StageSpawnData* m_pSpawnData{};
+	const SpawnPaths* m_pSpawnPaths{};
 	
-	//SLD::GameObjectId m_StageText{};
+	SLD::GameObjectId m_FormationTracker{};
 	//SLD::GameObjectId m_ReadyText{};
 	
 	//float m_MaxDisplayTime{};
@@ -41,5 +42,6 @@ private:
 	
 	//bool m_DisplayInterval{};
 	bool m_IsSpawning;
+	bool m_ShouldRestart;
 };
 

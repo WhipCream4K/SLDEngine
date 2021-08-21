@@ -41,17 +41,28 @@ struct SpriteRenderComponent : SLD::ComponentT<SpriteRenderComponent>
 
 struct TextRenderComponent : SLD::ComponentT<TextRenderComponent>
 {
-	TextRenderComponent(const SharedPtr<sf::Font>& font, const std::string& string,size_t fontSizePixel)
-		: text(string,*font, unsigned(fontSizePixel))
+	//TextRenderComponent(const SharedPtr<sf::Font>& font, const std::string& string,size_t fontSizePixel)
+	//	: text(std::make_shared<sf::Text>(string, *font, unsigned(fontSizePixel)))
+	//{
+	//}
+
+	//TextRenderComponent(const sf::Font& font,const std::string& string,size_t fontSizePixel)
+	//	: text(std::make_shared<sf::Text>(string,font, unsigned(fontSizePixel)))
+	//{
+	//}
+
+	TextRenderComponent(sf::Font* font, const std::string& string, size_t fontSizePixel)
+		: text(string)
+		, font(font)
+		, color()
+		, fontSize(fontSizePixel)	
 	{
 	}
 
-	TextRenderComponent(const sf::Font& font,const std::string& string,size_t fontSizePixel)
-		: text(string,font,unsigned(fontSizePixel))
-	{
-	}
-
-	sf::Text text;
+	std::string text;
+	sf::Font* font;
+	sf::Color color;
+	size_t fontSize;
 };
 
 struct InputListener : SLD::ComponentT<InputListener>

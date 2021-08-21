@@ -9,7 +9,6 @@ class GameState
 {
 public:
 
-	static SharedPtr<PlayState> Play;
 	static SharedPtr<IntervalState> Interval;
 
 	virtual ~GameState() = default;

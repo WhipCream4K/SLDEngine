@@ -14,12 +14,14 @@
 #include "../System/SystemBase.h"
 #include "Thread/SimpleThreadPool.h"
 #include "../Physics/Components/PhysicsUserData.h"
+#include "../System/Listener.h"
 
 class b2World;
 namespace SLD
 {
 	class ContactFilter;
 	class Prefab;
+	class Listener;
 	// For support both 32 and 64 bit
 	using GameObjectId = size_t;
 
@@ -181,6 +183,12 @@ namespace SLD
 		template<typename T>
 		EnableIsBasedOf<BaseComponent, T,T>* CallInterface();
 
+		template<typename T,typename ...Args>
+		EnableIsBasedOf<Listener, T> BroadCast(Args...);
+
+		template<typename T>
+		EnableIsBasedOf<BaseComponent, T, std::vector<GameObjectId>> QueryGameObject();
+
 	private:
 
 		struct TickComponentPool
@@ -243,7 +251,8 @@ namespace SLD
 		std::vector<MoveComponentRecord> m_ToMoveGameObjects;
 		
 		std::unordered_set<SharedPtr<NonTickComponent>> m_NonTickComponents;
-
+		std::vector<WeakPtr<Listener>> m_Listeners;
+		
 		void DestroyPendingGameObject();
 		void ValidateSystems();
 		void ValidateArchetype();
@@ -562,6 +571,45 @@ namespace SLD
 	std::future<Ret> WorldEntity::PushAsyncTask(Func&& task, Args&&... args)
 	{
 		return m_ThreadPool.PushTask(std::forward<Func>(task), std::forward<Args>(args)...);
+	}
+
+	template <typename T, typename ... Args>
+	EnableIsBasedOf<Listener, T> WorldEntity::BroadCast(Args... args)
+	{
+		for (auto it = m_Listeners.begin(); it != m_Listeners.end(); ++it)
+		{
+			if(it->expired())
+			{
+				it = m_Listeners.erase(it);
+			}
+			else
+			{
+				auto lockPtr = it->lock();
+				if(auto validPtr{std::dynamic_pointer_cast<T>(lockPtr)}; validPtr)
+				{
+					validPtr->BroadCast(std::forward<Args>(args)...);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	EnableIsBasedOf<BaseComponent, T, std::vector<GameObjectId>> WorldEntity::QueryGameObject()
+	{
+		const size_t compId{ ComponentT<T>::GetId() };
+		std::vector<GameObjectId> out{};
+		
+		const std::string toKey{ std::to_string(compId) };
+		
+		for (const auto& [type,archetype] : m_ArchetypeBuffer[ObjectBuffer::Write])
+		{
+			if(IsArchetypeIdsSameAsKey(toKey, type))
+			{
+				out.insert(out.end(), archetype->gameObjectIds.begin(), archetype->gameObjectIds.end());
+			}
+		}
+
+		return out;
 	}
 
 

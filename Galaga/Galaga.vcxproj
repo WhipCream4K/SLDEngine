@@ -180,6 +180,9 @@
     <ClCompile Include="IntervalState.cpp" />
     <ClCompile Include="LineDebugDraw.cpp" />
     <ClCompile Include="MenuState.cpp" />
+    <ClCompile Include="OnFormationLocked.cpp" />
+    <ClCompile Include="OnObjectDead.cpp" />
+    <ClCompile Include="OnPlayerDead.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Galaga.cpp" />
     <ClCompile Include="GalagaScene.cpp" />
@@ -192,6 +195,7 @@
     <ClCompile Include="ReloadShooter.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="ShootableComponent.cpp" />
+    <ClCompile Include="SoloPlayState.cpp" />
     <ClCompile Include="SpawnStages.cpp" />
     <ClCompile Include="SpriteRenderSystem.cpp" />
     <ClCompile Include="TextRenderSystem.cpp" />
@@ -232,6 +236,9 @@
     <ClInclude Include="IntervalState.h" />
     <ClInclude Include="LineDebugDraw.h" />
     <ClInclude Include="MenuState.h" />
+    <ClInclude Include="OnFormationLocked.h" />
+    <ClInclude Include="OnObjectDead.h" />
+    <ClInclude Include="OnPlayerDead.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="LimitPlayerToPlayArea.h" />
     <ClInclude Include="MyComponents.h" />
@@ -245,6 +252,7 @@
     <ClInclude Include="ReloadShooter.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShootableComponent.h" />
+    <ClInclude Include="SoloPlayState.h" />
     <ClInclude Include="SpawnData.h" />
     <ClInclude Include="SpawnPaths.h" />
     <ClInclude Include="SpawnStages.h" />

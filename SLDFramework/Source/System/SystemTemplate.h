@@ -17,6 +17,7 @@ namespace SLD
 
 		virtual void OnUpdate(GameObjectId gameObjectId, float deltaTime, ComponentTypes*...) = 0;
 
+
 	protected:
 
 		virtual void InternalUpdate(float deltaTime, const SharedPtr<Archetype>& archetype) override;
@@ -56,7 +57,7 @@ namespace SLD
 			const std::array<size_t, N>& strideOffsets,
 			uint8_t* componentAddress,
 			std::index_sequence<Idx...>);
-
+		
 	};
 
 	template <typename ... ComponentTypes>

@@ -4,6 +4,7 @@
 #include "Zako.h"
 #include "Goei.h"
 #include "Galagas.h"
+//#include "MyComponents.h"
 
 EnemyManager::EnemyManager()
 	: m_EnemyRowColFormation()
@@ -16,13 +17,82 @@ EnemyManager::EnemyManager()
 	InitializeRowCol();
 }
 
-void EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type, SpawnDirection dir)
+SLD::GameObjectId EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type, SpawnDirection dir)
 {
 	using namespace SLD;
 
 	size_t& activeEnemyCnt{ m_ActiveEnemyCounter[type] };
 	const size_t maxEnemyCnt{ m_MaxEnemyCounter[type] };
 	const auto& [row, col] = m_EnemyRowColFormation[type][activeEnemyCnt];
+	SharedPtr<GameObject> instance{};
+	SLD::GameObjectId out{};
+
+	if (activeEnemyCnt < maxEnemyCnt)
+	{
+		switch (type)
+		{
+		case EnemyType::Zako:
+		{
+			SharedPtr<Zako> zako{};
+			InstantiatePrefab<Zako>(world, { dir,row,col }, pos, zako);
+
+			m_EnemyInstances[type].emplace_back(zako->GetGameObjectInstance());
+			instance = zako->GetGameObjectInstance();
+		}
+		break;
+		case EnemyType::Goei:
+		{
+			SharedPtr<Goei> goei{};
+			InstantiatePrefab<Goei>(world, { dir,row,col }, pos, goei);
+
+			m_EnemyInstances[type].emplace_back(goei->GetGameObject());
+
+			instance = goei->GetGameObject();
+		}
+		break;
+		case EnemyType::Galagas:
+		{
+			SharedPtr<Goei> galagas{};
+			InstantiatePrefab<Goei>(world, { dir,row,col }, pos, galagas);
+
+			m_EnemyInstances[type].emplace_back(galagas->GetGameObject());
+
+			instance = galagas->GetGameObject();
+		}
+
+		break;
+		default: break;
+		}
+
+		activeEnemyCnt++;
+	}
+	else
+	{
+		instance = m_EnemyInstances[type][activeEnemyCnt % maxEnemyCnt];
+		instance->GetComponent<TransformComponent>()->Translate(pos);
+		FlyInComponent* flyIn{ instance->GetComponent<FlyInComponent>() };
+		if(flyIn)
+		{
+			flyIn->spawnDirection = dir;
+		}
+	}
+
+	out = instance->GetId();
+
+	return out;
+
+}
+
+SLD::GameObjectId EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type,
+	SpawnDirection dir, EnemyStateNums state)
+{
+	using namespace SLD;
+
+	size_t& activeEnemyCnt{ m_ActiveEnemyCounter[type] };
+	const size_t maxEnemyCnt{ m_MaxEnemyCounter[type] };
+	const auto& [row, col] = m_EnemyRowColFormation[type][activeEnemyCnt];
+	SharedPtr<GameObject> instance{};
+	SLD::GameObjectId out{};
 
 	if (activeEnemyCnt < maxEnemyCnt)
 	{
@@ -35,6 +105,7 @@ void EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, Enemy
 
 			m_EnemyInstances[type].emplace_back(zako->GetGameObjectInstance());
 
+			instance = zako->GetGameObjectInstance();
 		}
 		break;
 		case EnemyType::Goei:
@@ -44,6 +115,7 @@ void EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, Enemy
 
 			m_EnemyInstances[type].emplace_back(goei->GetGameObject());
 
+			instance = goei->GetGameObject();
 		}
 		break;
 		case EnemyType::Galagas:
@@ -52,6 +124,8 @@ void EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, Enemy
 			InstantiatePrefab<Goei>(world, { dir,row,col }, pos, goei);
 
 			m_EnemyInstances[type].emplace_back(goei->GetGameObject());
+
+			instance = goei->GetGameObject();
 		}
 
 		break;
@@ -62,10 +136,24 @@ void EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, Enemy
 	}
 	else
 	{
-		SharedPtr<GameObject> instance{ m_EnemyInstances[type][activeEnemyCnt % maxEnemyCnt] };
-		
+		instance = m_EnemyInstances[type][activeEnemyCnt % maxEnemyCnt];
+		instance->GetComponent<TransformComponent>()->Translate(pos);
+		FlyInComponent* flyIn{ instance->GetComponent<FlyInComponent>() };
+		if (flyIn)
+		{
+			flyIn->spawnDirection = dir;
+		}
 	}
 
+	EnemyTag* tag{ instance->GetComponent<EnemyTag>() };
+	if(tag)
+	{
+		tag->state = state;
+	}
+
+	out = instance->GetId();
+	
+	return out;
 }
 
 void EnemyManager::InitializeRowCol()

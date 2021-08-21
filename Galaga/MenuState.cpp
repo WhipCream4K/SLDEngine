@@ -2,6 +2,7 @@
 #include "MyComponents.h"
 #include "ResourceManager.h"
 #include "GalagaScene.h"
+#include "PlayState.h"
 #include <Components/TransformComponent.h>
 
 MenuState::MenuState()
@@ -28,9 +29,11 @@ SharedPtr<GameState> MenuState::HandleInput(SLDWorldEntity& world,GameStateCompo
 		const auto& currentWorldPos{ pointerTransform->GetWorldPos() };
 
 		pointerTransform->Translate(currentWorldPos.x, nextTransform->GetWorldPos().y - 50.0f, currentWorldPos.z);
-		
 	}
-
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter))
+	{
+		return std::make_shared<PlayState>();
+	}
 	
 	
 	return {};
@@ -53,13 +56,14 @@ void MenuState::Enter(SLDWorldEntity& world, GameStateComponent*)
 
 		const auto player1Object{ GameObject::Create(world) };
 		m_Player1Text = player1Object->GetId();
-		player1Object->AddComponent<TextRenderComponent>({ *font,playOnString,fontSize });
+		TextRenderComponent* test =  player1Object->AddComponent<TextRenderComponent>({ font,playOnString,fontSize });
+		test;
 
 		const auto& player1Transform{ player1Object->GetComponent<TransformComponent>() };
 
 		const auto player2Object{ GameObject::Create(world) };
 		m_Player2Text = player2Object->GetId();
-		player2Object->AddComponent<TextRenderComponent>({ *font,playOnString2,fontSize });
+		player2Object->AddComponent<TextRenderComponent>({ font,playOnString2,fontSize });
 
 		player2Object->GetComponent<TransformComponent>()->Translate(0.0f, -float(fontSize), 1.0f);
 
@@ -82,9 +86,13 @@ void MenuState::Exit(SLDWorldEntity& world, GameStateComponent*)
 	{
 		world.RemoveSystem(system.lock());
 	}
+
+	world.DestroyGameObject(m_Player1Text);
+	world.DestroyGameObject(m_Player2Text);
+	world.DestroyGameObject(m_Pointer);
 	
 	m_ExistSystem.clear();
-
+	
 	m_Player1Text = 0;
 	m_Player2Text = 0;
 	m_Pointer = 0;

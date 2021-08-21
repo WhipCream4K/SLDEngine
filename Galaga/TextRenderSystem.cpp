@@ -7,18 +7,19 @@ TextRenderSystem::TextRenderSystem(SLD::WorldEntity& world)
 }
 
 void TextRenderSystem::OnRender(const SharedPtr<SLD::Window>& renderWindow, SLD::GameObjectId,
-                                const SLD::TransformComponent* transform, TextRenderComponent* textureComponent)
+                                const SLD::TransformComponent* transform, TextRenderComponent* textComponent)
 {
 	
 #ifdef SLD_SUPPORT_SFML
-
-	renderWindow->GetNativeWindowHandle()->draw(textureComponent->text, SFMLTextToSystemPos(renderWindow, textureComponent, transform));
+	
+	sf::Text some{ textComponent->text.c_str(),*textComponent->font,unsigned(textComponent->fontSize) };
+	renderWindow->GetNativeWindowHandle()->draw(some, SFMLTextToSystemPos(renderWindow, &some, transform));
 	
 #endif
 }
 
 sf::RenderStates TextRenderSystem::SFMLTextToSystemPos(const SharedPtr<SLD::Window>& renderWindow,
-	TextRenderComponent* textComponent, const SLD::TransformComponent* transform) const
+	sf::Text* textComponent, const SLD::TransformComponent* transform) const
 {
 	textComponent;
 	const SLD::Vector2<uint32_t> viewCenter{ renderWindow->GetCenter() };
@@ -26,8 +27,8 @@ sf::RenderStates TextRenderSystem::SFMLTextToSystemPos(const SharedPtr<SLD::Wind
 	//const size_t textSize{ textComponent->text.getCharacterSize() };
 	//const auto& textOrigin{ textComponent->text.getOrigin() };
 	//textComponent->text.setOrigin(float(textSize),textOrigin.y);
-	
-	
+
+
 	sf::RenderStates out{};
 
 	const auto& objMat{ transform->GetWorldMatrix() };
@@ -44,3 +45,4 @@ sf::RenderStates TextRenderSystem::SFMLTextToSystemPos(const SharedPtr<SLD::Wind
 
 	return out;
 }
+

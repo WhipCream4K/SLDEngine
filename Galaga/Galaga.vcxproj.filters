@@ -147,6 +147,18 @@
     <ClCompile Include="IntervalState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SoloPlayState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OnPlayerDead.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OnFormationLocked.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OnObjectDead.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GalagaScene.h">
@@ -291,6 +303,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IntervalState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SoloPlayState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OnPlayerDead.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OnFormationLocked.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OnObjectDead.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

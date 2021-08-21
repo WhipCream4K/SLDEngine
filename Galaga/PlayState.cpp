@@ -8,7 +8,7 @@
 #include "EnemyPath.h"
 #include "EnemyManager.h"
 #include "IntervalState.h"
-
+#include "OnFormationLocked.h"
 #include <Components/TransformComponent.h>
 
 #include "EnemyStateSystem.h"
@@ -21,12 +21,20 @@ SharedPtr<GameState> PlayState::HandleInput(SLDWorldEntity& , GameStateComponent
 		return Interval;
 	}
 
+	if(game->currentStageCnt >= game->maxStage)
+	{
+		m_ShouldRestart = true;
+		// TODO: return end screen
+		return {};
+	}
+
 	return {};
 }
 
 void PlayState::Update(SLDWorldEntity& world, float dt, GameStateComponent* game)
 {
 	SpawnEnemy(world, dt, game->currentStageCnt);
+	SignalEnemyLockedFormation(world);
 }
 
 void PlayState::Enter(SLDWorldEntity& world, GameStateComponent* game)
@@ -36,14 +44,15 @@ void PlayState::Enter(SLDWorldEntity& world, GameStateComponent* game)
 	m_pSpawnPaths = &Instance<EnemyPath>()->GetAllSpawnPaths();
 	m_pSpawnData = &Instance<SpawnStages>()->GetSpawnStage();
 
+	// Initialize system at the start
 	if(game->currentStageCnt == 0)
 	{
 		auto& systems{ m_ExistSystem };
-		
 		const auto& enemyPath{ Instance<EnemyPath>() };
 		const auto formationTracker{ SLD::GameObject::Create(world) };
 		enemyPath->SetFormationTracker(formationTracker->GetId());
 		formationTracker->AddComponent<FormationWayPoints>({ Instance<EnemyPath>()->GetFormationWayPoints() });
+		m_FormationTracker = formationTracker->GetId();
 
 		systems.push_back(world.AddSystem<PlayerInputSystem>({ world }));
 		systems.push_back(world.AddSystem<OnBulletContact>({ world }));
@@ -60,24 +69,32 @@ void PlayState::Enter(SLDWorldEntity& world, GameStateComponent* game)
 
 		systems.push_back(world.AddSystem<UpdateFormationWayPoints>({ world,hopInterval }));
 
-		
-		
-		//const rtm::float3f playerSpawnPoint{ 0.0f,-260.0f,float(size_t(GalagaScene::Layer::Player)) };
-		//for (size_t i = 0; i < m_PlayerCount; ++i)
-		//{
-		//	InstantiatePrefab<Player>(world, { i }, { playerSpawnPoint });
-		//}
+
+		game->currentEnemyCount = 40;
 	}
 
 }
 
-void PlayState::Exit(SLDWorldEntity&, GameStateComponent* )
+void PlayState::Exit(SLDWorldEntity& world, GameStateComponent* game)
 {
 	m_WaveTimer = 0.0f;
 	m_SpawnTimer = 0.0f;
 	m_BusCounter = 0;
 	m_SectionCounter = 0;
 	m_IsSpawning = false;
+
+	if (m_ShouldRestart)
+	{
+		game->currentStageCnt = 0;
+		
+		m_ShouldRestart = false;
+		for (auto& system : m_ExistSystem)
+		{
+			world.RemoveSystem(system.lock());
+		}
+
+		m_SpawnEnemies.clear();
+	}
 }
 
 //void PlayState::DisplayInterval(SLDWorldEntity& world, float dt, int stageDisplay)
@@ -186,6 +203,26 @@ void PlayState::SpawnEnemySection(SLD::WorldEntity& world, float dt, const Spawn
 		{
 			m_WaveTimer -= section.interval;
 			m_IsSpawning = true;
+		}
+	}
+}
+
+void PlayState::SignalEnemyLockedFormation(SLD::WorldEntity& world)
+{
+	bool flyIn{ false };
+	for (const auto& enemy : m_SpawnEnemies)
+	{
+		EnemyTag* tag{ world.GetComponent<EnemyTag>(enemy) };
+		if (tag->state == EnemyStateNums::FlyIn)
+			flyIn = true;
+	}
+
+	if(flyIn)
+	{
+		FormationWayPoints* formation{ world.GetComponent<FormationWayPoints>(m_FormationTracker) };
+		if(formation)
+		{
+			formation->SetLock(true);
 		}
 	}
 }

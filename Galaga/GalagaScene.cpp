@@ -64,7 +64,7 @@ void GalagaScene::WorldCreation()
 
 		Instance<EnemyPath>()->Initialize();
 		Instance<SpawnStages>()->Initialize();
-
+		
 #ifdef  _DEBUG
 
 		const auto& enemyPath{ Instance<EnemyPath>() };

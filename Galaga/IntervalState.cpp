@@ -10,7 +10,7 @@
 SharedPtr<GameState> IntervalState::HandleInput(SLDWorldEntity&, GameStateComponent*)
 {
 	if (m_FinishedDisplay)
-		return Play;
+		return std::make_shared<PlayState>();
 
 	return {};
 }
@@ -32,7 +32,7 @@ void IntervalState::Update(SLDWorldEntity& world, float dt, GameStateComponent* 
 			if (stageText)
 			{
 				const std::string stageCnt{ "Stage " + std::to_string(game->currentStageCnt) };
-				stageText->text.setString(stageCnt);
+				stageText->text = stageCnt;
 			}
 
 			stageTransform->Translate(0.0f, 100.0f, 1.0f);
@@ -63,16 +63,18 @@ void IntervalState::Enter(SLDWorldEntity& world, GameStateComponent*)
 	if (font)
 	{
 		const auto textObject{ GameObject::Create(world) };
-		TextRenderComponent* textComp = textObject->AddComponent<TextRenderComponent>({ *font,"Stage",50 });
+		TextRenderComponent* textComp = textObject->AddComponent<TextRenderComponent>({ font,"Stage",50 });
 
-		textComp->text.setFillColor(sf::Color{ 31,115,240 });
+		//textComp->text.setFillColor(sf::Color{ 31,115,240 });
+		textComp->color = sf::Color{ 31,114,240 };
 
 		m_StageText = textObject->GetId();
 
 		const auto textObject2{ GameObject::Create(world) };
-		textComp = textObject2->AddComponent<TextRenderComponent>({ *font,"Ready",50 });
+		textComp = textObject2->AddComponent<TextRenderComponent>({ font,"Ready",50 });
 
-		textComp->text.setFillColor(sf::Color{ 189,38,38 });
+		//textComp->text.setFillColor(sf::Color{ 189,38,38 });
+		textComp->color = sf::Color{ 189,38,38 };
 
 		m_ReadyText = textObject2->GetId();
 	}

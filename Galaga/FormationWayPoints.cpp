@@ -17,3 +17,13 @@ void FormationWayPoints::SetLinkTask(std::future<void>&& future)
 {
 	m_UpdateWayPointsFinished = std::move(future);
 }
+
+void FormationWayPoints::SetLock(bool value)
+{
+	m_IsLocked = value;
+}
+
+bool FormationWayPoints::IsLocked() const
+{
+	return m_IsLocked;
+}

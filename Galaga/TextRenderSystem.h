@@ -14,7 +14,7 @@ private:
 
 	sf::RenderStates SFMLTextToSystemPos(
 		const SharedPtr<SLD::Window>& renderWindow,
-		TextRenderComponent* textComponent,
+		sf::Text* textComponent,
 		const SLD::TransformComponent* transform) const;
 };
 

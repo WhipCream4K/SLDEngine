@@ -30,6 +30,7 @@ struct GameStateComponent : SLD::ComponentT<GameStateComponent>
 		, currentStageCnt()
 		, maxStage(maxStageCnt)
 		, playStyle()
+		, playerDead()
 	{
 	}
 
@@ -39,7 +40,7 @@ struct GameStateComponent : SLD::ComponentT<GameStateComponent>
 	int currentStageCnt;
 	int maxStage;
 	PlayStyle playStyle;
-	bool m_PlayerAlreadySpawn;
+	bool playerDead;
 
 	//GameStateNum state;
 	//size_t playStage;

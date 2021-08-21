@@ -14,12 +14,18 @@ void OnBulletContact::OnBeginOverlap(SLD::GameObjectId collider, SLD::GameObject
 {
 	using namespace SLD;
 	
-	HealthComponent* hPtr{ m_World.GetComponent<HealthComponent>(against) };
+	ProjectileComponent* projectile{ m_World.GetComponent<ProjectileComponent>(collider) };
 
+	if (!projectile->isActive)
+		return;
+	
+	HealthComponent* hPtr{ m_World.GetComponent<HealthComponent>(against) };
 	if(hPtr)
 	{
 		std::cout << "Bullet Contact against id : " << against << '\n';
 		std::cout << "Current Health : " << --hPtr->health << '\n';
+
+		projectile->isActive = false;
 
 		if (hPtr->health <= 0)
 		{
@@ -29,8 +35,6 @@ void OnBulletContact::OnBeginOverlap(SLD::GameObjectId collider, SLD::GameObject
 
 			m_World.DestroyGameObject(against);
 
-			ProjectileComponent* projectile{ m_World.GetComponent<ProjectileComponent>(collider) };
-			projectile->isActive = false;
 		}
 	}
 }

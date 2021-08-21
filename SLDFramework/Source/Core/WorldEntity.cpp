@@ -340,13 +340,13 @@ void SLD::WorldEntity::OnPhysicsValidation(float dt)
 		system->FetchFutureResults();
 	}
 
+	UpdatePipeline(PipelineLayer::OnPrePhysicsStep, dt);
 	
 	m_PhysicsWorld->Step(dt, 6, 2);
 
 	UpdatePipeline(PipelineLayer::OnPostPhysicsStep, dt);
 }
 
-	//UpdatePipeline(PipelineLayer::OnPrePhysicsStep, dt);
 
 void SLD::WorldEntity::OnRenderSystem(const SharedPtr<Window>& winHandle)
 {

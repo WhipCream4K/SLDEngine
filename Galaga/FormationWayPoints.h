@@ -10,11 +10,15 @@ public:
 	FormationWayPoints(const LineWayPoints& lines);
 	LineWayPoints& GetWayPoints();
 	void SetLinkTask(std::future<void>&& future);
+	void SetLock(bool value);
+	bool IsLocked() const;
+
 	
+
 private:
 
 	LineWayPoints m_WayPoints;
 	std::future<void> m_UpdateWayPointsFinished;
-	bool m_IsLocked;
+	bool m_IsLocked{};
 };
 

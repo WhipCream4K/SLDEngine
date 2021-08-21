@@ -369,6 +369,9 @@
     <ClInclude Include="Physics\System\WorldToPhysicsUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="System\Listener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp">
@@ -519,6 +522,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Physics\System\WorldToPhysicsUpdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Listener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -14,7 +14,8 @@ public:
 
 	EnemyManager();
 	
-	void Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type, SpawnDirection dir);
+	SLD::GameObjectId Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type, SpawnDirection dir);
+	SLD::GameObjectId Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type, SpawnDirection dir, EnemyStateNums state);
 
 private:
 

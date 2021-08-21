@@ -210,6 +210,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="System\Listener.h" />
     <ClInclude Include="System\AsyncSystemT.h" />
     <ClInclude Include="Physics\Components\PhysicsUserData.h" />
     <ClInclude Include="Physics\System\ContactFilter.h" />
@@ -330,6 +331,7 @@
     <ClInclude Include="Physics\System\WorldToPhysicsUpdate.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="System\Listener.cpp" />
     <ClCompile Include="System\AsyncSystemT.cpp" />
     <ClCompile Include="Physics\System\ContactFilter.cpp" />
     <ClCompile Include="Physics\System\PhysicsToTransformUpdate.cpp" />
