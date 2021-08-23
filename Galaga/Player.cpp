@@ -39,7 +39,7 @@ void Player::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 	const float objectWidth{ PlayerSpriteRect.z * GalagaScene::GlobalScale.x };
 	const float objectHeight{ PlayerSpriteRect.a * GalagaScene::GlobalScale.y };
 
-	b2BodyDef bodyDef{ CreateBasicBody(GetPlayerId(),b2_kinematicBody) };
+	b2BodyDef bodyDef{ CreateBasicBody(GetPlayerId(),b2_dynamicBody) };
 	bodyDef.position = { worldPos.x,worldPos.y };
 
 	//SharedPtr<b2PolygonShape> box{std::make_shared<b2PolygonShape>()};
@@ -50,8 +50,10 @@ void Player::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 	
 	b2FixtureDef fixtureDef{};
 	fixtureDef.filter.categoryBits = CollisionGroup::mPlayer;
+	fixtureDef.filter.maskBits |= ~CollisionGroup::mPlayer;
 	//fixtureDef.shape = box.get();
 	fixtureDef.shape = &box;
+	fixtureDef.isSensor = true;
 
 	//m_Instance->AddComponent<Box2DComponent>({ world,bodyDef,fixtureDef,box,objectWidth,objectHeight });
 	m_Instance->AddComponent<Box2DComponent>({ world,bodyDef,fixtureDef,objectWidth,objectHeight });
@@ -61,8 +63,8 @@ void Player::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 	m_Instance->AddComponent<ShootableComponent>({ CollisionGroup::mPlayer,reloadTime,2 });
 	m_Instance->AddComponent<SpeedComponent>({ 200.0f });
 	m_Instance->AddComponent<PlayerTag>();
-
-	m_Instance->AddComponent<OnHitCommand>({std::make_shared<PlayerOnHit>()});
+	m_Instance->AddComponent<HealthComponent>({ 1 });
+	m_Instance->AddComponent<OnHitCommand>({ std::make_shared<PlayerOnHit>() });
 }
 
 SLD::GameObjectId Player::GetPlayerId() const

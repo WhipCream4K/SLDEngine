@@ -24,6 +24,7 @@
 #include "UpdateParticle.h"
 #include "Tracer/minitrace.h"
 #include "ZakoDiveSystem.h"
+#include "OnBodyContact.h"
 
 
 GalagaScene::GalagaScene()
@@ -99,6 +100,7 @@ void GalagaScene::WorldCreation()
 		world.AddSystem<ReloadShooter>({ world });
 
 		world.AddSystem<UpdateFormationWayPoints>({ world,hopInterval });
+		world.AddSystem<OnBodyContact>(world);
 
 		Instance<EnemyPath>()->Initialize();
 		Instance<SpawnStages>()->Initialize();
@@ -154,12 +156,6 @@ void GalagaScene::WorldCreation()
 				{Key{InputDevice::D_Keyboard,sf::Keyboard::Left},-1.0f},
 				{Key{InputDevice::D_Keyboard,sf::Keyboard::Right},1.0f},
 				{Key{InputDevice::D_Gamepad,KeyType(GamePadKey::GPK_Left_AxisX)},1.0f}
-			});
-
-		inputSettings.AddAxisMapping("Vertical",
-			{
-				{Key{InputDevice::D_Keyboard,sf::Keyboard::Up},1.0f},
-				{Key{InputDevice::D_Keyboard,sf::Keyboard::Down},-1.0f}
 			});
 
 		inputSettings.AddActionMapping("Shoot",

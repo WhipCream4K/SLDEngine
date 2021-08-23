@@ -17,7 +17,6 @@ void PlayerInputSystem::OnUpdate(SLD::GameObjectId gameObjectId, float deltaTime
 	SLD::InputSettings& inputSettings{ m_World.GetWorldInputSetting() };
 
 	float axisX{ inputSettings.GetInputAxis("Horizontal") };
-	float axisY{ inputSettings.GetInputAxis("Vertical") };
 
 	if (inputSettings.GetInputState("Shoot") == InputEvent::IE_Released)
 	{
@@ -34,7 +33,7 @@ void PlayerInputSystem::OnUpdate(SLD::GameObjectId gameObjectId, float deltaTime
 		}
 	}
 
-	box2d->SetVelocity({ speed->value * deltaTime * axisX,speed->value * deltaTime * axisY });
+	box2d->SetVelocity({ speed->value * deltaTime * axisX,0.0f });
 
 //#ifdef _DEBUG
 //	std::cout << "y : " << transform->GetWorldPos().y << std::endl;

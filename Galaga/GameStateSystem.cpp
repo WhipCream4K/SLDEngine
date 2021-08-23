@@ -89,11 +89,15 @@ void GameStateSystem::EnemyDead(SLD::GameObjectId enemyId)
 			// the current one
 			if (gameState->isActive)
 			{
-				gameState->activeEnemies.erase(
-					std::find(
+				const auto findIter{ std::find(
 						gameState->activeEnemies.begin(),
 						gameState->activeEnemies.end(),
-						enemyId));
+						enemyId) };
+
+				if (findIter == gameState->activeEnemies.end())
+					return;
+				
+				gameState->activeEnemies.erase(findIter);
 
 				gameState->currentEnemyDead++;
 				

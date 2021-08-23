@@ -5,6 +5,7 @@
 #include "Goei.h"
 #include "Galagas.h"
 #include <Physics/Components/Box2DComponent.h>
+#include <Random/Random.h>
 //#include "MyComponents.h"
 
 EnemyManager::EnemyManager()
@@ -179,6 +180,20 @@ void EnemyManager::Hide(SLD::WorldEntity& world, SLD::GameObjectId id)
 		}
 		
 	}
+}
+
+SLD::GameObjectId EnemyManager::GiveRandomType(SLD::WorldEntity& world , EnemyType type)
+{
+	int rand{};
+	while(true)
+	{
+		rand = SLD::Random::RandInt(0, int(m_EnemyInstances[type].size()) - 1);
+		EnemyTag* tag{world.GetComponent<EnemyTag>(m_EnemyInstances[type][rand]->GetId())};
+		if (tag->state != EnemyStateNums::Died && tag->state != EnemyStateNums::Dive)
+			break;
+	}
+	
+	return m_EnemyInstances[type][rand]->GetId();
 }
 
 void EnemyManager::Reset()

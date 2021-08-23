@@ -30,7 +30,7 @@ private:
 
 
 	SharedPtr<ReturnToMenu> m_OnReturnToMenu;
-	size_t m_MaxPlayerCount{ 2 };
+	size_t m_MaxPlayerCount{ 1 };
 	size_t m_CurrentSelectedPlayerStyle{};
 
 };

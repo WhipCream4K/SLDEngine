@@ -2,6 +2,7 @@
 //
 
 #include "GalagaScene.h"
+#include <vld.h>
 #include <Tracer/minitrace.h>
 
 int main()

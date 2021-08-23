@@ -58,7 +58,7 @@ void Galagas::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 	int startHealth{ 2 };
 	gameObject->AddComponent<HealthComponent>({ startHealth });
 
-	const float speed{ 1000.0f };
+	const float speed{ 210.0f };
 	gameObject->AddComponent<SpeedComponent>({ speed });
 
 	gameObject->AddComponent<FlyInComponent>({ Instance<EnemyPath>()->GetPath(m_SpawnDirection) });

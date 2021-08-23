@@ -115,6 +115,7 @@ struct DiveComponent : SLD::ComponentT<DiveComponent>
 
 	int currentWayPoint;
 	rtm::float3f initialPosition;
+	std::future<std::vector<rtm::float2f>> calculateWay;
 };
 
 struct FormationComponent : SLD::ComponentT<FormationComponent>

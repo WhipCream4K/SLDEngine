@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "OnPlayerDead.h"
 #include <Helpers/utils.h>
+#include <Random/Random.h>
 
 SharedPtr<GameState> PlayState::HandleInput(SLDWorldEntity& world, GameStateComponent* game)
 {
@@ -33,17 +34,17 @@ SharedPtr<GameState> PlayState::HandleInput(SLDWorldEntity& world, GameStateComp
 		return Interval;
 	}
 
-	
+
 	if (game->currentPlayerLives <= 0)
 		return End;
 
-	if(game->isInMidStage)
+	if (game->isInMidStage)
 	{
 		if (game->activeEnemies.empty())
 			return Interval;
 	}
-	
-	
+
+
 	return {};
 }
 
@@ -68,9 +69,9 @@ void PlayState::Update(SLDWorldEntity& world, float dt, GameStateComponent* game
 		if (!game->isFormationLocked)
 			SignalEnemyLockedFormation(world, game);
 
-		if (!game->isPlayerDead)
-			RandomizeDive(world, game);
-		else
+		if (!game->isPlayerDead && game->isFormationLocked)
+			RandomizeDive(world,dt, game);
+		if (game->isPlayerDead)
 			SpawnPlayer(world, game);
 	}
 }
@@ -87,7 +88,7 @@ void PlayState::Enter(SLDWorldEntity& world, GameStateComponent* game)
 	if (!game->isPlayerSet)
 	{
 		game->isPlayerSet = true;
-		
+
 		// Spawn Player Once
 		const rtm::float3f playerSpawnPoint{ 0.0f,-260.0f,float(size_t(GalagaScene::Layer::Player)) };
 		const auto id = InstantiatePrefab<Player>(world, { game->playerIndex }, playerSpawnPoint);
@@ -171,7 +172,7 @@ void PlayState::SpawnEnemySection(SLD::WorldEntity& world, float dt, const Spawn
 				const auto& spawnEnemy{ enemyTypes[m_BusCounter] };
 				const auto& startPoint{ m_pSpawnPaths->at(size_t(dir))[0] };
 
-				game->activeEnemies.emplace_back(enemyManager->Spawn(world, { startPoint.x,startPoint.y,enemyLayer }, spawnEnemy, dir,EnemyStateNums::FlyIn));
+				game->activeEnemies.emplace_back(enemyManager->Spawn(world, { startPoint.x,startPoint.y,enemyLayer }, spawnEnemy, dir, EnemyStateNums::FlyIn));
 
 			}
 
@@ -211,8 +212,36 @@ void PlayState::SignalEnemyLockedFormation(SLD::WorldEntity& world, GameStateCom
 	}
 }
 
-void PlayState::RandomizeDive(SLD::WorldEntity&, GameStateComponent*)
+void PlayState::RandomizeDive(SLD::WorldEntity& world, float dt,GameStateComponent*)
 {
+	using namespace SLD;
+
+	// goei row 1 - 2
+	// zako row 3 - 4
+	// galagas row 0
+
+	if (m_DiveTimer < m_DiveMaxTimer)
+	{
+		m_DiveTimer += dt;
+	}
+	else
+	{
+		m_DiveTimer -= m_DiveMaxTimer;
+		
+		SLD::GameObjectId randZako = Instance<EnemyManager>()->GiveRandomType(world,EnemyType::Zako);
+		EnemyTag* tag{ world.GetComponent<EnemyTag>(randZako) };
+		if (tag)
+		{
+			DiveComponent* diveIn{ world.GetComponent<DiveComponent>(randZako) };
+			TransformComponent* transform{ world.GetComponent<TransformComponent>(randZako) };
+			if (diveIn)
+			{
+				diveIn->initialPosition = transform->GetWorldPos();
+			}
+
+			tag->state = EnemyStateNums::Dive;
+		}
+	}
 
 }
 
@@ -271,7 +300,7 @@ void PlayState::Clear(SLD::WorldEntity& world, GameStateComponent* game)
 		EnemyTag* tag{ world.GetComponent<EnemyTag>(id) };
 		if (tag)
 			tag->state = EnemyStateNums::Died;
-		
+
 		Instance<EnemyManager>()->Hide(world, id);
 	}
 

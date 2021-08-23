@@ -21,9 +21,9 @@ private:
 	void SpawnEnemy(SLD::WorldEntity& world, float dt, int stage, GameStateComponent* game);
 	void SpawnEnemySection(SLD::WorldEntity&, float dt, const SpawnData& section, GameStateComponent* game);
 	void SignalEnemyLockedFormation(SLD::WorldEntity& world, GameStateComponent* game);
-	void RandomizeDive(SLD::WorldEntity& world, GameStateComponent* game);
-	void SpawnPlayer(SLD::WorldEntity& world,GameStateComponent* game);
-	void Clear(SLD::WorldEntity& world,GameStateComponent* game);
+	void RandomizeDive(SLD::WorldEntity& world, float dt, GameStateComponent* game);
+	void SpawnPlayer(SLD::WorldEntity& world, GameStateComponent* game);
+	void Clear(SLD::WorldEntity& world, GameStateComponent* game);
 
 	const StageSpawnData* m_pSpawnData{};
 	const SpawnPaths* m_pSpawnPaths{};
@@ -36,10 +36,14 @@ private:
 	float m_WaveTimer{};
 	float m_SpawnTimer{};
 
+	float m_DiveTimer{};
+	float m_DiveMaxTimer{ 4.0f };
+
 	size_t m_BusCounter{};
 	size_t m_SectionCounter{};
 
 	bool m_IsSpawning{};
+	bool m_Test{};
 	std::future<void> m_WaitForSignal{};
 };
 

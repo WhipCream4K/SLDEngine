@@ -98,7 +98,7 @@ void GameModeSystem::SpawnMenu()
 	if (font && mainSprite)
 	{
 		const std::string playOnString{ "1 Player" };
-		const std::string playOnString2{ "2 Players" };
+		//const std::string playOnString2{ "2 Players" };
 		const size_t fontSize{ 30 };
 
 		const auto player1Object{ GameObject::Create(m_World) };
@@ -108,11 +108,11 @@ void GameModeSystem::SpawnMenu()
 
 		const auto& player1Transform{ player1Object->GetComponent<TransformComponent>() };
 
-		const auto player2Object{ GameObject::Create(m_World) };
-		m_Player2Text = player2Object->GetId();
-		player2Object->AddComponent<TextRenderComponent>({ font,playOnString2,fontSize });
+		//const auto player2Object{ GameObject::Create(m_World) };
+		//m_Player2Text = player2Object->GetId();
+		//player2Object->AddComponent<TextRenderComponent>({ font,playOnString2,fontSize });
 
-		player2Object->GetComponent<TransformComponent>()->Translate(0.0f, -float(fontSize), 1.0f);
+		//player2Object->GetComponent<TransformComponent>()->Translate(0.0f, -float(fontSize), 1.0f);
 
 		const Vector4<uint32_t> rect{ 289,136,16,16 };
 

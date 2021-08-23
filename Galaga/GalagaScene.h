@@ -23,9 +23,9 @@ public:
 	enum class Layer
 	{
 		Background,
-		Particle,
 		Enemy,
-		Player
+		Player,
+		Particle
 	};
 	
 	GalagaScene();
