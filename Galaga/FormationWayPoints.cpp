@@ -1,4 +1,5 @@
 #include "FormationWayPoints.h"
+#include "EnemyPath.h"
 
 FormationWayPoints::FormationWayPoints(const LineWayPoints& lines)
 	: m_WayPoints(lines)
@@ -8,8 +9,6 @@ FormationWayPoints::FormationWayPoints(const LineWayPoints& lines)
 
 LineWayPoints& FormationWayPoints::GetWayPoints()
 {
-
-
 	return m_WayPoints;
 }
 
@@ -26,4 +25,9 @@ void FormationWayPoints::SetLock(bool value)
 bool FormationWayPoints::IsLocked() const
 {
 	return m_IsLocked;
+}
+
+void FormationWayPoints::Reset()
+{
+	m_WayPoints = SLD::Instance<EnemyPath>()->GetFormationWayPoints();
 }

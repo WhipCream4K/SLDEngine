@@ -2,6 +2,7 @@
 #include "Components/InputComponent.h"
 #include "BulletManager.h"
 #include "ShootableComponent.h"
+#include "OnPlayerShoot.h"
 
 PlayerInputSystem::PlayerInputSystem(SLD::WorldEntity& world)
 	: SystemTemplate(world,SLD::PipelineLayer::OnFixedUpdate)
@@ -27,7 +28,10 @@ void PlayerInputSystem::OnUpdate(SLD::GameObjectId gameObjectId, float deltaTime
 
 		ShootableComponent* shooter{ m_World.GetComponent<ShootableComponent>(gameObjectId) };
 		if (shooter)
+		{
 			shooter->Shoot(m_World, barrelPoint,{0.0f,1.0f});
+			m_World.BroadCast<OnPlayerShoot>(gameObjectId);
+		}
 	}
 
 	box2d->SetVelocity({ speed->value * deltaTime * axisX,speed->value * deltaTime * axisY });

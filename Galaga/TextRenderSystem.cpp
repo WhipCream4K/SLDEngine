@@ -13,6 +13,7 @@ void TextRenderSystem::OnRender(const SharedPtr<SLD::Window>& renderWindow, SLD:
 #ifdef SLD_SUPPORT_SFML
 	
 	sf::Text some{ textComponent->text.c_str(),*textComponent->font,unsigned(textComponent->fontSize) };
+	some.setFillColor(textComponent->color);
 	renderWindow->GetNativeWindowHandle()->draw(some, SFMLTextToSystemPos(renderWindow, &some, transform));
 	
 #endif

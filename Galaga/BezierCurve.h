@@ -24,7 +24,7 @@ struct BezierCurve
 		const auto endVec{ rtm::vector_load2(&endPoint) };
 
 		const auto v1 = rtm::vector_mul(startVec, uCube);
-		const auto v2 = rtm::vector_mul(controlStartVec, 3 * uCube * t);
+		const auto v2 = rtm::vector_mul(controlStartVec, 3 * uSqr * t);
 		const auto v3 = rtm::vector_mul(controlEndVec, 3 * u * tSqr);
 		const auto v4 = rtm::vector_mul(endVec, tCube);
 

@@ -26,5 +26,6 @@ private:
 	int m_HopCount;
 	int m_HopMax;
 	int m_Swap;
+	int m_SpreadSwap{1};
 };
 

@@ -1,0 +1,327 @@
+{
+    "1": [
+        {
+            "Section": [
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                },
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 2,
+                    "Types": [
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 3,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        }
+    ],
+    "2": [
+        {
+            "Section": [
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                },
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 0.3
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 2,
+                    "Types": [
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly",
+                        "Boss",
+                        "Butterfly",
+                        "boss"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 3,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        }
+    ],
+    "3": [
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                },
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 0.3
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 2,
+                    "Types": [
+                        "Boss",
+                        "Boss",
+                        "Boss",
+                        "Boss"
+                    ]
+                },
+                {
+                    "Direction": 3,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 2,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                },
+                {
+                    "Direction": 3,
+                    "Types": [
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly",
+                        "Butterfly"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                },
+                {
+                    "Direction": 1,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        },
+        {
+            "Section": [
+                {
+                    "Direction": 0,
+                    "Types": [
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee",
+                        "Bee"
+                    ]
+                }
+            ],
+            "Interval": 3.0
+        }
+    ]
+}

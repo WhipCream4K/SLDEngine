@@ -9,6 +9,7 @@
 #include "ResourceManager.h"
 #include "ShootableComponent.h"
 #include "CollisionGroup.h"
+#include "OnObjectHit.h"
 #include "ParticleManager.h"
 
 Player::Player(size_t playerIndex)
@@ -27,12 +28,12 @@ void Player::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 
 	auto& world{ gameObject->GetWorld() };
 
-	sf::Texture* mainTexture{ Instance<ResourceManager>()->Get<sf::Texture>(GalagaScene::MainSpriteSheet) };
+	sf::Texture* mainTexture{ Instance<ResourceManager>()->Get<sf::Texture>("Player")};
 
 	if (mainTexture)
 	{
 		m_Instance->AddComponent<SpriteRenderComponent>({
-			*mainTexture,PlayerSpriteRect,GalagaScene::GlobalScale,{0.5f,0.5f} });
+			*mainTexture,{0,0,16,16},GalagaScene::GlobalScale,{0.5f,0.5f} });
 	}
 
 	const float objectWidth{ PlayerSpriteRect.z * GalagaScene::GlobalScale.x };
@@ -57,9 +58,11 @@ void Player::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 
 	const float reloadTime{ 0.3f };
 	m_Instance->AddComponent<InputListener>({ m_PlayerIndex });
-	m_Instance->AddComponent<ShootableComponent>({ CollisionGroup::mPlayer,reloadTime });
-	m_Instance->AddComponent<SpeedComponent>({ 1000.0f });
+	m_Instance->AddComponent<ShootableComponent>({ CollisionGroup::mPlayer,reloadTime,2 });
+	m_Instance->AddComponent<SpeedComponent>({ 200.0f });
 	m_Instance->AddComponent<PlayerTag>();
+
+	m_Instance->AddComponent<OnHitCommand>({std::make_shared<PlayerOnHit>()});
 }
 
 SLD::GameObjectId Player::GetPlayerId() const

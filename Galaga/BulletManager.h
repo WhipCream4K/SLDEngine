@@ -5,7 +5,7 @@
 
 #include "CollisionGroup.h"
 
-constexpr size_t MaximumBullet{ 5 };
+constexpr size_t MaximumBullet{ 2 };
 
 class BulletManager final : public SLD::Singleton<BulletManager>
 {
@@ -18,7 +18,7 @@ public:
 		const rtm::float3f& spawnPoint,
 		const rtm::float2f& shootDir);
 
-	void Spawn(
+	SLD::GameObjectId Spawn(
 		SLD::WorldEntity& world,
 		const rtm::float3f& spawnPoint,
 		const rtm::float2f& shootDir,

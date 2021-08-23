@@ -2,9 +2,10 @@
 
 #include <SLDFramework.h>
 
-struct GameStateComponent;
+//struct GameStateComponent;
 class OnPlayerDead : public SLD::ListenerT<SLD::GameObjectId,bool>
 {
-	
+public:
+	OnPlayerDead();
 };
 

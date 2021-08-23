@@ -13,9 +13,11 @@ public:
 
 private:
 
+	
 	SLD::GameObjectId m_Player1Text{};
 	SLD::GameObjectId m_Player2Text{};
 	SLD::GameObjectId m_Pointer{};
+	
 	size_t m_MaxPlayerCount;
 	size_t m_CurrentSelectedPlayerStyle{};
 };

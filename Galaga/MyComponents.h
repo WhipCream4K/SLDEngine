@@ -2,6 +2,9 @@
 
 #include <SFML/Graphics.hpp>
 #include <Components/BaseComponent.h>
+
+#include "OnObjectHit.h"
+
 //#include <Math/RealTimeMath.h>
 
 struct SpriteRenderComponent : SLD::ComponentT<SpriteRenderComponent>
@@ -41,21 +44,12 @@ struct SpriteRenderComponent : SLD::ComponentT<SpriteRenderComponent>
 
 struct TextRenderComponent : SLD::ComponentT<TextRenderComponent>
 {
-	//TextRenderComponent(const SharedPtr<sf::Font>& font, const std::string& string,size_t fontSizePixel)
-	//	: text(std::make_shared<sf::Text>(string, *font, unsigned(fontSizePixel)))
-	//{
-	//}
-
-	//TextRenderComponent(const sf::Font& font,const std::string& string,size_t fontSizePixel)
-	//	: text(std::make_shared<sf::Text>(string,font, unsigned(fontSizePixel)))
-	//{
-	//}
 
 	TextRenderComponent(sf::Font* font, const std::string& string, size_t fontSizePixel)
 		: text(string)
 		, font(font)
-		, color()
-		, fontSize(fontSizePixel)	
+		, fontSize(fontSizePixel)
+		, color(255, 255, 255)
 	{
 	}
 
@@ -79,10 +73,12 @@ struct HealthComponent : SLD::ComponentT<HealthComponent>
 {
 	HealthComponent(int startHealth)
 		: health(startHealth)
+		, maxHealth(startHealth)
 	{
 	}
 
 	int health{};
+	int maxHealth{};
 };
 
 enum class SpawnDirection
@@ -107,6 +103,18 @@ struct FlyInComponent : SLD::ComponentT<FlyInComponent>
 	const std::vector<rtm::float2f>& carryPath;
 	SpawnDirection spawnDirection;
 	int currentWayPoint;
+};
+
+struct DiveComponent : SLD::ComponentT<DiveComponent>
+{
+	DiveComponent()
+		: currentWayPoint()
+		, initialPosition()
+	{
+	}
+
+	int currentWayPoint;
+	rtm::float3f initialPosition;
 };
 
 struct FormationComponent : SLD::ComponentT<FormationComponent>
@@ -165,6 +173,7 @@ enum class EnemyStateNums
 {
 	FlyIn,
 	Formation,
+	ReadyToDive,
 	Dive,
 	Died
 };
@@ -187,7 +196,7 @@ struct BreakawayTendency
 		: percent(breakPercent)
 	{
 	}
-	
+
 	float percent;
 };
 
@@ -202,6 +211,47 @@ struct EnemyTag : SLD::ComponentT<EnemyTag>
 	EnemyType type;
 	EnemyStateNums state;
 };
+
+struct ScoreComponent : SLD::ComponentT<ScoreComponent>
+{
+	ScoreComponent(int score)
+		: value(score)
+	{
+	}
+
+	int value;
+};
+
+//class OnObjectHit;
+struct OnHitCommand : SLD::ComponentT<OnHitCommand>
+{
+	OnHitCommand(const SharedPtr<OnObjectHit>& hit)
+		: onHit(hit)
+	{
+	}
+	
+	SharedPtr<OnObjectHit> onHit;
+};
+
+//struct TendencyToShoot : SLD::ComponentT<TendencyToShoot>
+//{
+//	TendencyToShoot(int percent)
+//		: value(percent)
+//	{
+//	}
+//
+//	int value;
+//};
+//
+//struct TendencyToDive : SLD::ComponentT<TendencyToDive>
+//{
+//	TendencyToDive(int percent)
+//		: value(percent)
+//	{
+//	}
+//
+//	int value;
+//};
 
 struct PlayerTag : SLD::ComponentT<PlayerTag>
 {

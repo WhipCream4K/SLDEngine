@@ -9,8 +9,9 @@ class ShootableComponent : SLD::ComponentT<ShootableComponent>
 public:
 
 	ShootableComponent(CollisionGroup group, float reloadTime);
+	ShootableComponent(CollisionGroup group, float reloadTime, int magazine);
 	
-	void Shoot(
+	bool Shoot(
 		SLD::WorldEntity& world,
 		const rtm::float3f& from,
 		const rtm::float2f& dir);
@@ -18,11 +19,15 @@ public:
 	bool ShouldReload() const;
 	float GetReloadTime() const;
 	void SetReloadFinished();
+	int GetShotsCount() const;
 
 private:
-	
+
+	std::vector<SLD::GameObjectId> m_Magazine{};
 	float m_ReloadTime{};
-	bool m_ShouldReload{};
+	int m_ShotsTracker{};
 	CollisionGroup m_ShooterGroup;
+	bool m_ShouldReload{};
+	bool m_UseMagazine{};
 };
 

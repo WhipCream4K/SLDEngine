@@ -4,7 +4,7 @@
 
 void SpawnStages::Initialize()
 {
-	const std::string spawnDataPath{ "./Resources/Mapfiles/EnemySpawnStage.json" };
+	const std::string spawnDataPath{ "./Resources/Mapfiles/EnemySpawnStage-1.json" };
 	std::ifstream spawnDataFile{ spawnDataPath };
 
 	nlohmann::json parser{};

@@ -6,6 +6,7 @@ class IntervalState :
 {
 public:
 
+	IntervalState() = default;
 	SharedPtr<GameState> HandleInput(SLDWorldEntity&, GameStateComponent*) override;
 	void Update(SLDWorldEntity&, float, GameStateComponent*) override;
 	void Enter(SLDWorldEntity&, GameStateComponent*) override;
@@ -13,11 +14,13 @@ public:
 
 private:
 
+	void InitializedHUD(SLD::WorldEntity&,GameStateComponent*);
+
 	SLD::GameObjectId m_StageText{};
 	SLD::GameObjectId m_ReadyText{};
 
 	float m_DisplayTimer{};
-	float m_MaxDisplayTime{};
+	float m_MaxDisplayTime{5.0f};
 	bool m_FinishedDisplay{};
 };
 

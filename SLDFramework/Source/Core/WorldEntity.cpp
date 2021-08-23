@@ -675,6 +675,22 @@ size_t SLD::WorldEntity::GetOffsetOfComponent(const SharedPtr<Archetype>& archet
 	return offset;
 }
 
+void SLD::WorldEntity::RegisterListener(const SharedPtr<Listener>& instance)
+{
+	const auto findIter = std::find_if(m_Listeners.begin(), m_Listeners.end(), [instance](const WeakPtr<Listener>& listener)
+		{
+			if (!listener.expired())
+				return listener.lock() == instance;
+		
+			return false;
+		});
+
+	if(findIter == m_Listeners.end())
+	{
+		m_Listeners.push_back(instance);
+	}
+}
+
 void SLD::WorldEntity::UpdatePipeline(PipelineLayer layer, float deltatime)
 {
 	for (const auto& system : m_SystemMap[size_t(layer)])

@@ -16,6 +16,8 @@ public:
 	
 	SLD::GameObjectId Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type, SpawnDirection dir);
 	SLD::GameObjectId Spawn(SLD::WorldEntity& world, const rtm::float3f& pos, EnemyType type, SpawnDirection dir, EnemyStateNums state);
+	void Hide(SLD::WorldEntity& world,SLD::GameObjectId id);
+	void Reset();
 
 private:
 

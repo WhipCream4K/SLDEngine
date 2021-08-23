@@ -3,24 +3,33 @@
 #include "GalagaScene.h"
 #include "EnemyStateSystem.h"
 #include <Helpers/utils.h>
-
+#include "OnPlayerDead.h"
+#include "OnEnemyDead.h"
+#include "GameStateManager.h"
+#include "GameState.h"
+#include "OnPlayerShoot.h"
 #include "Player.h"
 
 GameStateSystem::GameStateSystem(SLDWorldEntity& world)
 	: SystemTemplate(world)
+	, m_OnPlayerDead(std::make_shared<OnPlayerDead>())
+	, m_OnEnemyDead(std::make_shared<OnEnemyDead>())
+	, m_OnPlayerShoot(std::make_shared<OnPlayerShoot>())
 {
-	//OnPlayerDead->Bind([this](bool holder) { PlayerDead(holder); });
+	m_OnPlayerDead->Bind([this](SLD::GameObjectId id, bool holder) { PlayerDead(id, holder); });
+	m_OnEnemyDead->Bind([this](SLD::GameObjectId id) {EnemyDead(id); });
+	m_OnPlayerShoot->Bind([this](SLD::GameObjectId id) {PlayerShoot(id); });
+
+	world.RegisterListener(m_OnPlayerDead);
+	world.RegisterListener(m_OnEnemyDead);
+	world.RegisterListener(m_OnPlayerShoot);
 }
 
-GameStateSystem::GameStateSystem(SLD::WorldEntity& world, SLD::GameObjectId gameStateObject)
-	: SystemTemplate(world)
-	, m_GameStateObject(gameStateObject)
+void GameStateSystem::OnUpdate(SLD::GameObjectId, float dt, GameStateComponent* game)
 {
-	OnPlayerDead->Bind([this](SLD::GameObjectId playerId, bool holder) { PlayerDead(playerId, holder); });
-}
+	if (!game->isActive)
+		return;
 
-void GameStateSystem::OnUpdate(SLD::GameObjectId, float dt, GameStateComponent* game, InputListener*)
-{
 	const auto& oldState{ game->state };
 	const auto newState{ game->state->HandleInput(m_World,game) };
 
@@ -35,66 +44,104 @@ void GameStateSystem::OnUpdate(SLD::GameObjectId, float dt, GameStateComponent* 
 	game->state->Update(m_World, dt, game);
 }
 
-void GameStateSystem::PlayerDead(SLD::GameObjectId, bool)
+void GameStateSystem::PlayerDead(SLD::GameObjectId playerId, bool)
 {
-	if(GameStateComponent * gameState{ m_World.GetComponent<GameStateComponent>(m_GameStateObject) }; 
-		gameState)
+	const auto activeGameState = m_World.QueryGameObject<GameStateComponent>();
+
+	for (auto id : activeGameState)
 	{
-		gameState->playerDead = true;
+		if (GameStateComponent* gameState{ m_World.GetComponent<GameStateComponent>(id) };
+			gameState)
+		{
+			// the current one
+			if (gameState->isActive)
+			{
+				gameState->currentPlayerLives--;
+				gameState->isPlayerDead = true;
+
+				// Update player lives ( could seperate this too)
+				{
+					SpriteRenderComponent* playerLivesSprite{ m_World.GetComponent<SpriteRenderComponent>(gameState->attachedHUD.d_Lives) };
+					if (playerLivesSprite)
+					{
+						playerLivesSprite->sprite.setTextureRect({ 0,0,16 * gameState->currentPlayerLives,16 });
+					}
+				}
+
+				// Destroy?
+				{
+					m_World.DestroyGameObject(playerId);
+				}
+			}
+		}
 	}
 }
 
-void GameStateSystem::HandleMenuState(GameStateComponent* game)
+void GameStateSystem::EnemyDead(SLD::GameObjectId enemyId)
 {
-	// Spawn UI, background
-	using namespace SLD;
-	game;
-	//InputSettings& input{ m_World.GetWorldInputSetting() };
-	//if (input.GetInputState("Enter") == InputEvent::IE_Pressed)
-	//{
-	//	game->state = GameStateNum::Play;
-	//}
+	const auto activeGameState = m_World.QueryGameObject<GameStateComponent>();
+
+	for (auto id : activeGameState)
+	{
+		if (GameStateComponent* gameState{ m_World.GetComponent<GameStateComponent>(id) };
+			gameState)
+		{
+			// the current one
+			if (gameState->isActive)
+			{
+				gameState->activeEnemies.erase(
+					std::find(
+						gameState->activeEnemies.begin(),
+						gameState->activeEnemies.end(),
+						enemyId));
+
+				gameState->currentEnemyDead++;
+				
+				EnemyTag* tag{ m_World.GetComponent<EnemyTag>(enemyId) };
+				if (tag)
+				{
+					int earnedScore{};
+					bool isDiving{ tag->state == EnemyStateNums::Dive ? true : false };
+					switch (tag->type)
+					{
+					case EnemyType::Zako:		earnedScore = isDiving ? 100 : 50; break;
+					case EnemyType::Goei:		earnedScore = isDiving ? 160 : 80; break;
+					case EnemyType::Galagas:	earnedScore = isDiving ? 400 : 150; break;
+					default: break;
+					}
+
+					gameState->currentScore += earnedScore;
+
+					tag->state = EnemyStateNums::Died;
+				}
+
+				// Could have separate this
+				{
+					TextRenderComponent* scoreText{ m_World.GetComponent<TextRenderComponent>(gameState->attachedHUD.d_Score) };
+					if (scoreText)
+					{
+						scoreText->text = std::to_string(gameState->currentScore);
+					}
+				}
+			}
+		}
+	}
 }
 
-void GameStateSystem::HandlePlayState(GameStateComponent*)
+void GameStateSystem::PlayerShoot(SLD::GameObjectId)
 {
-	// Spawn player, enemy and etc...
-	using namespace SLD;
+	const auto activeGameState = m_World.QueryGameObject<GameStateComponent>();
 
-	//bool& isSpawn{ m_StateBits[size_t(GameStateNum::Play)] };
-	//if (!isSpawn)
-	//{
-	//	isSpawn = true;
-
-	//	auto& systems{ m_SystemStateArray[size_t(GameStateNum::Play)] };
-
-	//	const auto& enemyPath{ Instance<EnemyPath>() };
-	//	const auto formationTracker{ SLD::GameObject::Create(m_World) };
-	//	enemyPath->SetFormationTracker(formationTracker->GetId());
-	//	formationTracker->AddComponent<FormationWayPoints>({ Instance<EnemyPath>()->GetFormationWayPoints() });
-
-	//	systems.push_back(m_World.AddSystem<PlayerInputSystem>({ m_World }));
-	//	systems.push_back(m_World.AddSystem<OnBulletContact>({ m_World }));
-
-	//	const rtm::float4f playArea{ 0,0,550.0f,720.0f };
-	//	const float hopInterval{ 0.5f };
-
-	//	systems.push_back(m_World.AddSystem<LimitPlayerToPlayArea>({ m_World, playArea }));
-	//	systems.push_back(m_World.AddSystem<UpdateProjectile>({ m_World,1000.0f }));
-	//	systems.push_back(m_World.AddSystem<UpdateParticle>({ m_World }));
-	//	systems.push_back(m_World.AddSystem<ReloadShooter>({ m_World }));
-	//	systems.push_back(m_World.AddSystem<EnemySpawnerSystem>({ m_World }));
-	//	systems.push_back(m_World.AddSystem<EnemyStateSystem>({ m_World,formationTracker->GetId() }));
-
-
-	//	systems.push_back(m_World.AddSystem<UpdateFormationWayPoints>({ m_World,hopInterval }));
-
-
-	//	const rtm::float3f playerSpawnPoint{ 0.0f,-260.0f,float(size_t(GalagaScene::Layer::Player)) };
-	//	for (size_t i = 0; i < m_PlayerCount; ++i)
-	//	{
-	//		InstantiatePrefab<Player>(m_World, { i }, { playerSpawnPoint });
-	//	}
-
-	//}
+	for (auto id : activeGameState)
+	{
+		if (GameStateComponent* gameState{ m_World.GetComponent<GameStateComponent>(id) };
+			gameState)
+		{
+			// the current one
+			if (gameState->isActive)
+			{
+				gameState->shotCount++;
+			}
+		}
+	}
 }

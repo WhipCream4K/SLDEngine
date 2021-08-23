@@ -3,7 +3,7 @@
         {
             "Section": [
                 {
-                    "Direction": 0,
+                    "Direction": 1,
                     "Types": [
                         "Bee",
                         "Bee",
@@ -12,7 +12,7 @@
                     ]
                 },
                 {
-                    "Direction": 1,
+                    "Direction": 0,
                     "Types": [
                         "Butterfly",
                         "Butterfly",
@@ -39,7 +39,7 @@
                     ]
                 }
             ],
-            "Interval": 5.0
+            "Interval": 3.0
         },
         {
             "Section": [
@@ -57,7 +57,7 @@
                     ]
                 }
             ],
-            "Interval": 5.0
+            "Interval": 3.0
         },
         {
             "Section": [
@@ -75,7 +75,7 @@
                     ]
                 }
             ],
-            "Interval": 5.0
+            "Interval": 3.0
         },
         {
             "Section": [
@@ -93,7 +93,7 @@
                     ]
                 }
             ],
-            "Interval": 5.0
+            "Interval": 3.0
         }
     ]
 }

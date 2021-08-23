@@ -8,15 +8,22 @@
 #include "LimitPlayerToPlayArea.h"
 #include "UpdateProjectile.h"
 #include <Helpers/utils.h>
+#include "GameModeComponent.h"
 
 #include "ResourceManager.h"
 #include "HandleSpriteOutOfWindow.h"
 #include "GameStateSystem.h"
 #include "LineDebugDraw.h"
 #include "EnemyPath.h"
+#include "EnemyStateSystem.h"
+#include "GameModeSystem.h"
+#include "ReloadShooter.h"
 #include "SpawnStages.h"
 #include "TextRenderSystem.h"
+#include "UpdateFormationWayPoints.h"
+#include "UpdateParticle.h"
 #include "Tracer/minitrace.h"
+#include "ZakoDiveSystem.h"
 
 
 GalagaScene::GalagaScene()
@@ -33,41 +40,79 @@ void GalagaScene::WorldCreation()
 	SLD::WorldEntity& world{ m_Framework->GetDefaultWorldEntity() };
 
 	bool loadFileSuccess{};
+	const auto& resourceManager{ Instance<ResourceManager>() };
 
-	sf::Texture* mainTexture{ SLD::Instance<ResourceManager>()->Add<sf::Texture>(MainSpriteSheet,{}) };
-	sf::Texture* background{ SLD::Instance<ResourceManager>()->Add<sf::Texture>("Background",{}) };
+	sf::Texture* mainTexture{ resourceManager->Add<sf::Texture>(MainSpriteSheet,{}) };
+	sf::Texture* background{ resourceManager->Add<sf::Texture>("Background",{}) };
+	sf::Texture* player{ resourceManager->Add<sf::Texture>("Player",{}) };
+	sf::Texture* zako{ resourceManager->Add<sf::Texture>("Zako",{}) };
+	sf::Texture* goei{ resourceManager->Add<sf::Texture>("Goei",{}) };
+	sf::Texture* galagasGreen{ resourceManager->Add<sf::Texture>("GalagasYellow",{}) };
+	sf::Texture* galagasPurple{ resourceManager->Add<sf::Texture>("GalagasPurple",{}) };
+	sf::Texture* stage{ resourceManager->Add<sf::Texture>("Stage",{}) };
 
 	sf::Font* font{ Instance<ResourceManager>()->Add<sf::Font>(MainFont, {}) };
 
 	loadFileSuccess = mainTexture->loadFromFile("./Resources/SpriteSheet/GeneralSprite.png");
 	loadFileSuccess = background->loadFromFile("./Resources/SpriteSheet/BG.png");
-	loadFileSuccess = font->loadFromFile("./Resources/Fonts/VCR_OSD_MONO_1.001.ttf");
+	loadFileSuccess = player->loadFromFile("./Resources/SpriteSheet/rocket.png");
+	loadFileSuccess = zako->loadFromFile("./Resources/SpriteSheet/Blue Wings.png");
+	loadFileSuccess = goei->loadFromFile("./Resources/SpriteSheet/Red Wings.png");
+	loadFileSuccess = galagasGreen->loadFromFile("./Resources/SpriteSheet/Green.png");
+	loadFileSuccess = galagasPurple->loadFromFile("./Resources/SpriteSheet/Purple.png");
+	loadFileSuccess = stage->loadFromFile("./Resources/SpriteSheet/Flag.png");
+	loadFileSuccess = font->loadFromFile("./Resources/Fonts/PressStart2P-Regular.ttf");
 
 	if (loadFileSuccess)
 	{
-		const auto stateObject{ GameObject::Create(world) };
-		stateObject->AddComponent<InputListener>({ 0 });
-		GameStateComponent* gameState = stateObject->AddComponent<GameStateComponent>({ int(MaxEnemyCount),3 });
-
-		gameState->state = std::make_shared<MenuState>();
-		gameState->state->Enter(world,gameState);
+		// Set tiles for some texture
+		{
+			player->setRepeated(true);
+			stage->setRepeated(true);
+		}
+		
+		const auto gameModeObj{ GameObject::Create(world) };
+		gameModeObj->AddComponent<GameModeComponent>({});
 
 		const auto bg{ GameObject::Create(world) };
 		bg->GetComponent<TransformComponent>()->Translate(0.0f, 0.0f, float(Layer::Background));
 		bg->AddComponent<SpriteRenderComponent>({ *background,{0,0,200,256},GlobalScale });
 
+		world.AddSystem<GameModeSystem>(world);
+		world.AddSystem<GameStateSystem>(world);
 
 		world.AddSystem<SpriteRenderSystem>(world);
 		world.AddSystem<HandleSpriteOutOfWindow>({ world,{1280,720} });
-		world.AddSystem<GameStateSystem>({ world });
 		world.AddSystem<TextRenderSystem>(world);
+		world.AddSystem<ZakoDiveSystem>(world);
+
+
+		world.AddSystem<PlayerInputSystem>({ world });
+		world.AddSystem<OnBulletContact>({ world });
+
+		const rtm::float4f playArea{ 0,0,550.0f,720.0f };
+		const float hopInterval{ 0.5f };
+
+		world.AddSystem<LimitPlayerToPlayArea>({ world, playArea });
+		world.AddSystem<UpdateProjectile>({ world,360.0f });
+		world.AddSystem<UpdateParticle>({ world });
+		world.AddSystem<ReloadShooter>({ world });
+
+		world.AddSystem<UpdateFormationWayPoints>({ world,hopInterval });
 
 		Instance<EnemyPath>()->Initialize();
 		Instance<SpawnStages>()->Initialize();
-		
-#ifdef  _DEBUG
 
 		const auto& enemyPath{ Instance<EnemyPath>() };
+		const auto worldFormationTracker{ SLD::GameObject::Create(world) };
+		worldFormationTracker->AddComponent<FormationWayPoints>({ enemyPath->GetFormationWayPoints() });
+		enemyPath->SetFormationTracker(worldFormationTracker->GetId());
+		
+		world.AddSystem<EnemyStateSystem>({ world,worldFormationTracker->GetId() });
+
+#ifdef  _DEBUG
+
+		//const auto& enemyPath{ Instance<EnemyPath>() };
 
 		const auto testLine{ GameObject::Create(world) };
 		LineComponent* line{ testLine->AddComponent<LineComponent>() };
@@ -95,10 +140,10 @@ void GalagaScene::WorldCreation()
 
 		const auto& firstFormation{ enemyPath->GetFormationWayPoints()[4] };
 		line->points.insert(line->points.end(), firstFormation.begin(), firstFormation.end());
-		
+
 		world.AddSystem<LineDebugDraw>(world);
 		world.AddSystem<Box2DDebugDraw>(world);
-		
+
 #endif
 
 		// Set World input
@@ -128,9 +173,14 @@ void GalagaScene::WorldCreation()
 				{Key{InputDevice::D_Keyboard,sf::Keyboard::P}}
 			});
 
-		inputSettings.AddActionMapping("UI",
+		inputSettings.AddActionMapping("Select",
 			{
-				{Key{InputDevice::D_Keyboard,sf::Keyboard::Up}}
+				{Key{InputDevice::D_Keyboard,sf::Keyboard::LControl}}
+			});
+
+		inputSettings.AddActionMapping("Start",
+			{
+				{Key{InputDevice::D_Keyboard,sf::Keyboard::Enter}}
 			});
 
 	}

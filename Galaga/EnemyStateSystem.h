@@ -51,6 +51,14 @@ private:
 		SpeedComponent* speed,
 		EnemyTag* tag);
 
+	//void HandleFlyToFormationState(
+	//	float dt,
+	//	SLD::TransformComponent* transform,
+	//	SLD::Box2DComponent* box2d,
+	//	FormationComponent* formation,
+	//	SpeedComponent* speed,
+	//	EnemyTag* tag);
+
 	//void HandleDiveState(
 	//	float dt,
 	//	SLD::TransformComponent* transform,

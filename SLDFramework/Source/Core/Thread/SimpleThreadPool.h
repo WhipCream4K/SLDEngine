@@ -44,7 +44,7 @@ namespace SLD
 		}
 		else
 		{
-			task = std::move(std::packaged_task<Ret()>{std::forward<Func>(fn)});
+			task = std::move(std::packaged_task<Ret()>(std::forward<Func>(fn)));
 		}
 
 

@@ -57,5 +57,5 @@ void Bullet::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 		boxHeight
 		});
 	
-	gameObject->AddComponent<ProjectileComponent>({80000.0f,true});
+	gameObject->AddComponent<ProjectileComponent>({400.0f,true});
 }

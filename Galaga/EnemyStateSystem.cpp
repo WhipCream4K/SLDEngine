@@ -27,12 +27,16 @@ void EnemyStateSystem::OnUpdate(SLD::GameObjectId  , float deltaTime, SLD::Trans
 		
 		break;
 
+	case EnemyStateNums::ReadyToDive:
 	case EnemyStateNums::Formation:
 
 		HandleFormationState(deltaTime, transform, box2d, formation, speed, tag);
 
+		break;
+		
 	case EnemyStateNums::Dive:
-			
+
+
 		break;
 	}
 }
@@ -72,6 +76,7 @@ void EnemyStateSystem::HandleFlyInState(float dt, SLD::TransformComponent* trans
 		}
 		else
 		{
+			flyIn->currentWayPoint = 0;
 			box2d->SetVelocity({ 0.0f,0.0f });
 			tag->state = EnemyStateNums::Formation;
 		}
@@ -116,7 +121,6 @@ void EnemyStateSystem::HandleFormationState(float dt, SLD::TransformComponent* t
 		else // Set the current transform to targetpos
 		{
 			box2d->SetPosition(targetSlot);
-			//box2d->GetBody()->SetTransform({ targetSlot.x,targetSlot.y }, 0.0f);
 		}
 	}
 }

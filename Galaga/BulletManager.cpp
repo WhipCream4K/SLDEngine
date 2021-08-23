@@ -13,6 +13,7 @@ void BulletManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& spawnPoin
 	GameObjectId bulletId{};
 
 	bulletId = m_Magazine[m_CurrentBulletSpawn % MaximumBullet];
+	
 	if (bulletId == 0)
 	{
 		bulletId = InstantiatePrefab<Bullet>(world, {}, spawnPoint);
@@ -29,9 +30,8 @@ void BulletManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& spawnPoin
 		if (!physicsBody->IsAwake())
 			physicsBody->SetAwake(true);
 
-		physicsBody->SetLinearVelocity({ 0.0f,0.0f });
 		physicsBody->SetTransform({ spawnPoint.x,spawnPoint.y }, 0.0f);
-		physicsBody->ApplyLinearImpulseToCenter({ shootDir.x * projectile->impulseForce,shootDir.y * projectile->impulseForce }, true);
+		physicsBody->SetLinearVelocity({ shootDir.x * projectile->impulseForce,shootDir.y * projectile->impulseForce });
 	}
 
 	m_CurrentBulletSpawn++;
@@ -40,7 +40,7 @@ void BulletManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& spawnPoin
 		m_CurrentBulletSpawn = 0;
 }
 
-void BulletManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& spawnPoint, const rtm::float2f& shootDir,
+SLD::GameObjectId BulletManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& spawnPoint, const rtm::float2f& shootDir,
 	CollisionGroup shootFrom)
 {
 	using namespace SLD;
@@ -53,7 +53,7 @@ void BulletManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& spawnPoin
 		bulletId = InstantiatePrefab<Bullet>(world, {}, spawnPoint);
 		m_Magazine[m_CurrentBulletSpawn] = bulletId;
 	}
-
+	
 	Box2DComponent* box{ world.GetComponent<Box2DComponent>(bulletId) };
 	ProjectileComponent* projectile{ world.GetComponent<ProjectileComponent>(bulletId) };
 
@@ -71,15 +71,17 @@ void BulletManager::Spawn(SLD::WorldEntity& world, const rtm::float3f& spawnPoin
 		newFilter.maskBits &= ~(CollisionGroup::Projectile | shootFrom);
 		
 		box->SetContactFilter(newFilter);
-		physicsBody->SetLinearVelocity({ 0.0f,0.0f });
 		physicsBody->SetTransform({ spawnPoint.x,spawnPoint.y }, 0.0f);
-		physicsBody->ApplyLinearImpulseToCenter({ shootDir.x * projectile->impulseForce,shootDir.y * projectile->impulseForce }, true);
+		physicsBody->SetLinearVelocity({ shootDir.x * projectile->impulseForce,shootDir.y * projectile->impulseForce });
+		//physicsBody->ApplyLinearImpulseToCenter({ shootDir.x * projectile->impulseForce,shootDir.y * projectile->impulseForce }, true);
 	}
 
 	m_CurrentBulletSpawn++;
 
 	if (m_CurrentBulletSpawn >= MaximumBullet)
 		m_CurrentBulletSpawn = 0;
+
+	return bulletId;
 }
 
 void BulletManager::Hide(SLDWorldEntity& world, SLD::GameObjectId id)

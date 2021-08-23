@@ -5,6 +5,7 @@
 #include <Components/TransformComponent.h>
 
 #include "CollisionGroup.h"
+#include "ShootableComponent.h"
 #include "Physics/Components/Box2DComponent.h"
 
 Goei::Goei(SpawnDirection dir)
@@ -36,8 +37,8 @@ void Goei::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 	bodyDef.type = b2_kinematicBody;
 	bodyDef.position = { worldPos.x,worldPos.y };
 
-	const float objectWidth{ GoeiRect.z * GalagaScene::GlobalScale.x };
-	const float objectHeight{ GoeiRect.a * GalagaScene::GlobalScale.y };
+	const float objectWidth{ float(GoeiRect.z) * 1.25f };
+	const float objectHeight{ float(GoeiRect.a) * 1.25f };
 
 	b2PolygonShape box{};
 	box.SetAsBox(objectWidth, objectHeight);
@@ -53,10 +54,10 @@ void Goei::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 	//gameObject->AddComponent<Box2DComponent>({ gameObject->GetWorld(),bodyDef,fixtureDef,box,objectWidth,objectHeight });
 	gameObject->AddComponent<Box2DComponent>({ gameObject->GetWorld(),bodyDef,fixtureDef,objectWidth,objectHeight });
 
-	sf::Texture* mainTexture{ Instance<ResourceManager>()->Get<sf::Texture>(GalagaScene::MainSpriteSheet) };
+	sf::Texture* mainTexture{ Instance<ResourceManager>()->Get<sf::Texture>("Goei") };
 
 	if (mainTexture)
-		gameObject->AddComponent<SpriteRenderComponent>({ *mainTexture,GoeiRect,GalagaScene::GlobalScale });
+		gameObject->AddComponent<SpriteRenderComponent>({ *mainTexture,{0,0,16,16},GalagaScene::GlobalScale });
 
 	gameObject->AddComponent<EnemyTag>({ EnemyType::Goei });
 
@@ -69,6 +70,12 @@ void Goei::OnCreate(const SharedPtr<SLD::GameObject>& gameObject)
 	gameObject->AddComponent<FlyInComponent>({ Instance<EnemyPath>()->GetPath(m_SpawnDirection) });
 
 	gameObject->AddComponent<FormationComponent>({ m_Row,m_Col });
+
+	gameObject->AddComponent<ScoreComponent>({ 80 });
+	
+	gameObject->AddComponent<ShootableComponent>({ CollisionGroup::Enemy,1.0f });
+	gameObject->AddComponent<DiveComponent>();
+	gameObject->AddComponent<OnHitCommand>({std::make_shared<EnemyHit>()});
 }
 
 const SharedPtr<SLD::GameObject>& Goei::GetGameObject() const

@@ -4,6 +4,7 @@
 #include "Zako.h"
 #include "Goei.h"
 #include "Galagas.h"
+#include <Physics/Components/Box2DComponent.h>
 //#include "MyComponents.h"
 
 EnemyManager::EnemyManager()
@@ -52,8 +53,8 @@ SLD::GameObjectId EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3
 		break;
 		case EnemyType::Galagas:
 		{
-			SharedPtr<Goei> galagas{};
-			InstantiatePrefab<Goei>(world, { dir,row,col }, pos, galagas);
+			SharedPtr<Galagas> galagas{};
+			InstantiatePrefab<Galagas>(world, { dir,row,col }, pos, galagas);
 
 			m_EnemyInstances[type].emplace_back(galagas->GetGameObject());
 
@@ -90,7 +91,7 @@ SLD::GameObjectId EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3
 
 	size_t& activeEnemyCnt{ m_ActiveEnemyCounter[type] };
 	const size_t maxEnemyCnt{ m_MaxEnemyCounter[type] };
-	const auto& [row, col] = m_EnemyRowColFormation[type][activeEnemyCnt];
+	const auto& [row, col] = m_EnemyRowColFormation[type][activeEnemyCnt % maxEnemyCnt];
 	SharedPtr<GameObject> instance{};
 	SLD::GameObjectId out{};
 
@@ -120,12 +121,12 @@ SLD::GameObjectId EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3
 		break;
 		case EnemyType::Galagas:
 		{
-			SharedPtr<Goei> goei{};
-			InstantiatePrefab<Goei>(world, { dir,row,col }, pos, goei);
+			SharedPtr<Galagas> galagas{};
+			InstantiatePrefab<Galagas>(world, { dir,row,col }, pos, galagas);
 
-			m_EnemyInstances[type].emplace_back(goei->GetGameObject());
+			m_EnemyInstances[type].emplace_back(galagas->GetGameObject());
 
-			instance = goei->GetGameObject();
+			instance = galagas->GetGameObject();
 		}
 
 		break;
@@ -154,6 +155,35 @@ SLD::GameObjectId EnemyManager::Spawn(SLD::WorldEntity& world, const rtm::float3
 	out = instance->GetId();
 	
 	return out;
+}
+
+void EnemyManager::Hide(SLD::WorldEntity& world, SLD::GameObjectId id)
+{
+	using namespace SLD;
+	
+	for (const auto& [type,enemyVector] : m_EnemyInstances)
+	{
+		const auto findIt = std::find_if(enemyVector.begin(), enemyVector.end(), [&id](const SharedPtr<SLD::GameObject>& instance)
+			{
+				return id == instance->GetId();
+			});
+
+		if(findIt != enemyVector.end())
+		{
+			Box2DComponent* box2d{ world.GetComponent<Box2DComponent>(id) };
+			if(box2d)
+			{
+				box2d->SetVelocity({ 0.0f,0.0f });
+				box2d->SetPosition({ 0.0f,-720.0f });
+			}
+		}
+		
+	}
+}
+
+void EnemyManager::Reset()
+{
+	m_ActiveEnemyCounter.clear();
 }
 
 void EnemyManager::InitializeRowCol()

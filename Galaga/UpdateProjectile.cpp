@@ -1,4 +1,4 @@
-#include "UpdateProjectile.h"
+ #include "UpdateProjectile.h"
 #include "BulletManager.h"
 
 UpdateProjectile::UpdateProjectile(SLD::WorldEntity& world, float upLimit)

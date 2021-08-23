@@ -5,12 +5,14 @@
 #include "PlayState.h"
 #include <Components/TransformComponent.h>
 
+#include "GameStateComponent.h"
+
 MenuState::MenuState()
 	: m_MaxPlayerCount(2)
 {
 }
 
-SharedPtr<GameState> MenuState::HandleInput(SLDWorldEntity& world,GameStateComponent*)
+SharedPtr<GameState> MenuState::HandleInput(SLDWorldEntity& world,GameStateComponent* )
 {
 	world;
 	using namespace SLD;
@@ -32,7 +34,21 @@ SharedPtr<GameState> MenuState::HandleInput(SLDWorldEntity& world,GameStateCompo
 	}
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter))
 	{
-		return std::make_shared<PlayState>();
+		if(m_CurrentSelectedPlayerStyle == 0)
+		{
+			// Initialize Single play
+			//game->playStyle = PlayStyle::Solo;
+			return std::make_shared<PlayState>();
+		}
+		else
+		{
+			// Initialize Coop play
+			//game->playStyle = PlayStyle::Coop;
+			//game->saveState = std::make_shared<PlayState>();
+			 //GameObject::Create(world);
+
+			return std::make_shared<PlayState>();
+		}
 	}
 	
 	
@@ -97,3 +113,4 @@ void MenuState::Exit(SLDWorldEntity& world, GameStateComponent*)
 	m_Player2Text = 0;
 	m_Pointer = 0;
 }
+

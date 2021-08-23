@@ -19,12 +19,12 @@ UpdateFormationWayPoints::UpdateFormationWayPoints(SLD::WorldEntity& world, floa
 	, m_HopInterval(hopTime)
 	, m_Timer()
 	, m_Step(15.0f)
-	, m_SpreadStep(15.0f)
+	, m_SpreadStep(10.0f)
+	, m_SpreadMaxCount(4)
+	, m_SpreadCount()
 	, m_HopCount()
 	, m_HopMax(3)
 	, m_Swap(1)
-	, m_SpreadCount()
-	, m_SpreadMaxCount(4)
 {
 }
 
@@ -66,26 +66,38 @@ void UpdateFormationWayPoints::BreathingWayPoints(FormationWayPoints* points)
 	{
 		float left{ -1.0f };
 		float right{ 1.0f };
-
+		
 		if (m_SpreadCount == m_SpreadMaxCount)
 		{
-			left = 1.0f;
-			right = -1.0f;
+			//left = 1.0f;
+			//right = -1.0f;
+			m_SpreadSwap *= -1;
 			m_SpreadCount = 0;
 		}
 
-		for (auto& line : points->GetWayPoints())
-		{
-			for (size_t i = 0; i < line.size(); ++i)
-			{
-				auto& point{ line[i] };
+		const int maxRow{ 5 };
 
-				if (i % 2 == 0) // odd goes right, even goes left
+		// the first row doesn't move
+
+		for (auto it = points->GetWayPoints().begin() + 1; it != points->GetWayPoints().end(); ++it)
+		{
+			float offset{ 1.0f / float(m_SpreadMaxCount) };
+			for (size_t i = 0; i < it->size(); ++i)
+			{
+				auto& point{ (*it)[i] };
+
+				if (i != 0 && i % 2 == 0)
 				{
-					point.x += m_SpreadStep * left;
+					//sideCnt++;
+					offset += 1.0f / float(m_SpreadMaxCount);
+				}
+				
+				if (i % 2 == 0) // odd goes left, even goes right
+				{
+					point.x += m_SpreadStep * right * offset * m_SpreadSwap;
 				}
 				else
-					point.x += m_SpreadStep * right;
+					point.x += m_SpreadStep * left * offset * m_SpreadSwap;
 			}
 		}
 

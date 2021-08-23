@@ -210,6 +210,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Random\Random.h" />
     <ClInclude Include="System\Listener.h" />
     <ClInclude Include="System\AsyncSystemT.h" />
     <ClInclude Include="Physics\Components\PhysicsUserData.h" />
@@ -331,6 +332,7 @@
     <ClInclude Include="Physics\System\WorldToPhysicsUpdate.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Random\Random.cpp" />
     <ClCompile Include="System\Listener.cpp" />
     <ClCompile Include="System\AsyncSystemT.cpp" />
     <ClCompile Include="Physics\System\ContactFilter.cpp" />

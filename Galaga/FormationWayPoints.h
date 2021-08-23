@@ -12,7 +12,7 @@ public:
 	void SetLinkTask(std::future<void>&& future);
 	void SetLock(bool value);
 	bool IsLocked() const;
-
+	void Reset();
 	
 
 private:

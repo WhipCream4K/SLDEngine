@@ -25,6 +25,9 @@
     <Filter Include="Systems">
       <UniqueIdentifier>{b4916e5a-6141-44ba-8679-367946b5bfe4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Listener">
+      <UniqueIdentifier>{5569ddf2-68f1-40e4-ab2f-5786e343f155}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Galaga.cpp">
@@ -150,14 +153,32 @@
     <ClCompile Include="SoloPlayState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OnPlayerDead.cpp">
+    <ClCompile Include="UpdateScore.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="EndState.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GoeiDiveSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="OnObjectHit.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="OnBodyContact.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="OnPlayerDead.cpp">
+      <Filter>Listener</Filter>
     </ClCompile>
     <ClCompile Include="OnFormationLocked.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OnObjectDead.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Listener</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,14 +329,44 @@
     <ClInclude Include="SoloPlayState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OnPlayerDead.h">
+    <ClInclude Include="UpdateScore.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="GameModeComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameModeSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="EndState.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GoeiDiveSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="OnObjectHit.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="OnBodyContact.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="OnPlayerDead.h">
+      <Filter>Listener</Filter>
+    </ClInclude>
+    <ClInclude Include="OnEnemyDead.h">
+      <Filter>Listener</Filter>
+    </ClInclude>
+    <ClInclude Include="HUD.h">
+      <Filter>Prefabs</Filter>
+    </ClInclude>
+    <ClInclude Include="OnPlayerShoot.h">
+      <Filter>Listener</Filter>
     </ClInclude>
     <ClInclude Include="OnFormationLocked.h">
-      <Filter>Header Files</Filter>
+      <Filter>Listener</Filter>
     </ClInclude>
-    <ClInclude Include="OnObjectDead.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ReturnToMenu.h">
+      <Filter>Listener</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

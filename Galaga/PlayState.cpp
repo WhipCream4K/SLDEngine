@@ -10,69 +10,89 @@
 #include "IntervalState.h"
 #include "OnFormationLocked.h"
 #include <Components/TransformComponent.h>
-
+#include "EndState.h"
 #include "EnemyStateSystem.h"
+#include "Player.h"
+#include "OnPlayerDead.h"
+#include <Helpers/utils.h>
 
-SharedPtr<GameState> PlayState::HandleInput(SLDWorldEntity& , GameStateComponent* game)
+SharedPtr<GameState> PlayState::HandleInput(SLDWorldEntity& world, GameStateComponent* game)
 {
-	if (game->currentEnemyCount <= 0)
+	using namespace SLD;
+
+	InputSettings& input{ world.GetWorldInputSetting() };
+
+	// For skipping if needed
+	if (input.GetInputState("Enter") == InputEvent::IE_Pressed)
 	{
 		game->currentStageCnt++;
+
+		if (game->currentStageCnt >= game->maxStage)
+			return End;
+
 		return Interval;
 	}
 
-	if(game->currentStageCnt >= game->maxStage)
-	{
-		m_ShouldRestart = true;
-		// TODO: return end screen
-		return {};
-	}
+	
+	if (game->currentPlayerLives <= 0)
+		return End;
 
+	if(game->isInMidStage)
+	{
+		if (game->activeEnemies.empty())
+			return Interval;
+	}
+	
+	
 	return {};
 }
 
 void PlayState::Update(SLDWorldEntity& world, float dt, GameStateComponent* game)
 {
-	SpawnEnemy(world, dt, game->currentStageCnt);
-	SignalEnemyLockedFormation(world);
+	if (!game->isInMidStage)
+	{
+		if (game->activeEnemies.size() < size_t(game->maxEnemyCount))
+		{
+			SpawnEnemy(world, dt, game->currentStageCnt, game);
+		}
+		else
+		{
+			game->isInMidStage = true;
+			m_SectionCounter = 0;
+		}
+	}
+	else
+	{
+		// Respawn maybe
+
+		if (!game->isFormationLocked)
+			SignalEnemyLockedFormation(world, game);
+
+		if (!game->isPlayerDead)
+			RandomizeDive(world, game);
+		else
+			SpawnPlayer(world, game);
+	}
 }
 
 void PlayState::Enter(SLDWorldEntity& world, GameStateComponent* game)
 {
 	using namespace SLD;
-	
+
 	m_pSpawnPaths = &Instance<EnemyPath>()->GetAllSpawnPaths();
 	m_pSpawnData = &Instance<SpawnStages>()->GetSpawnStage();
 
-	// Initialize system at the start
-	if(game->currentStageCnt == 0)
+	game->isStageStart = true;
+
+	if (!game->isPlayerSet)
 	{
-		auto& systems{ m_ExistSystem };
-		const auto& enemyPath{ Instance<EnemyPath>() };
-		const auto formationTracker{ SLD::GameObject::Create(world) };
-		enemyPath->SetFormationTracker(formationTracker->GetId());
-		formationTracker->AddComponent<FormationWayPoints>({ Instance<EnemyPath>()->GetFormationWayPoints() });
-		m_FormationTracker = formationTracker->GetId();
-
-		systems.push_back(world.AddSystem<PlayerInputSystem>({ world }));
-		systems.push_back(world.AddSystem<OnBulletContact>({ world }));
-
-		const rtm::float4f playArea{ 0,0,550.0f,720.0f };
-		const float hopInterval{ 0.5f };
-
-		systems.push_back(world.AddSystem<LimitPlayerToPlayArea>({ world, playArea }));
-		systems.push_back(world.AddSystem<UpdateProjectile>({ world,1000.0f }));
-		systems.push_back(world.AddSystem<UpdateParticle>({ world }));
-		systems.push_back(world.AddSystem<ReloadShooter>({ world }));
-		systems.push_back(world.AddSystem<EnemyStateSystem>({ world,formationTracker->GetId() }));
-
-
-		systems.push_back(world.AddSystem<UpdateFormationWayPoints>({ world,hopInterval }));
-
-
-		game->currentEnemyCount = 40;
+		game->isPlayerSet = true;
+		
+		// Spawn Player Once
+		const rtm::float3f playerSpawnPoint{ 0.0f,-260.0f,float(size_t(GalagaScene::Layer::Player)) };
+		const auto id = InstantiatePrefab<Player>(world, { game->playerIndex }, playerSpawnPoint);
+		game->playerId = id;
 	}
-
 }
 
 void PlayState::Exit(SLDWorldEntity& world, GameStateComponent* game)
@@ -83,79 +103,44 @@ void PlayState::Exit(SLDWorldEntity& world, GameStateComponent* game)
 	m_SectionCounter = 0;
 	m_IsSpawning = false;
 
-	if (m_ShouldRestart)
-	{
-		game->currentStageCnt = 0;
-		
-		m_ShouldRestart = false;
-		for (auto& system : m_ExistSystem)
-		{
-			world.RemoveSystem(system.lock());
-		}
+	game->isFormationLocked = false;
+	game->isInMidStage = false;
+	game->isStageStart = false;
 
-		m_SpawnEnemies.clear();
+	Clear(world, game);
+
+	game->activeEnemies.clear();
+
+	FormationWayPoints* formation = world.GetComponent<FormationWayPoints>(SLD::Instance<EnemyPath>()->GetFormationTracker());
+	if (formation)
+	{
+		formation->SetLock(false);
+		formation->Reset();
 	}
 }
 
-//void PlayState::DisplayInterval(SLDWorldEntity& world, float dt, int stageDisplay)
-//{
-//	using namespace SLD;
-//
-//	if (m_DisplayTimer < m_MaxDisplayTime)
-//	{
-//		m_DisplayTimer += dt;
-//
-//		TransformComponent* stageTransform{ world.GetComponent<TransformComponent>(m_StageText) };
-//		TextRenderComponent* stageText{ world.GetComponent<TextRenderComponent>(m_StageText) };
-//
-//		if (m_DisplayTimer < m_MaxDisplayTime / 2.0f)
-//		{
-//			// Display stage
-//			if (stageText)
-//			{
-//				const std::string stageCnt{ "Stage " + std::to_string(stageDisplay) };
-//				stageText->text.setString(stageCnt);
-//			}
-//
-//			stageTransform->Translate(0.0f, 100.0f, 1.0f);
-//		}
-//		else
-//		{
-//			// Hide old stage text
-//			stageTransform->Translate(0.0f, -720.0f, 0.0f);
-//			TransformComponent* readyTransform{ world.GetComponent<TransformComponent>(m_ReadyText) };
-//			readyTransform->Translate(0.0f, 100.0f, 1.0f);
-//		}
-//	}
-//	else
-//	{
-//		m_DisplayTimer -= m_MaxDisplayTime;
-//
-//		TransformComponent* readyTransform{ world.GetComponent<TransformComponent>(m_ReadyText) };
-//		readyTransform->Translate(0.0f, -720.0f, 0.0f);
-//
-//		m_DisplayInterval = false;
-//	}
-//}
-
-void PlayState::SpawnEnemy(SLD::WorldEntity& world, float dt, int stage)
+void PlayState::SpawnEnemy(SLD::WorldEntity& world, float dt, int stage, GameStateComponent* game)
 {
-	const auto& spawnData{ m_pSpawnData->at(stage) };
+	if (stage < game->maxStage)
+	{
+		const auto& spawnData{ m_pSpawnData->at(stage) };
 
-	if (m_SectionCounter < spawnData.size())
-	{
-		SpawnEnemySection(world,dt, spawnData[m_SectionCounter]);
-	}
-	else
-	{
-		// the whole wave has finished
-		// trigger should not spawn
-		m_SectionCounter = 0;
-		// signal that formation should lock
+		if (m_SectionCounter < spawnData.size())
+		{
+			SpawnEnemySection(world, dt, spawnData[m_SectionCounter], game);
+		}
+		else
+		{
+			// the whole wave has finished
+			// trigger should not spawn
+			m_SectionCounter = 0;
+			// signal that formation should lock
+			game->isInMidStage = true;
+		}
 	}
 }
 
-void PlayState::SpawnEnemySection(SLD::WorldEntity& world, float dt, const SpawnData& section)
+void PlayState::SpawnEnemySection(SLD::WorldEntity& world, float dt, const SpawnData& section, GameStateComponent* game)
 {
 	using namespace SLD;
 	constexpr float enemyLayer{ float(GalagaScene::Layer::Enemy) };
@@ -186,14 +171,12 @@ void PlayState::SpawnEnemySection(SLD::WorldEntity& world, float dt, const Spawn
 				const auto& spawnEnemy{ enemyTypes[m_BusCounter] };
 				const auto& startPoint{ m_pSpawnPaths->at(size_t(dir))[0] };
 
-				enemyManager->Spawn(world, { startPoint.x,startPoint.y,enemyLayer }, spawnEnemy, dir);
+				game->activeEnemies.emplace_back(enemyManager->Spawn(world, { startPoint.x,startPoint.y,enemyLayer }, spawnEnemy, dir,EnemyStateNums::FlyIn));
 
 			}
 
 			m_BusCounter++;
 		}
-
-
 	}
 	else
 	{
@@ -207,22 +190,90 @@ void PlayState::SpawnEnemySection(SLD::WorldEntity& world, float dt, const Spawn
 	}
 }
 
-void PlayState::SignalEnemyLockedFormation(SLD::WorldEntity& world)
+void PlayState::SignalEnemyLockedFormation(SLD::WorldEntity& world, GameStateComponent* game)
 {
-	bool flyIn{ false };
-	for (const auto& enemy : m_SpawnEnemies)
+	bool alreadyInformation{ true };
+	for (const auto& enemy : game->activeEnemies)
 	{
-		EnemyTag* tag{ world.GetComponent<EnemyTag>(enemy) };
-		if (tag->state == EnemyStateNums::FlyIn)
-			flyIn = true;
+		FormationComponent* formationComp{ world.GetComponent<FormationComponent>(enemy) };
+		if (!formationComp->alreadyInside)
+			alreadyInformation = false;
 	}
 
-	if(flyIn)
+	if (alreadyInformation)
 	{
-		FormationWayPoints* formation{ world.GetComponent<FormationWayPoints>(m_FormationTracker) };
-		if(formation)
+		FormationWayPoints* formation{ world.GetComponent<FormationWayPoints>(SLD::Instance<EnemyPath>()->GetFormationTracker()) };
+		if (formation)
 		{
 			formation->SetLock(true);
+			game->isFormationLocked = true;
 		}
 	}
+}
+
+void PlayState::RandomizeDive(SLD::WorldEntity&, GameStateComponent*)
+{
+
+}
+
+void PlayState::SpawnPlayer(SLD::WorldEntity& world, GameStateComponent* game)
+{
+	const auto parent{ game->parent };
+
+	if (!m_WaitForSignal.valid())
+	{
+		m_WaitForSignal = world.PushAsyncTask([&world, parent]()
+			{
+				while (true)
+				{
+					GameStateComponent* gameState{ world.GetComponent<GameStateComponent>(parent) };
+					if (gameState)
+					{
+						bool isAllInFormation{ false };
+						for (auto id : gameState->activeEnemies)
+						{
+							EnemyTag* tag{ world.GetComponent<EnemyTag>(id) };
+							if (tag)
+							{
+								if (tag->state == EnemyStateNums::Formation)
+									isAllInFormation = true;
+							}
+						}
+
+						if (isAllInFormation)
+							break;
+					}
+
+				}
+			});
+	}
+
+	if (m_WaitForSignal.valid())
+	{
+		if (m_WaitForSignal.wait_for(std::chrono::seconds{ 0 }) == std::future_status::ready)
+		{
+			m_WaitForSignal.get();
+
+			const rtm::float3f playerSpawnPoint{ 0.0f,-260.0f,float(size_t(GalagaScene::Layer::Player)) };
+			const auto id = SLD::InstantiatePrefab<Player>(world, { game->playerIndex }, playerSpawnPoint);
+			game->playerId = id;
+			game->isPlayerDead = false;
+		}
+	}
+}
+
+void PlayState::Clear(SLD::WorldEntity& world, GameStateComponent* game)
+{
+	using namespace SLD;
+
+	for (auto& id : game->activeEnemies)
+	{
+		EnemyTag* tag{ world.GetComponent<EnemyTag>(id) };
+		if (tag)
+			tag->state = EnemyStateNums::Died;
+		
+		Instance<EnemyManager>()->Hide(world, id);
+	}
+
+	Instance<EnemyManager>()->Reset();
 }

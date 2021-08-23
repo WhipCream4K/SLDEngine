@@ -183,6 +183,8 @@ namespace SLD
 		template<typename T>
 		EnableIsBasedOf<BaseComponent, T,T>* CallInterface();
 
+		void RegisterListener(const SharedPtr<Listener>& instance);
+		
 		template<typename T,typename ...Args>
 		EnableIsBasedOf<Listener, T> BroadCast(Args...);
 
@@ -599,7 +601,7 @@ namespace SLD
 		const size_t compId{ ComponentT<T>::GetId() };
 		std::vector<GameObjectId> out{};
 		
-		const std::string toKey{ std::to_string(compId) };
+		const std::string toKey{ std::to_string(compId) + '-'};
 		
 		for (const auto& [type,archetype] : m_ArchetypeBuffer[ObjectBuffer::Write])
 		{

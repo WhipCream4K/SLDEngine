@@ -1,6 +1,7 @@
 #include "EnemyPath.h"
 #include <fstream>
 #include <JSON/nlohmann/json.hpp>
+#include "FormationWayPoints.h"
 
 EnemyPath::EnemyPath()
 	: m_Paths()
@@ -111,7 +112,7 @@ const SpawnPaths& EnemyPath::GetAllSpawnPaths() const
 	return m_Paths;
 }
 
-const EnemyPath::FormationWayPoints& EnemyPath::GetFormationWayPoints() const
+const EnemyPath::LineWayPoints& EnemyPath::GetFormationWayPoints() const
 {
 	return m_LineFormationWayPoints;
 }
@@ -119,6 +120,20 @@ const EnemyPath::FormationWayPoints& EnemyPath::GetFormationWayPoints() const
 void EnemyPath::SetFormationTracker(SLD::GameObjectId id)
 {
 	m_FormationHolder = id;
+}
+
+void EnemyPath::TrackerPathReset(SLD::WorldEntity& world)
+{
+	auto* formation = world.GetComponent<FormationWayPoints>(m_FormationHolder);
+	if(formation)
+	{
+		formation->GetWayPoints() = GetFormationWayPoints();
+	}
+}
+
+void EnemyPath::Destroy(SLD::WorldEntity& world)
+{
+	world.DestroyGameObject(m_FormationHolder);
 }
 
 SLD::GameObjectId EnemyPath::GetFormationTracker() const
